@@ -11,6 +11,7 @@ import SignUpForm from "./components/auth/SignUpForm";
 import Dashboard from "./components/dashboard/Dashboard";
 import ProfilePage from "./components/ProfilePage";
 import Navbar from "./components/Navbar";
+import { Toaster } from "sonner";
 
 export default function App() {
   const { user, loading } = useAuth(); // ✅ FIXED: Changed from useAuthContext to useAuth
@@ -25,7 +26,9 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+  
+    <div className="min-h-screen bg-neutral-50">
+	<Toaster richColors position="top-right" />
       {/* Show navbar only if logged in */}
       {user && <Navbar />} {/* ✅ FIXED: Changed from session to user */}
 

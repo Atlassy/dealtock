@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../../supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import { Link, useNavigate } from "react-router-dom";
 import PasswordStrength from "./PasswordStrength";
 import { Eye, EyeOff } from "lucide-react";
@@ -20,6 +20,7 @@ export default function SignUpForm() {
   const moroccanCities = [
     "Casablanca",
     "Rabat",
+	"Salé",
     "Marrakech",
     "Fes",
     "Tangier",

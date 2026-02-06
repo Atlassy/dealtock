@@ -1,13 +1,14 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../contexts/SupabaseAuthContext";
+import { useAuth } from "@/contexts/SupabaseAuthContext";
 
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center text-gray-600">
-        Vérification de la session...
+      <div className="route-loading">
+        <div className="spinner" />
+        <p>Checking authentication...</p>
       </div>
     );
   }
