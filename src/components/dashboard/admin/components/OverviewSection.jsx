@@ -1,0 +1,274 @@
+﻿// src/components/dashboard/admin/components/OverviewSection.jsx
+import React, { useState } from "react";
+import { 
+  Package, 
+  Truck, 
+  Shield, 
+  DollarSign, 
+  TrendingUp,
+  Users,
+  Eye,
+  Percent,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  RefreshCw,
+  Activity
+} from "lucide-react";
+import { formatCurrency, formatDate } from '../utils/helpers';
+
+const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabChange }) => {
+  const [showAllActivity, setShowAllActivity] = useState(false);
+
+  const statCards = [
+    {
+      title: "Total Orders",
+      value: stats.totalOrders.toLocaleString(),
+      icon: Package,
+      color: "bg-blue-500",
+      trend: "+12%",
+      trendUp: true,
+      description: `${stats.deliveredOrders} delivered`
+    },
+    {
+      title: "Pending Escrows",
+      value: stats.pendingEscrows,
+      icon: Shield,
+      color: "bg-yellow-500",
+      amount: formatCurrency(stats.totalEscrowAmount),
+      description: "Awaiting release"
+    },
+    {
+      title: "Active Deliveries",
+      value: stats.activeDeliveries,
+      icon: Truck,
+      color: "bg-green-500",
+      description: `${stats.shippedOrders} orders in transit`
+    },
+    {
+      title: "Total Revenue",
+      value: formatCurrency(stats.totalRevenue),
+      icon: DollarSign,
+      color: "bg-purple-500",
+      description: `COD: ${stats.codOrders} orders`
+    },
+    {
+      title: "Order Status",
+      value: `${stats.deliveredOrders}/${stats.shippedOrders}/${stats.pendingOrders}`,
+      icon: TrendingUp,
+      color: "bg-orange-500",
+      description: "Delivered/In Transit/Pending"
+    },
+    {
+      title: "Users",
+      value: stats.totalSellers + stats.totalDropshippers,
+      icon: Users,
+      color: "bg-indigo-500",
+      description: `${stats.totalSellers} sellers, ${stats.totalDropshippers} dropshippers`
+    }
+  ];
+
+  const quickActions = [
+    {
+      label: "Manage Delivery",
+      icon: Truck,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      tab: "delivery",
+      description: "Add/Edit companies"
+    },
+    {
+      label: "Review Escrows",
+      icon: Shield,
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+      tab: "escrow",
+      description: "Release payments",
+      badge: stats.pendingEscrows
+    },
+    {
+      label: "Order Oversight",
+      icon: Eye,
+      color: "text-orange-600",
+      bgColor: "bg-orange-50",
+      tab: "orders",
+      description: "View all orders"
+    },
+    {
+      label: "Commission Rules",
+      icon: Percent,
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+      tab: "commissions",
+      description: "Configure fees"
+    }
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-wrap gap-4 justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Activity className="w-6 h-6" />
+            Platform Overview
+          </h2>
+          <p className="text-gray-600 text-sm mt-1">
+            Real-time metrics and platform health
+          </p>
+        </div>
+        <button
+          onClick={onRefresh}
+          disabled={isLoading}
+          className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center gap-2 text-sm"
+        >
+          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          {isLoading ? 'Refreshing...' : 'Refresh'}
+        </button>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {statCards.map((card, index) => (
+          <div key={index} className="bg-white rounded-lg border p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-start justify-between mb-2">
+              <div>
+                <p className="text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  {card.title}
+                </p>
+                <div className="text-2xl font-bold mt-1">{card.value}</div>
+                {card.amount && (
+                  <div className="text-sm text-gray-600">{card.amount}</div>
+                )}
+              </div>
+              <div className={`${card.color} p-2 rounded-lg`}>
+                <card.icon className="w-5 h-5 text-white" />
+              </div>
+            </div>
+            <div className="flex items-center justify-between mt-2">
+              <p className="text-xs text-gray-500">{card.description}</p>
+              {card.trend && (
+                <span className={`text-xs font-medium ${card.trendUp ? 'text-green-600' : 'text-red-600'}`}>
+                  {card.trend}
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg border p-4">
+          <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-gray-600" />
+            Quick Actions
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            {quickActions.map((action, index) => (
+              <button
+                key={index}
+                onClick={() => onTabChange(action.tab)}
+                className="p-3 border rounded-lg hover:bg-gray-50 text-left transition-colors group"
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`${action.bgColor} p-2 rounded-lg group-hover:scale-110 transition-transform`}>
+                    <action.icon className={`w-5 h-5 ${action.color}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-medium text-sm truncate">{action.label}</h4>
+                      {action.badge > 0 && (
+                        <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs rounded-full">
+                          {action.badge}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 truncate">{action.description}</p>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white rounded-lg border p-4">
+          <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
+            <Activity className="w-5 h-5 text-gray-600" />
+            Recent Activity
+          </h3>
+          <div className="space-y-3 max-h-[300px] overflow-y-auto">
+            {recentActivity.length > 0 ? (
+              recentActivity.slice(0, 5).map((activity, idx) => (
+                <div key={activity.id || idx} className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded">
+                  <div className="w-2 h-2 mt-2 rounded-full bg-blue-500 flex-shrink-0"></div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {activity.admin?.full_name || 'System'}
+                    </p>
+                    <p className="text-xs text-gray-600 truncate">
+                      {activity.reason || activity.action_type}
+                    </p>
+                  </div>
+                  <span className="text-xs text-gray-500 whitespace-nowrap">
+                    {formatDate(activity.created_at)}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Activity className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                <p className="text-sm">No recent activity</p>
+              </div>
+            )}
+          </div>
+          {recentActivity.length > 5 && (
+            <button 
+              onClick={() => setShowAllActivity(true)}
+              className="mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              View all activity →
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* System Status */}
+      <div className="bg-white rounded-lg border p-4">
+        <h3 className="text-lg font-bold mb-3">System Status</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm font-medium">Database</span>
+            </div>
+            <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Operational</span>
+          </div>
+          <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm font-medium">API Services</span>
+            </div>
+            <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Operational</span>
+          </div>
+          <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 ${stats.pendingEscrows > 0 ? 'bg-yellow-500' : 'bg-green-500'} rounded-full`}></div>
+              <span className="text-sm font-medium">Escrow Queue</span>
+            </div>
+            <span className={`text-xs px-2 py-1 rounded ${
+              stats.pendingEscrows > 0 
+                ? 'text-yellow-600 bg-yellow-50' 
+                : 'text-green-600 bg-green-50'
+            }`}>
+              {stats.pendingEscrows} pending
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default OverviewSection;

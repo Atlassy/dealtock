@@ -1,9 +1,11 @@
+// src/components/Navbar.jsx
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
-import { Home } from "lucide-react";
+import { Home, Store } from "lucide-react"; // ✅ Added Store icon
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import NotificationDropdown from "@/components/notifications/NotificationDropdown";
+import NotificationBell from "@/components/notifications/NotificationBell";
+
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
@@ -73,6 +75,15 @@ export default function Navbar() {
           <>
             {/* Navigation Links */}
             <div className="hidden md:flex items-center space-x-4">
+              {/* ✅ Added Marketplace Link */}
+              <Link 
+                to="/marketplace" 
+                className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
+                <Store className="w-4 h-4" />
+                <span>Marketplace</span>
+              </Link>
+              
               <Link 
                 to="/dashboard" 
                 className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
@@ -100,7 +111,7 @@ export default function Navbar() {
             </div>
 
             {/* Notification Dropdown */}
-            <NotificationDropdown
+            <NotificationBell
               notifications={notifications.notifications || []}
               unreadCount={notifications.unreadCount || 0}
               open={notificationOpen}

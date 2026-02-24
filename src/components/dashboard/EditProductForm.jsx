@@ -1,153 +1,119 @@
-import React, { useEffect, useState } from "react";
-
-const CATEGORIES = ["Electronics", "Fashion", "Home", "Beauty", "Sports", "Other"];
-const STATUSES = ["available", "unavailable"];
+// In EditProductForm.jsx - Add this validation and SKU handling
 
 const EditProductForm = ({ product, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    category: "",
-    quantity: 0,
+    name: '',
+    description: '',
+    category: '',
+    sku: '',
     purchase_price: 0,
-    sale_price: 0,
-    status: "available",
+    quantity: 0,
+    location: '',
+    condition: 'new',
+    image_url: '',
+    available_for_sale: true,
+    status: 'available'
   });
+  
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [originalSku, setOriginalSku] = useState(''); // Store original SKU
 
   useEffect(() => {
     if (product) {
       setFormData({
-        name: product.name || "",
-        category: product.category || "",
-        quantity: product.quantity || 0,
+        name: product.name || '',
+        description: product.description || '',
+        category: product.category || '',
+        sku: product.sku || '',
         purchase_price: product.purchase_price || 0,
-        sale_price: product.sale_price || 0,
-        status: product.status || "available",
+        quantity: product.quantity || 0,
+        location: product.location || '',
+        condition: product.condition || 'new',
+        image_url: product.image_url || '',
+        available_for_sale: product.available_for_sale !== false,
+        status: product.status || 'available'
       });
+      setOriginalSku(product.sku || ''); // Store original SKU
     }
   }, [product]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: ["quantity", "purchase_price", "sale_price"].includes(name)
-        ? Number(value)
-        : value,
+      [name]: type === 'checkbox' ? checked : 
+              name === 'purchase_price' ? (value === '' ? '' : Number(value)) :
+              name === 'quantity' ? (value === '' ? '' : parseInt(value) || 0) :
+              value
     }));
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = async () => {
+    const newErrors = {};
+    
+    // Required fields
+    if (!formData.name?.trim()) newErrors.name = 'Product name is required';
+    if (!formData.purchase_price || formData.purchase_price <= 0) {
+      newErrors.purchase_price = 'Price must be greater than 0';
+    }
+    if (!formData.quantity || formData.quantity < 0) {
+      newErrors.quantity = 'Quantity cannot be negative';
+    }
+    if (!formData.location?.trim()) {
+      newErrors.location = 'Location is required for shipping';
+    }
+
+    // SKU UNIQUE VALIDATION - Only check if SKU changed
+    if (formData.sku && formData.sku !== originalSku) {
+      try {
+        const { data: existingProduct, error } = await supabase
+          .from('products')
+          .select('id, sku')
+          .eq('sku', formData.sku)
+          .neq('id', product.id) // Exclude current product
+          .maybeSingle();
+
+        if (existingProduct) {
+          newErrors.sku = 'This SKU already exists. Please use a different SKU.';
+        }
+      } catch (error) {
+        console.error('SKU validation error:', error);
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    
+    const isValid = await validateForm();
+    if (!isValid) {
+      toast.error('Please fix the errors in the form');
+      return;
+    }
+    
+    setLoading(true);
+    
+    // Prepare submission data
+    const submissionData = {
+      ...formData,
+      // If SKU is empty, generate one
+      sku: formData.sku?.trim() || `SKU-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      purchase_price: parseFloat(formData.purchase_price) || 0,
+      quantity: parseInt(formData.quantity) || 0,
+      // Don't send sale_price - marketplace calculates it
+    };
+
+    await onSubmit(submissionData);
+    setLoading(false);
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Name Field */}
-      <div>
-        <label className="block text-sm text-gray-600 mb-1">Product Name</label>
-        <input 
-          name="name" 
-          value={formData.name} 
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
-          placeholder="Enter product name"
-        />
-      </div>
-
-      {/* Category Field */}
-      <div>
-        <label className="block text-sm text-gray-600 mb-1">Category</label>
-        <select 
-          name="category" 
-          value={formData.category} 
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
-        >
-          <option value="">Select category</option>
-          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
-      </div>
-
-      {/* Quantity Field */}
-      <div>
-        <label className="block text-sm text-gray-600 mb-1">Quantity</label>
-        <input 
-          type="number" 
-          name="quantity" 
-          value={formData.quantity} 
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
-          placeholder="0"
-          min="0"
-        />
-      </div>
-
-      {/* Purchase Price Field - REMOVED from AddProductForm but kept here */}
-      <div>
-        <label className="block text-sm text-gray-600 mb-1">Purchase Price (MAD)</label>
-        <input 
-          type="number" 
-          name="purchase_price" 
-          value={formData.purchase_price} 
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
-          placeholder="0.00"
-          min="0"
-          step="0.01"
-        />
-      </div>
-
-      {/* Sale Price Field */}
-      <div>
-        <label className="block text-sm text-gray-600 mb-1">Sale Price (MAD)</label>
-        <input 
-          type="number" 
-          name="sale_price" 
-          value={formData.sale_price} 
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
-          placeholder="0.00"
-          min="0"
-          step="0.01"
-        />
-      </div>
-
-      {/* Status Field */}
-      <div>
-        <label className="block text-sm text-gray-600 mb-1">Status</label>
-        <select 
-          name="status" 
-          value={formData.status} 
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
-        >
-          {STATUSES.map(s => (
-            <option key={s} value={s}>
-              {s === 'available' ? 'Available' : 'Unavailable'}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Buttons */}
-      <div className="flex gap-3 pt-2">
-        <button 
-          type="button" 
-          onClick={onCancel}
-          className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-        >
-          Cancel
-        </button>
-        <button 
-          type="submit"
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Save
-        </button>
-      </div>
-    </form>
-  );
+  // Rest of your component remains the same...
 };
-
-export default EditProductForm;

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 const CATEGORIES = ["Electronics", "Fashion", "Home", "Beauty", "Sports", "Other"];
@@ -9,7 +8,9 @@ const AddProductForm = ({ onSubmit, onCancel }) => {
     name: '',
     category: '',
     quantity: 1,
-    sale_price: '',
+    purchase_price: '',  // CHANGED: sale_price → purchase_price
+    location: '',        // ADDED: location field
+    description: '',     // ADDED: description field
     status: 'available'
   });
   
@@ -19,7 +20,7 @@ const AddProductForm = ({ onSubmit, onCancel }) => {
     const { name, value } = e.target;
     setFormData(prev => ({ 
       ...prev, 
-      [name]: name === 'quantity' || name === 'sale_price' 
+      [name]: name === 'quantity' || name === 'purchase_price'  // CHANGED: sale_price → purchase_price
         ? (value === '' ? '' : Number(value))
         : value 
     }));
@@ -31,7 +32,7 @@ const AddProductForm = ({ onSubmit, onCancel }) => {
     
     const submissionData = {
       ...formData,
-      sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null,
+      purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : null, // CHANGED
       quantity: formData.quantity || 1
     };
 
@@ -55,6 +56,19 @@ const AddProductForm = ({ onSubmit, onCancel }) => {
         />
       </div>
 
+      {/* Description Field - ADDED */}
+      <div>
+        <label className="block text-sm text-gray-600 mb-1">Description</label>
+        <textarea
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          className="w-full px-3 py-2 border rounded"
+          placeholder="Product description"
+          rows="3"
+        />
+      </div>
+
       {/* Category Field */}
       <div>
         <label className="block text-sm text-gray-600 mb-1">Category</label>
@@ -69,6 +83,19 @@ const AddProductForm = ({ onSubmit, onCancel }) => {
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
+      </div>
+
+      {/* Location Field - ADDED */}
+      <div>
+        <label className="block text-sm text-gray-600 mb-1">Location (City)</label>
+        <input
+          type="text"
+          name="location"
+          value={formData.location}
+          onChange={handleChange}
+          className="w-full px-3 py-2 border rounded"
+          placeholder="e.g., Casablanca, Rabat"
+        />
       </div>
 
       {/* Quantity Field */}
@@ -86,13 +113,16 @@ const AddProductForm = ({ onSubmit, onCancel }) => {
         />
       </div>
 
-      {/* Sale Price Field - MAD Currency */}
+      {/* Purchase Price Field - CHANGED from sale_price to purchase_price */}
       <div>
-        <label className="block text-sm text-gray-600 mb-1">Sale Price (MAD) *</label>
+        <label className="block text-sm text-gray-600 mb-1">
+          Your Price (MAD) *
+          <span className="text-xs text-gray-500 ml-2">You receive this amount per sale</span>
+        </label>
         <input
           type="number"
-          name="sale_price"
-          value={formData.sale_price}
+          name="purchase_price"  // CHANGED: sale_price → purchase_price
+          value={formData.purchase_price}
           onChange={handleChange}
           className="w-full px-3 py-2 border rounded"
           placeholder="0.00"
@@ -100,6 +130,11 @@ const AddProductForm = ({ onSubmit, onCancel }) => {
           step="0.01"
           min="0"
         />
+        <p className="text-xs text-gray-500 mt-1">
+          Marketplace customers will pay: <strong>
+            {formData.purchase_price ? (formData.purchase_price * 1.2).toFixed(2) : '0.00'} MAD
+          </strong> (includes 20% marketplace fee)
+        </p>
       </div>
 
       {/* Status Field */}
@@ -117,6 +152,16 @@ const AddProductForm = ({ onSubmit, onCancel }) => {
             </option>
           ))}
         </select>
+      </div>
+
+      {/* Marketplace Pricing Info Box - ADDED */}
+      <div className="bg-blue-50 border border-blue-200 rounded p-3">
+        <h4 className="font-semibold text-blue-800 mb-1">Marketplace Pricing</h4>
+        <p className="text-sm text-blue-700">
+          • You set: <strong>Your Price</strong> (what you receive)<br/>
+          • B2B buyers see: <strong>Your Price</strong> (no markup)<br/>
+          • B2C customers pay: <strong>Your Price + 20%</strong> marketplace fee
+        </p>
       </div>
 
       {/* Buttons */}

@@ -16,7 +16,7 @@ const DealtockLogo = ({ size = 'normal', className = '' }) => {
     >
       {/* ✅ FIXED: Changed from img-replace to img */}
       <img 
-        src="https://ibb.co/F4qTX7mb" 
+        src="" 
         alt="Dealtock Logo" 
         className="w-full h-full object-contain"
         onError={(e) => {

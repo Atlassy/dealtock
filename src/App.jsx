@@ -6,15 +6,16 @@ import ResetPassword from "./components/auth/ResetPassword";
 import EmailConfirmation from "./components/auth/EmailConfirmation";
 import CheckEmail from "./components/auth/CheckEmail";
 import PasswordUpdated from "./components/auth/PasswordUpdated";
-import Login from "./components/auth/login"; // ✅ Changed from Login to login
+import Login from "./components/auth/login";
 import SignUpForm from "./components/auth/SignUpForm";
 import Dashboard from "./components/dashboard/Dashboard";
 import ProfilePage from "./components/ProfilePage";
 import Navbar from "./components/Navbar";
+import MarketplacePage from "./components/marketplace/MarketplacePage"; // ✅ Added marketplace import
 import { Toaster } from "sonner";
 
 export default function App() {
-  const { user, loading } = useAuth(); // ✅ FIXED: Changed from useAuthContext to useAuth
+  const { user, loading } = useAuth();
 
   // While session is loading → show loading screen
   if (loading) {
@@ -26,11 +27,10 @@ export default function App() {
   }
 
   return (
-  
     <div className="min-h-screen bg-neutral-50">
-	<Toaster richColors position="top-right" />
+      <Toaster richColors position="top-right" />
       {/* Show navbar only if logged in */}
-      {user && <Navbar />} {/* ✅ FIXED: Changed from session to user */}
+      {user && <Navbar />}
 
       <Routes>
         {/* Public routes */}
@@ -49,9 +49,19 @@ export default function App() {
           element={user ? <Navigate to="/dashboard" replace /> : <SignUpForm />}
         />
 
+        {/* ✅ Marketplace route - accessible to all authenticated users */}
+        <Route
+          path="/marketplace"
+          element={
+            <ProtectedRoute>
+              <MarketplacePage />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Protected routes */}
         <Route
-          path="/dashboard"
+          path="/dashboard/*"
           element={
             <ProtectedRoute>
               <Dashboard />
