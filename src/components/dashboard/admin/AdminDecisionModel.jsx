@@ -3,7 +3,7 @@ useEffect(() => {
     .from("returns")
     .select(`
       id,
-      return_reason,
+      reason,
       condition_on_return,
       decision,
       created_at,

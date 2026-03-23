@@ -60,8 +60,7 @@ export default function Login() {
             alignItems: "center",
             justifyContent: "center"
           }}>
-            <img 
-              src="https://i.ibb.co/DHfJQK07/Your-paragraph-text.png" 
+            <img src="https://i.ibb.co/PGkjFhwv/Dealtock.png"
               alt="Dealtock Logo" 
               style={{
                 width: "100%",

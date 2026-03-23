@@ -1,16 +1,70 @@
-// components/dropshipper/ProductCard.jsx
-import { useState } from 'react';
-import { MapPin, Package, TrendingUp, Truck } from 'lucide-react';
-import { calculatePotentialProfit } from '../../utils/pricing';
+// src/components/dashboard/dropshipper/ProductCard.jsx
+import { useState, useEffect } from 'react';
+import { MapPin, Package, TrendingUp, Truck, Info, Percent } from 'lucide-react';
+import { supabase } from '../../../lib/supabaseClient';
 
 const ProductCard = ({ product, onPlaceOrder }) => {
   const [showCalculator, setShowCalculator] = useState(false);
-  const [markupPercent, setMarkupPercent] = useState(20); // Default 20%
+  const [markupPercent, setMarkupPercent] = useState(20);
+  const [commissionRate, setCommissionRate] = useState(0);
+  const [loadingCommission, setLoadingCommission] = useState(false);
+  const [error, setError] = useState(null);
   
-  const basePrice = product.purchase_price;
+  const basePrice = product.purchase_price || 0;
   const markupAmount = (basePrice * markupPercent) / 100;
   const customerPrice = basePrice + markupAmount;
-  const profit = markupAmount;
+  const commissionAmount = (markupAmount * commissionRate) / 100;
+  const netProfit = markupAmount - commissionAmount;
+
+  // Fetch commission rate whenever markup changes
+  useEffect(() => {
+    if (showCalculator && product.category_id) {
+      fetchCommissionRate();
+    }
+  }, [markupPercent, showCalculator]);
+
+  const fetchCommissionRate = async () => {
+    if (!product.category_id) {
+      setCommissionRate(5); // Default to 5% if no category
+      return;
+    }
+    
+    setLoadingCommission(true);
+    setError(null);
+    
+    try {
+      const markupAmount = (basePrice * markupPercent) / 100;
+      
+      const { data, error } = await supabase
+        .rpc('calculate_commission', {
+          p_seller_id: product.seller_id || product.user_id,
+          p_category_id: product.category_id,
+          p_product_id: product.id,
+          p_amount: markupAmount,
+          p_for_role: 'dropshipper'
+        });
+
+      if (error) throw error;
+      
+      // Ensure we have a valid number
+      const rate = parseFloat(data) || 5;
+      setCommissionRate(rate);
+      
+    } catch (error) {
+      console.error('Error fetching commission:', error);
+      setError('Could not load commission rate');
+      setCommissionRate(5); // Default fallback
+    } finally {
+      setLoadingCommission(false);
+    }
+  };
+
+  const getCommissionColor = () => {
+    if (commissionRate <= 5) return 'text-green-600';
+    if (commissionRate <= 8) return 'text-yellow-600';
+    if (commissionRate <= 10) return 'text-orange-600';
+    return 'text-red-600';
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
@@ -27,11 +81,18 @@ const ProductCard = ({ product, onPlaceOrder }) => {
             <Package className="w-12 h-12" />
           </div>
         )}
-        {product.condition && (
-          <span className="absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-            {product.condition}
-          </span>
-        )}
+        <div className="absolute top-2 right-2 flex gap-1">
+          {product.condition && (
+            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+              {product.condition}
+            </span>
+          )}
+          {product.category && (
+            <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
+              {product.category}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Product Info */}
@@ -40,90 +101,168 @@ const ProductCard = ({ product, onPlaceOrder }) => {
         <p className="text-sm text-gray-600 mb-2 line-clamp-2">{product.description}</p>
 
         {/* Seller & Location */}
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
+        <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
           <div className="flex items-center">
             <MapPin className="w-4 h-4 mr-1" />
-            {product.location}
+            {product.location || 'N/A'}
           </div>
           <div className="flex items-center">
-            <Star className="w-4 h-4 mr-1 text-yellow-400" />
-            {product.seller_rating?.toFixed(1) || 'New'}
+            <Percent className="w-4 h-4 mr-1 text-gray-400" />
+            {product.seller_name || 'Seller'}
           </div>
         </div>
 
-        {/* Pricing */}
-        <div className="border-t pt-3 mt-2">
-          <div className="flex justify-between items-center mb-2">
+        {/* Base Price */}
+        <div className="bg-gray-50 p-3 rounded-lg mb-3">
+          <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Base Price:</span>
-            <span className="font-medium">{basePrice} MAD</span>
+            <span className="font-bold text-lg">{basePrice.toFixed(2)} MAD</span>
           </div>
+        </div>
 
-          {showCalculator ? (
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Your Markup (%)
+        {showCalculator ? (
+          <div className="space-y-4">
+            {/* Markup Slider */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Your Markup
                 </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={markupPercent}
-                  onChange={(e) => setMarkupPercent(parseInt(e.target.value))}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-sm">
-                  <span>{markupPercent}%</span>
-                  <span className="text-green-600">+{markupAmount} MAD</span>
-                </div>
+                <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                  {markupPercent}%
+                </span>
               </div>
-
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <div className="flex justify-between text-sm mb-1">
-                  <span>Customer pays:</span>
-                  <span className="font-bold">{customerPrice} MAD</span>
-                </div>
-                <div className="flex justify-between text-sm text-green-600">
-                  <span>Your profit:</span>
-                  <span className="font-bold">{profit} MAD</span>
-                </div>
-              </div>
-
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setShowCalculator(false)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => onPlaceOrder(product)}
-                  className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
-                >
-                  Place Order
-                </button>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={markupPercent}
+                onChange={(e) => setMarkupPercent(parseInt(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0%</span>
+                <span>25%</span>
+                <span>50%</span>
+                <span>75%</span>
+                <span>100%</span>
               </div>
             </div>
-          ) : (
-            <button
-              onClick={() => setShowCalculator(true)}
-              className="w-full flex items-center justify-center space-x-2 bg-gray-50 hover:bg-gray-100 text-gray-700 py-2 rounded-lg transition-colors"
-            >
-              <TrendingUp className="w-4 h-4" />
-              <span>Calculate Your Profit</span>
-            </button>
-          )}
-        </div>
 
-        {/* Stock & Delivery */}
-        <div className="flex items-center justify-between text-xs text-gray-500 mt-3">
-          <span className="flex items-center">
-            <Package className="w-3 h-3 mr-1" />
-            Stock: {product.quantity}
+            {/* Commission & Profit Calculator */}
+            {loadingCommission ? (
+              <div className="bg-blue-50 p-4 rounded-lg text-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="text-xs text-gray-500 mt-2">Calculating commission...</p>
+              </div>
+            ) : error ? (
+              <div className="bg-red-50 p-4 rounded-lg text-center">
+                <p className="text-sm text-red-600">{error}</p>
+                <p className="text-xs text-gray-500 mt-1">Using default 5% rate</p>
+              </div>
+            ) : (
+              <div className="bg-blue-50 p-4 rounded-lg space-y-3">
+                <h4 className="font-semibold text-sm flex items-center gap-1">
+                  <Info className="w-4 h-4" />
+                  Profit Calculator
+                </h4>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Gross Markup:</span>
+                    <span className="font-medium text-green-600">
+                      +{markupAmount.toFixed(2)} MAD
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between text-sm border-t border-blue-200 pt-2">
+                    <span className="flex items-center gap-1">
+                      Dealtock Fee:
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getCommissionColor()} bg-white`}>
+                        {commissionRate}%
+                      </span>
+                    </span>
+                    <span className="font-medium text-orange-600">
+                      -{commissionAmount.toFixed(2)} MAD
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between font-bold text-base border-t border-blue-200 pt-2">
+                    <span>Your Net Profit:</span>
+                    <span className="text-green-700">
+                      {netProfit.toFixed(2)} MAD
+                    </span>
+                  </div>
+                  
+                  <div className="text-xs text-gray-500 bg-white p-2 rounded mt-2">
+                    <div className="flex justify-between">
+                      <span>Customer pays:</span>
+                      <span className="font-medium">{customerPrice.toFixed(2)} MAD</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>+ Shipping:</span>
+                      <span className="font-medium">~25-35 MAD</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowCalculator(false)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => onPlaceOrder({
+                  ...product,
+                  markup: markupPercent,
+                  markupAmount: markupAmount,
+                  commissionRate: commissionRate,
+                  commissionAmount: commissionAmount,
+                  netProfit: netProfit
+                })}
+                disabled={loadingCommission}
+                className="flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-sm hover:from-blue-700 hover:to-blue-800 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loadingCommission ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    Calculating...
+                  </>
+                ) : (
+                  'Place Order'
+                )}
+              </button>
+            </div>
+
+            {/* Help Text */}
+            <p className="text-xs text-gray-500 text-center">
+              💡 Dealtock fee ({commissionRate}%) is deducted from your markup. Adjust your markup to maximize profit.
+            </p>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowCalculator(true)}
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition shadow-sm"
+          >
+            <TrendingUp className="w-4 h-4" />
+            <span className="font-medium">Calculate Your Profit</span>
+          </button>
+        )}
+
+        {/* Stock & Delivery Info */}
+        <div className="flex items-center justify-between text-xs text-gray-500 mt-4 pt-3 border-t">
+          <span className="flex items-center gap-1">
+            <Package className="w-3 h-3" />
+            Stock: {product.quantity || 0}
           </span>
-          <span className="flex items-center">
-            <Truck className="w-3 h-3 mr-1" />
-            {product.estimated_delivery_days || 2}-4 days
+          <span className="flex items-center gap-1">
+            <Truck className="w-3 h-3" />
+            Delivery: 2-4 days
           </span>
         </div>
       </div>

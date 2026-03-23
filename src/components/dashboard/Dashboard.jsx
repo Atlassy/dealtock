@@ -1,43 +1,29 @@
-import React, { useEffect, useState } from 'react';
+// src/components/dashboard/Dashboard.jsx
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/SupabaseAuthContext";
-import { supabase } from '../../lib/supabaseClient';
-
-// Import dashboard components
-import AdminDashboard from "./admin/AdminDashboard";
+import { supabase } from "../../lib/supabaseClient";
+import { motion } from "framer-motion";
+import { Package, TrendingUp, Percent, Euro } from "lucide-react";
+import { toast } from "sonner";
+import DashboardHeader from "./DashboardHeader";
 import SellerDashboard from "./seller/SellerDashboard";
-import DeliveryDashboard from "./delivery/DeliveryDashboard";
-
-// Import your actual dropshipper dashboard (once created)
 import DropshipperDashboard from "./dropshipper/DropshipperDashboard";
-
-const WarehouseDashboard = () => (
-  <div className="min-h-screen bg-gray-50 p-8">
-    <h1 className="text-2xl font-bold mb-4">Warehouse Dashboard</h1>
-    <p className="text-gray-600">Warehouse dashboard is under construction.</p>
-  </div>
-);
-
-const DashboardSkeleton = () => (
-  <div className="h-screen flex items-center justify-center">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-      <p className="mt-4 text-gray-600">Loading dashboard...</p>
-    </div>
-  </div>
-);
+import DeliveryDashboard from "./delivery/DeliveryDashboard";
+import WarehouseDashboard from "./warehouse/WarehouseDashboard";
+import AdminDashboard from "./admin/AdminDashboard";
 
 const Dashboard = () => {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
   const { user, loading: authLoading } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
       fetchUserProfile();
-    } else if (!authLoading) {
-      setLoading(false);
+    } else {
+      setProfileLoading(false);
     }
-  }, [user, authLoading]);
+  }, [user]);
 
   const fetchUserProfile = async () => {
     try {
@@ -48,53 +34,56 @@ const Dashboard = () => {
         .single();
 
       if (error) throw error;
-      console.log('User profile loaded:', data); // Debug log
+      console.log('User profile loaded:', data);
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {
-      setLoading(false);
+      setProfileLoading(false);
     }
   };
 
-  // Show loading state
-  if (loading || authLoading) {
-    return <DashboardSkeleton />;
-  }
+  const isLoading = authLoading || profileLoading;
 
-  // Not logged in
-  if (!user) {
+  if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <p>Please log in to access the dashboard</p>
-      </div>
-    );
-  }
-
-  // Profile not found - this could happen for new users
-  if (!profile) {
-    return (
-      <div className="h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">Profile not found. Please complete your registration.</p>
-          <button 
-            onClick={fetchUserProfile}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Retry
-          </button>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-white text-lg">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
-  // Debug log to see what role is being returned
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 flex items-center justify-center">
+        <div className="text-center bg-white/10 backdrop-blur-lg p-8 rounded-2xl">
+          <Package className="w-20 h-20 text-purple-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-2">Please Log In</h2>
+          <p className="text-gray-300">You need to be authenticated to access your dashboard.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 flex items-center justify-center">
+        <div className="text-center bg-white/10 backdrop-blur-lg p-8 rounded-2xl">
+          <Package className="w-20 h-20 text-purple-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-2">Profile Not Found</h2>
+          <p className="text-gray-300">Please contact support.</p>
+        </div>
+      </div>
+    );
+  }
+
   console.log('User role:', profile.role);
 
-  // Route based on role - NO DEFAULT FALLBACK TO SELLER
-  switch (profile.role?.toLowerCase()) {
-    case "admin":
-      return <AdminDashboard />;
+  // Route to appropriate dashboard based on role
+  switch (profile.role) {
     case "seller":
       return <SellerDashboard />;
     case "dropshipper":
@@ -103,15 +92,15 @@ const Dashboard = () => {
       return <DeliveryDashboard />;
     case "warehouse":
       return <WarehouseDashboard />;
+    case "admin":
+      return <AdminDashboard />;
     default:
-      // Show error for unknown roles instead of defaulting
       return (
-        <div className="h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-xl font-bold text-red-600 mb-2">Access Denied</h2>
-            <p className="text-gray-600">
-              Unknown role: {profile.role || 'undefined'}. Please contact support.
-            </p>
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 flex items-center justify-center">
+          <div className="text-center bg-white/10 backdrop-blur-lg p-8 rounded-2xl">
+            <Package className="w-20 h-20 text-purple-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-2">Unauthorized Role</h2>
+            <p className="text-gray-300">Your account role '{profile.role}' is not recognized.</p>
           </div>
         </div>
       );

@@ -1,51 +1,151 @@
 // src/hooks/useMarketplaceProducts.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../contexts/SupabaseAuthContext';
 
-export function useMarketplaceProducts(filters = {}) {
+export const useMarketplaceProducts = (filters) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [commissionRates, setCommissionRates] = useState({});
+  const { user } = useAuth();
 
-  // Get current user role
+  // Fetch user role
   useEffect(() => {
-    const getUserRole = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single();
-          setUserRole(profile?.role || 'buyer');
-        } else {
-          setUserRole('guest');
+    const fetchUserRole = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        
+        if (!error && data) {
+          setUserRole(data.role);
         }
-      } catch (err) {
-        console.error('Error getting user role:', err);
-        setUserRole('guest');
+      } else {
+        setUserRole('b2c');
       }
     };
-    getUserRole();
-  }, []);
+    
+    fetchUserRole();
+  }, [user]);
 
+  // Fetch commission rates
   useEffect(() => {
-    if (userRole !== null) {
-      fetchProducts();
-    }
-  }, [JSON.stringify(filters), userRole]);
+    const fetchCommissionRates = async () => {
+      if (!userRole) return;
+      
+      try {
+        let appliesTo = 'B2C';
+        if (userRole === 'dropshipper') {
+          appliesTo = 'dropshipper';
+        } else if (userRole === 'seller') {
+          appliesTo = 'Seller';
+        }
+        
+        const { data, error } = await supabase
+          .from('commission_rules')
+          .select('category, percentage, min_amount, max_amount')
+          .eq('applies_to', appliesTo)
+          .eq('is_active', true);
+        
+        if (!error && data) {
+          const rates = {};
+          data.forEach(rule => {
+            const category = rule.category || 'default';
+            if (!rates[category]) {
+              rates[category] = [];
+            }
+            rates[category].push({
+              percentage: rule.percentage,
+              min_amount: rule.min_amount,
+              max_amount: rule.max_amount
+            });
+          });
+          setCommissionRates(rates);
+        }
+      } catch (err) {
+        console.error('Error fetching commission rates:', err);
+      }
+    };
+    
+    fetchCommissionRates();
+  }, [userRole]);
 
-  async function fetchProducts() {
+  // Get commission rate for a product
+  const getCommissionRate = useCallback((product) => {
+    const basePrice = product.purchase_price || 0;
+    const category = product.category || 'Other';
+    
+    const categoryRules = commissionRates[category] || commissionRates['default'] || [];
+    
+    let rate = 0;
+    for (const rule of categoryRules) {
+      const minOk = rule.min_amount === null || basePrice >= rule.min_amount;
+      const maxOk = rule.max_amount === null || basePrice <= rule.max_amount;
+      
+      if (minOk && maxOk) {
+        rate = rule.percentage;
+        break;
+      }
+    }
+    
+    // Fallback logic
+    if (rate === 0 && userRole !== 'dropshipper' && userRole !== 'seller') {
+      if (basePrice >= 5000) rate = 10;
+      else if (basePrice >= 1000) rate = 20;
+      else rate = 30;
+    }
+    
+    return rate;
+  }, [commissionRates, userRole]);
+
+  // Get price for user role
+  const getPriceForRole = useCallback((product) => {
+    const basePrice = product.purchase_price || 0;
+    
+    // If product has zero price, return zero
+    if (basePrice <= 0) {
+      return {
+        price: 0,
+        label: 'Price',
+        marketplace_fee: 0,
+        commission_rate: 0,
+        invalid: true
+      };
+    }
+    
+    if (userRole === 'dropshipper' || userRole === 'seller') {
+      return {
+        price: basePrice,
+        label: userRole === 'dropshipper' ? 'Wholesale Price' : 'Your Price',
+        marketplace_fee: 0,
+        commission_rate: 0,
+        invalid: false
+      };
+    }
+    
+    const commissionRate = getCommissionRate(product);
+    const finalPrice = basePrice * (1 + commissionRate / 100);
+    
+    return {
+      price: finalPrice,
+      label: 'Price',
+      marketplace_fee: finalPrice - basePrice,
+      commission_rate: commissionRate,
+      invalid: false
+    };
+  }, [userRole, getCommissionRate]);
+
+  // Fetch products - EXCLUDE zero price products
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      setLoading(true);
-      setError(null);
-      
-      console.log('Fetching products with filters:', filters);
-      console.log('User role:', userRole);
-      
-      // Clean select statement - NO COMMENTS
+      // Only select columns that exist in your products table
       let query = supabase
         .from('products')
         .select(`
@@ -54,176 +154,85 @@ export function useMarketplaceProducts(filters = {}) {
           description,
           category,
           purchase_price,
-          image_url,
           quantity,
           condition,
+          status,
+          image_url,
           location,
+          created_at,
           user_id,
-          created_at
+          profiles!user_id (
+            id,
+            email,
+            full_name,
+            company,
+            role
+          )
         `)
         .eq('available_for_sale', true)
         .eq('status', 'available')
         .gt('quantity', 0)
-        .gt('purchase_price', 0); // Only show products with valid prices
+        .gt('purchase_price', 0);  // EXCLUDE products with zero or negative price
 
       // Apply filters
+      if (filters.search) {
+        query = query.ilike('name', `%${filters.search}%`);
+      }
       if (filters.category) {
         query = query.eq('category', filters.category);
-      }
-      
-      // Price filters using purchase_price
-      if (filters.minPrice) {
-        query = query.gte('purchase_price', filters.minPrice);
-      }
-      if (filters.maxPrice) {
-        query = query.lte('purchase_price', filters.maxPrice);
-      }
-      
-      if (filters.condition) {
-        query = query.eq('condition', filters.condition);
       }
       if (filters.location) {
         query = query.eq('location', filters.location);
       }
-      if (filters.search) {
-        query = query.ilike('name', `%${filters.search}%`);
+      if (filters.minPrice) {
+        query = query.gte('purchase_price', parseFloat(filters.minPrice));
+      }
+      if (filters.maxPrice) {
+        query = query.lte('purchase_price', parseFloat(filters.maxPrice));
+      }
+      if (filters.condition) {
+        query = query.eq('condition', filters.condition);
       }
 
-      // Add sorting
-      const sortField = filters.sortBy || 'created_at';
-      const sortOrder = filters.sortOrder || 'desc';
-      
-      if (sortField === 'price_asc') {
+      // Apply sorting
+      if (filters.sortBy === 'price_asc') {
         query = query.order('purchase_price', { ascending: true });
-      } else if (sortField === 'price_desc') {
+      } else if (filters.sortBy === 'price_desc') {
         query = query.order('purchase_price', { ascending: false });
+      } else if (filters.sortBy === 'name') {
+        query = query.order('name', { ascending: true });
       } else {
-        query = query.order(sortField, { ascending: sortOrder === 'asc' });
+        query = query.order('created_at', { ascending: false });
       }
 
-      const { data: productsData, error: productsError } = await query;
+      const { data, error } = await query;
       
-      if (productsError) throw productsError;
-
-      console.log('Products fetched:', productsData?.length || 0);
-
-      // If we have products, fetch profiles for the unique user_ids
-      if (productsData && productsData.length > 0) {
-        const userIds = [...new Set(productsData.map(p => p.user_id))];
-        
-        // Fetch profiles for these users
-        const { data: profilesData, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, full_name, company, city, average_rating')
-          .in('id', userIds);
-
-        if (profilesError) {
-          console.warn('Error fetching profiles:', profilesError);
-        }
-
-        // Create a map of profiles by user_id
-        const profilesMap = {};
-        if (profilesData) {
-          profilesData.forEach(profile => {
-            profilesMap[profile.id] = profile;
-          });
-        }
-
-        // Merge products with their profiles and calculate display prices based on role
-        const productsWithProfiles = productsData.map(product => {
-          const basePrice = parseFloat(product.purchase_price) || 0;
-          
-          // Calculate display price based on user role
-          let displayPrice = basePrice;
-          let priceLabel = 'B2B Price';
-          let marketplaceFee = 0;
-          
-          if (userRole === 'dropshipper') {
-            displayPrice = basePrice;
-            priceLabel = 'Your Cost (B2B)';
-            marketplaceFee = 0;
-          } else if (userRole === 'buyer' || userRole === 'guest') {
-            displayPrice = basePrice * 1.20;
-            priceLabel = 'Retail Price';
-            marketplaceFee = basePrice * 0.20;
-          }
-          
-          return {
-            ...product,
-            base_price: basePrice,
-            display_price: displayPrice,
-            price_label: priceLabel,
-            marketplace_fee: marketplaceFee,
-            formatted_price: new Intl.NumberFormat('fr-MA', {
-              style: 'currency',
-              currency: 'MAD',
-              minimumFractionDigits: 2
-            }).format(displayPrice),
-            profiles: profilesMap[product.user_id] || {
-              full_name: 'Seller',
-              company: null,
-              city: product.location || 'Unknown',
-              average_rating: 0
-            }
-          };
-        });
-
-        setProducts(productsWithProfiles);
-      } else {
-        setProducts([]);
-      }
+      if (error) throw error;
+      
+      // Filter out any remaining zero-price products (double-check)
+      const validProducts = (data || []).filter(product => (product.purchase_price || 0) > 0);
+      
+      console.log('Products fetched:', validProducts.length);
+      setProducts(validProducts);
       
     } catch (err) {
-      console.error('Error in fetchProducts:', err);
-      setError(err.message || 'Failed to load products');
+      console.error('Error fetching products:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
-  }
+  }, [filters]);
 
-  // Helper function to refresh products
-  const refetch = () => {
-    if (userRole !== null) {
-      fetchProducts();
-    }
-  };
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
-  // Helper function to get price based on role
-  const getPriceForRole = (product, role = userRole) => {
-    const basePrice = parseFloat(product.purchase_price) || 0;
-    
-    switch (role) {
-      case 'dropshipper':
-        return {
-          price: basePrice,
-          formatted: new Intl.NumberFormat('fr-MA', {
-            style: 'currency',
-            currency: 'MAD'
-          }).format(basePrice),
-          label: 'Your Cost (B2B)'
-        };
-      case 'buyer':
-      case 'guest':
-      default:
-        const retailPrice = basePrice * 1.20;
-        return {
-          price: retailPrice,
-          formatted: new Intl.NumberFormat('fr-MA', {
-            style: 'currency',
-            currency: 'MAD'
-          }).format(retailPrice),
-          label: 'Retail Price',
-          marketplace_fee: basePrice * 0.20
-        };
-    }
-  };
-
-  return { 
-    products, 
-    loading, 
-    error, 
-    refetch,
+  return {
+    products,
+    loading,
+    error,
     userRole,
-    getPriceForRole 
+    getPriceForRole,
+    refetch: fetchProducts
   };
-}
+};

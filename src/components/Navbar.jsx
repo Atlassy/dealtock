@@ -1,19 +1,20 @@
-// src/components/Navbar.jsx
+// src/components/Navbar.jsx - UPDATED TO USE PROFILE FROM CONTEXT
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
-import { Home, Store } from "lucide-react"; // ✅ Added Store icon
+import { Home, Store, Package, LayoutDashboard, User, Settings, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import NotificationBell from "@/components/notifications/NotificationBell";
 
-
 export default function Navbar() {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth(); // Get profile from context
   const [notifications, setNotifications] = useState({ notifications: [], unreadCount: 0 });
   const [notificationOpen, setNotificationOpen] = useState(false);
+  
+  const userRole = profile?.role; // Get role from profile
 
+  // Fetch notifications
   useEffect(() => {
-    // Fetch notifications
     const fetchNotifications = async () => {
       if (user) {
         try {
@@ -47,7 +48,6 @@ export default function Navbar() {
         .update({ read: true })
         .eq("id", id);
       
-      // Update local state
       setNotifications(prev => ({
         notifications: prev.notifications.map(n => 
           n.id === id ? { ...n, read: true } : n
@@ -58,6 +58,26 @@ export default function Navbar() {
       console.error('Error marking notification as read:', error);
     }
   };
+
+  // Navigation links configuration with role requirements
+  const navLinks = [
+    { path: "/marketplace", icon: Store, label: "Marketplace", roles: ["all"] },
+    { path: "/inventory", icon: Package, label: "Inventory", roles: ["seller", "admin"] },
+    { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard", roles: ["all"] },
+    { path: "/profile", icon: User, label: "Profile", roles: ["all"] },
+    { path: "/settings", icon: Settings, label: "Settings", roles: ["all"] }
+  ];
+
+  // Filter links based on user role
+  const visibleLinks = navLinks.filter(link => {
+    if (link.roles.includes("all")) return true;
+    if (userRole && link.roles.includes(userRole)) return true;
+    return false;
+  });
+
+  // Debug log
+  console.log('Navbar - User role:', userRole);
+  console.log('Navbar - Visible links:', visibleLinks.map(l => l.label));
 
   return (
     <nav className="flex items-center justify-between p-4 border-b bg-white shadow-sm sticky top-0 z-40">
@@ -75,40 +95,36 @@ export default function Navbar() {
           <>
             {/* Navigation Links */}
             <div className="hidden md:flex items-center space-x-4">
-              {/* ✅ Added Marketplace Link */}
-              <Link 
-                to="/marketplace" 
-                className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium transition-colors"
-              >
-                <Store className="w-4 h-4" />
-                <span>Marketplace</span>
-              </Link>
+              {visibleLinks.map((link) => (
+                <Link 
+                  key={link.path}
+                  to={link.path} 
+                  className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                >
+                  <link.icon className="w-4 h-4" />
+                  <span>{link.label}</span>
+                </Link>
+              ))}
               
-              <Link 
-                to="/dashboard" 
-                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-              >
-                Dashboard
-              </Link>
-              <Link 
-                to="/profile" 
-                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-              >
-                Profile
-              </Link>
-              <Link 
-                to="/settings" 
-                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-              >
-                Settings
-              </Link>
+              {/* Logout Button */}
               <button
                 onClick={signOut}
-                className="text-red-600 hover:text-red-800 font-medium transition-colors"
+                className="flex items-center space-x-1 text-red-600 hover:text-red-800 font-medium transition-colors"
               >
-                Logout
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
               </button>
             </div>
+
+            {/* User Email with Role Badge */}
+            <span className="hidden lg:block text-sm text-gray-600">
+              {user.email}
+              {userRole && (
+                <span className="ml-2 text-xs px-2 py-1 bg-gray-100 rounded-full">
+                  {userRole}
+                </span>
+              )}
+            </span>
 
             {/* Notification Dropdown */}
             <NotificationBell
@@ -118,11 +134,6 @@ export default function Navbar() {
               setOpen={setNotificationOpen}
               onRead={markAsRead}
             />
-
-            {/* Mobile Menu Icon (Optional) */}
-            <div className="md:hidden">
-              {/* You can add a hamburger menu here if needed */}
-            </div>
           </>
         ) : (
           <Link 

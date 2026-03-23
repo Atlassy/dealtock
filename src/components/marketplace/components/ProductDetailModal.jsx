@@ -1,9 +1,10 @@
 // src/components/marketplace/components/ProductDetailModal.jsx
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { X, MapPin, Package, Truck, AlertCircle, ChevronRight, User, Phone, Home, DollarSign, ShoppingBag, CheckCircle, Clock, TrendingUp } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, MapPin, Package, Truck, AlertCircle, ChevronRight, User, Phone, Home, DollarSign, ShoppingBag, CheckCircle, Clock, Shield } from 'lucide-react';
 import { useAuth } from '../../../contexts/SupabaseAuthContext';
 import { useDeliveryOptions } from '../../../hooks/useDeliveryOptions';
 import { marketplaceQueries } from '../../../lib/marketplaceQueries';
+import { supabase } from '../../../lib/supabaseClient';
 import OrderConfirmation from './OrderConfirmation';
 
 export default function ProductDetailModal({ 
@@ -11,6 +12,7 @@ export default function ProductDetailModal({
   onClose, 
   product, 
   dropshipperId,
+  userRole,
   onOrderSuccess 
 }) {
   const { user } = useAuth();
@@ -28,12 +30,22 @@ export default function ProductDetailModal({
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [createdOrder, setCreatedOrder] = useState(null);
   const [formErrors, setFormErrors] = useState({});
+  
+  // Commission state
+  const [commissionRate, setCommissionRate] = useState(30);
+  const [commissionLoading, setCommissionLoading] = useState(true);
 
   const { options, loading: deliveryLoading, calculateOptions } = useDeliveryOptions();
   
   // Refs for debouncing
   const timeoutRef = useRef(null);
   const previousCity = useRef('');
+
+  // Format price safely
+  const formatPrice = (price) => {
+    if (price === undefined || price === null || isNaN(price)) return '0.00';
+    return Number(price).toFixed(2);
+  };
 
   // Cleanup on unmount
   useEffect(() => {
@@ -63,15 +75,96 @@ export default function ProductDetailModal({
     }
   }, [shippingCity, product?.id, product?.weight_kg, calculateOptions]);
 
-  // Format price safely
-  const formatPrice = (price) => {
-    if (price === undefined || price === null || isNaN(price)) return '0.00';
-    return Number(price).toFixed(2);
-  };
+  // Fetch commission rate from database
+  useEffect(() => {
+    const fetchCommissionRate = async () => {
+      if (!product || !userRole) {
+        setCommissionLoading(false);
+        return;
+      }
+      
+      const basePrice = Number(product?.purchase_price) || Number(product?.price) || 0;
+      
+      // Determine which applies_to to use
+      let appliesTo = 'B2C';
+      if (userRole === 'dropshipper') {
+        appliesTo = 'dropshipper';
+      } else if (userRole === 'seller') {
+        appliesTo = 'Seller';
+      }
+      
+      try {
+        const category = product?.category || 'Other';
+        
+        // Fetch the appropriate commission rule based on price range
+        const { data, error } = await supabase
+          .from('commission_rules')
+          .select('percentage')
+          .eq('applies_to', appliesTo)
+          .eq('is_active', true)
+          .eq('category', category)
+          .lte('min_amount', basePrice)
+          .gte('max_amount', basePrice)
+          .maybeSingle();
+        
+        if (data) {
+          setCommissionRate(data.percentage);
+        } else {
+          // Try default rule (no category)
+          const { data: defaultData } = await supabase
+            .from('commission_rules')
+            .select('percentage')
+            .eq('applies_to', appliesTo)
+            .eq('is_active', true)
+            .eq('is_default', true)
+            .maybeSingle();
+          
+          if (defaultData) {
+            setCommissionRate(defaultData.percentage);
+          } else {
+            // Fallback based on user role
+            if (appliesTo === 'B2C') {
+              if (basePrice >= 5000) setCommissionRate(10);
+              else if (basePrice >= 1000) setCommissionRate(20);
+              else setCommissionRate(30);
+            } else {
+              setCommissionRate(0);
+            }
+          }
+        }
+        
+      } catch (error) {
+        console.error('Error fetching commission rate:', error);
+        // Fallback logic
+        if (userRole === 'b2c' || userRole === 'admin') {
+          if (basePrice >= 5000) setCommissionRate(10);
+          else if (basePrice >= 1000) setCommissionRate(20);
+          else setCommissionRate(30);
+        } else {
+          setCommissionRate(0);
+        }
+      } finally {
+        setCommissionLoading(false);
+      }
+    };
+    
+    fetchCommissionRate();
+  }, [product, userRole]);
 
-  // Get product price from sale_price
+  // Get the correct price based on user role and commission
   const getProductPrice = () => {
-    return Number(product?.sale_price) || 0;
+    const basePrice = Number(product?.purchase_price) || Number(product?.price) || 0;
+    
+    if (!userRole) return basePrice;
+    
+    // Dropshipper and Seller see base price (their cost)
+    if (userRole === 'dropshipper' || userRole === 'seller') {
+      return basePrice;
+    }
+    
+    // For B2C, apply commission rate fetched from database
+    const commissionMultiplier = 1 + (commissionRate / 100);
+    return basePrice * commissionMultiplier;
   };
 
   // Calculate totals
@@ -109,12 +202,20 @@ export default function ProductDetailModal({
 
   // Handle order submission
   const handleSubmitOrder = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      setError('Please fill in all required fields');
-      return;
-    }
+  e.preventDefault();
+  
+  if (!validateForm()) {
+    setError('Please fill in all required fields');
+    return;
+  }
+
+  // Validate product price
+  const productPrice = getProductPrice();
+  if (productPrice <= 0) {
+    setError('Cannot place order for this product - invalid price');
+    return;
+  }
+
 
     try {
       setLoading(true);
@@ -123,34 +224,32 @@ export default function ProductDetailModal({
       const totals = calculateTotals();
       
       const orderData = {
-        productId: product.id,
-        sellerId: product.user_id,
-        dropshipperId: dropshipperId,
-        deliveryCompanyId: selectedDelivery.id,
-        productPrice: getProductPrice(),
-        dropshipperMarkup: Number(markup) * quantity,
-        finalPrice: totals.finalTotal,
-        shippingFee: totals.shippingTotal,
-        shippingCity: shippingCity,
-        quantity: quantity,
-        weight: product.weight_kg || 1,
-        serviceType: selectedDelivery.service_type || 'standard',
-        customerId: null,
-        shippingAddress: {
-          name: customerName,
-          phone: customerPhone,
-          address: customerAddress,
-          city: shippingCity
-        },
-        notes: '',
-        product: product
-      };
+  productId: product.id,
+  sellerId: product.user_id,
+  dropshipperId: userRole === 'dropshipper' ? dropshipperId : null,
+  deliveryCompanyId: selectedDelivery.id,
+  productPrice: productPrice, // base price
+  dropshipperMarkup: userRole === 'dropshipper' ? markup : 0,
+  finalPrice: totals.finalTotal,
+  shippingFee: totals.shippingTotal,
+  shippingCity: shippingCity,
+  quantity: quantity,
+  serviceType: selectedDelivery.service_type || 'standard',
+  customerId: null,
+  shippingAddress: {
+    name: customerName,
+    phone: customerPhone,
+    address: customerAddress,
+    city: shippingCity
+  },
+  product: product
+};
 
       const order = await marketplaceQueries.createOrder(orderData);
       
       setCreatedOrder(order);
       setShowConfirmation(true);
-      onOrderSuccess();
+      if (onOrderSuccess) onOrderSuccess(order);
 
     } catch (err) {
       console.error('Order error:', err);
@@ -170,14 +269,14 @@ export default function ProductDetailModal({
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex justify-between items-center">
+          <div className="bg-gradient-to-r from-blue-700 to-blue-800 px-6 py-4 flex justify-between items-center">
             <div className="flex items-center gap-3">
               <ShoppingBag className="w-6 h-6 text-white" />
               <h2 className="text-xl font-semibold text-white">Complete Your Order</h2>
             </div>
             <button 
               onClick={onClose} 
-              className="p-2 hover:bg-blue-500 rounded-lg transition-colors"
+              className="p-2 hover:bg-blue-600 rounded-lg transition-colors"
             >
               <X className="h-5 w-5 text-white" />
             </button>
@@ -194,9 +293,9 @@ export default function ProductDetailModal({
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Left Column - Product & Customer Info */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Product Summary Card - FIXED: Now shows product price clearly */}
-                <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-5">
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                {/* Product Summary Card */}
+                <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                  <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <Package className="w-5 h-5 text-blue-600" />
                     Product Details
                   </h3>
@@ -212,8 +311,8 @@ export default function ProductDetailModal({
                       <h4 className="font-medium text-gray-900 line-clamp-1">{product.name}</h4>
                       <p className="text-sm text-gray-500 mt-1">{product.category || 'Uncategorized'}</p>
                       
-                      {/* Price Display - FIXED: Now prominently shown */}
-                      <div className="mt-3 flex items-center gap-4">
+                      {/* Price Display */}
+                      <div className="mt-3 flex items-center gap-4 flex-wrap">
                         <div className="bg-blue-50 px-3 py-1.5 rounded-lg">
                           <p className="text-xs text-blue-600 font-medium">Unit Price</p>
                           <p className="text-xl font-bold text-blue-700">{formatPrice(productPrice)} MAD</p>
@@ -237,8 +336,8 @@ export default function ProductDetailModal({
                 </div>
 
                 {/* Customer Information Card */}
-                <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-5">
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                  <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <User className="w-5 h-5 text-blue-600" />
                     Delivery Information
                   </h3>
@@ -347,8 +446,8 @@ export default function ProductDetailModal({
                 </div>
 
                 {/* Quantity & Markup Card */}
-                <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-5">
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                  <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <ShoppingBag className="w-5 h-5 text-blue-600" />
                     Order Details
                   </h3>
@@ -384,31 +483,34 @@ export default function ProductDetailModal({
                       <p className="text-xs text-gray-500 mt-1">{product.quantity} available</p>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Your Markup (MAD)
-                      </label>
-                      <div className="relative">
-                        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={markup}
-                          onChange={(e) => setMarkup(parseFloat(e.target.value) || 0)}
-                          className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          placeholder="0.00"
-                        />
+                    {/* Markup - ONLY for dropshippers */}
+                    {userRole === 'dropshipper' && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Your Markup (MAD)
+                        </label>
+                        <div className="relative">
+                          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={markup}
+                            onChange={(e) => setMarkup(parseFloat(e.target.value) || 0)}
+                            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">Total markup: {(markup * quantity).toFixed(2)} MAD</p>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">Total markup: {(markup * quantity).toFixed(2)} MAD</p>
-                    </div>
+                    )}
                   </div>
                   
                   {/* Subtotal display */}
                   <div className="mt-4 pt-3 border-t border-gray-200">
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-600">Subtotal ({quantity} × {formatPrice(productPrice)} MAD)</span>
-                      <span className="font-semibold text-gray-900">{formatPrice(productPrice * quantity)} MAD</span>
+                      <span className="font-semibold text-gray-800">{formatPrice(productPrice * quantity)} MAD</span>
                     </div>
                   </div>
                 </div>
@@ -417,8 +519,8 @@ export default function ProductDetailModal({
               {/* Right Column - Delivery & Summary */}
               <div className="lg:col-span-1 space-y-6">
                 {/* Delivery Options Card */}
-                <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-5">
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                  <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <Truck className="w-5 h-5 text-blue-600" />
                     Delivery Options
                   </h3>
@@ -455,13 +557,14 @@ export default function ProductDetailModal({
                         >
                           <div className="flex justify-between items-start mb-2">
                             <div>
-                              <p className="font-semibold text-gray-900">{company.name}</p>
+                              <p className="font-semibold text-gray-800">{company.name}</p>
                               <span className={`inline-block px-2 py-0.5 text-xs rounded-full mt-1 ${
                                 company.service_type === 'express' ? 'bg-purple-100 text-purple-700' :
                                 company.service_type === 'economy' ? 'bg-green-100 text-green-700' :
                                 'bg-blue-100 text-blue-700'
                               }`}>
-                                {company.service_type}
+                                {company.service_type === 'express' ? 'Express' : 
+                                 company.service_type === 'economy' ? 'Economy' : 'Standard'}
                               </span>
                             </div>
                             <div className="text-right">
@@ -477,8 +580,8 @@ export default function ProductDetailModal({
                             </span>
                             {company.escrow_enabled && (
                               <span className="flex items-center gap-1 text-green-600">
-                                <CheckCircle className="w-3 h-3" />
-                                Escrow protected
+                                <Shield className="w-3 h-3" />
+                                Escrow
                               </span>
                             )}
                           </div>
@@ -491,43 +594,47 @@ export default function ProductDetailModal({
                   )}
                 </div>
 
-                {/* Order Summary Card - FIXED: Now shows product price breakdown */}
-                <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-5 text-white">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                {/* Order Summary Card */}
+                <div className="bg-gradient-to-br from-blue-700 to-blue-800 rounded-xl p-5 text-white shadow-lg">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2 text-white">
                     <ShoppingBag className="w-5 h-5" />
                     Order Summary
                   </h3>
                   
                   <div className="space-y-3 text-sm">
-                    {/* Product price line - FIXED: Now clearly shown */}
                     <div className="flex justify-between items-center">
-                      <span className="text-blue-100">Product ({quantity}x {formatPrice(productPrice)} MAD)</span>
-                      <span className="font-medium">{formatPrice(totals.productTotal)} MAD</span>
+                      <span className="text-white/80">Product ({quantity}x)</span>
+                      <span className="font-semibold text-white">{formatPrice(totals.productTotal)} MAD</span>
                     </div>
                     
                     <div className="flex justify-between">
-                      <span className="text-blue-100">Delivery</span>
-                      <span className="font-medium">{formatPrice(totals.shippingTotal)} MAD</span>
+                      <span className="text-white/80">Delivery</span>
+                      <span className="font-semibold text-white">{formatPrice(totals.shippingTotal)} MAD</span>
                     </div>
                     
-                    <div className="flex justify-between">
-                      <span className="text-blue-100">Your Markup</span>
-                      <span className="font-medium text-yellow-300">+{formatPrice(totals.markupTotal)} MAD</span>
-                    </div>
-                    
-                    <div className="border-t border-blue-400 my-2 pt-2">
-                      <div className="flex justify-between items-center text-base font-bold">
-                        <span>Total</span>
-                        <span className="text-xl">{formatPrice(totals.finalTotal)} MAD</span>
+                    {userRole === 'dropshipper' && markup > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-white/80">Your Markup</span>
+                        <span className="font-semibold text-yellow-300">+{formatPrice(totals.markupTotal)} MAD</span>
                       </div>
-                      <p className="text-xs text-blue-200 mt-1">Cash on delivery</p>
+                    )}
+                    
+                    <div className="border-t border-blue-500 my-2 pt-2">
+                      <div className="flex justify-between items-center text-base font-bold">
+                        <span className="text-white">Total</span>
+                        <span className="text-xl text-white">{formatPrice(totals.finalTotal)} MAD</span>
+                      </div>
+                      <p className="text-xs text-white/70 mt-1 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" />
+                        Cash on delivery
+                      </p>
                     </div>
                   </div>
 
                   <button
                     onClick={handleSubmitOrder}
                     disabled={loading || !selectedDelivery}
-                    className="w-full mt-4 bg-white text-blue-600 py-3 px-4 rounded-lg font-semibold hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                    className="w-full mt-4 bg-white text-blue-700 py-3 px-4 rounded-lg font-semibold hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-md"
                   >
                     {loading ? (
                       <>
@@ -547,7 +654,7 @@ export default function ProductDetailModal({
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                   <div className="flex items-center justify-around text-xs text-gray-600">
                     <div className="text-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mx-auto mb-1" />
+                      <Shield className="w-5 h-5 text-green-500 mx-auto mb-1" />
                       <span>Secure Payment</span>
                     </div>
                     <div className="text-center">
@@ -567,7 +674,7 @@ export default function ProductDetailModal({
       </div>
 
       {/* Order Confirmation */}
-      {showConfirmation && (
+      {showConfirmation && createdOrder && (
         <OrderConfirmation
           order={createdOrder}
           onClose={() => {

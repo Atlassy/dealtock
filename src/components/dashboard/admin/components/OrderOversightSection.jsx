@@ -21,14 +21,16 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "../../../../lib/supabaseClient";
-import { formatCurrency, formatDate, formatDateTime, downloadCSV, getStatusBadge } from '../utils/helpers';
+import { formatCurrency, formatDate, formatDateTime, downloadCSV } from '../utils/helpers';
 
+// ✅ FIXED: Match your actual database statuses from orders table
 const ORDER_STATUSES = [
-  'ordered', 'ready', 'picked', 'shipped', 'in_transit', 
-  'out_for_delivery', 'delivered', 'settled', 'returned', 'cancelled'
+  'ordered', 'approved', 'processing', 'ready_for_pickup',
+  'picked_up', 'in_transit', 'delivered',
+  'cancelled', 'returned', 'failed', 'refunded'
 ];
 
-const PAYMENT_STATUSES = ['pending', 'collected', 'failed', 'refunded'];
+const PAYMENT_STATUSES = ['pending', 'collected', 'paid', 'failed', 'refunded'];
 const PAYMENT_METHODS = ['COD', 'card', 'bank_transfer', 'wallet'];
 
 const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExport }) => {
@@ -103,24 +105,27 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
     totalValue: orders.reduce((sum, o) => sum + (o.final_customer_price || 0), 0)
   };
 
-  // Handle status update
+  // ✅ FIXED: Use RPC function for status updates
   const handleStatusUpdate = async (orderId, newStatus) => {
     if (!window.confirm(`Update order status to ${newStatus}?`)) return;
 
     try {
       setLoading(true);
       
-      const { error } = await supabase
-        .from('orders')
-        .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', orderId);
+        const { data, error } = await supabase
+      .rpc('update_order_status', {
+        p_order_id: orderId,
+        p_new_status: newStatus,
+        p_reason: null  // Add this third parameter
+      });
 
-      if (error) throw error;
+      if (error) {
+        console.error('RPC Error:', error);
+        toast.error(error.message || 'Failed to update order status');
+        return;
+      }
 
-      toast.success('Order status updated');
+      toast.success('Order status updated successfully');
       onRefresh();
     } catch (error) {
       console.error('Error updating order:', error);
@@ -221,17 +226,23 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
   const getStatusIcon = (status) => {
     switch(status) {
       case 'delivered':
-      case 'settled':
         return <CheckCircle className="w-4 h-4 text-green-500" />;
       case 'shipped':
       case 'in_transit':
-      case 'out_for_delivery':
+     
         return <Truck className="w-4 h-4 text-blue-500" />;
       case 'returned':
       case 'cancelled':
+      case 'failed':
         return <XCircle className="w-4 h-4 text-red-500" />;
-      default:
+      case 'processing':
+      case 'ready_for_pickup':
+        return <Package className="w-4 h-4 text-purple-500" />;
+      case 'ordered':
+      case 'approved':
         return <Clock className="w-4 h-4 text-yellow-500" />;
+      default:
+        return <Clock className="w-4 h-4 text-gray-500" />;
     }
   };
 
@@ -266,7 +277,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Updated with correct statuses */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-lg border">
           <p className="text-sm text-gray-600">Total Orders</p>
@@ -276,27 +287,27 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
         <div className="bg-white p-4 rounded-lg border">
           <p className="text-sm text-gray-600">Pending</p>
           <p className="text-2xl font-bold text-yellow-600">
-            {orderStats.byStatus.ordered + orderStats.byStatus.ready + orderStats.byStatus.picked}
+            {orderStats.byStatus.ordered + orderStats.byStatus.approved}
           </p>
           <p className="text-xs text-gray-500 mt-1">Awaiting processing</p>
         </div>
         <div className="bg-white p-4 rounded-lg border">
-          <p className="text-sm text-gray-600">In Transit</p>
-          <p className="text-2xl font-bold text-blue-600">
-            {orderStats.byStatus.shipped + orderStats.byStatus.in_transit + orderStats.byStatus.out_for_delivery}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">On the way</p>
-        </div>
+  <p className="text-sm text-gray-600">In Transit</p>
+  <p className="text-2xl font-bold text-blue-600">
+    {(orderStats.byStatus.picked_up || 0) + (orderStats.byStatus.in_transit || 0)}
+  </p>
+  <p className="text-xs text-gray-500 mt-1">On the way</p>
+</div>
         <div className="bg-white p-4 rounded-lg border">
           <p className="text-sm text-gray-600">Delivered</p>
           <p className="text-2xl font-bold text-green-600">
-            {orderStats.byStatus.delivered + orderStats.byStatus.settled}
+            {orderStats.byStatus.delivered}
           </p>
           <p className="text-xs text-gray-500 mt-1">Completed orders</p>
         </div>
       </div>
 
-      {/* Secondary Stats */}
+      {/* Secondary Stats - Updated */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg border">
           <p className="text-sm text-gray-600">COD Orders</p>
@@ -304,14 +315,18 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
           <p className="text-xs text-gray-500 mt-1">{orderStats.totalCollected} collected</p>
         </div>
         <div className="bg-white p-4 rounded-lg border">
-          <p className="text-sm text-gray-600">Returns</p>
-          <p className="text-2xl font-bold text-orange-600">{orderStats.byStatus.returned}</p>
-          <p className="text-xs text-gray-500 mt-1">Awaiting processing</p>
+          <p className="text-sm text-gray-600">Returns/Failed</p>
+          <p className="text-2xl font-bold text-orange-600">
+            {orderStats.byStatus.returned + orderStats.byStatus.failed}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">Issues to resolve</p>
         </div>
         <div className="bg-white p-4 rounded-lg border">
-          <p className="text-sm text-gray-600">Cancelled</p>
-          <p className="text-2xl font-bold text-red-600">{orderStats.byStatus.cancelled}</p>
-          <p className="text-xs text-gray-500 mt-1">Order cancelled</p>
+          <p className="text-sm text-gray-600">Cancelled/Refunded</p>
+          <p className="text-2xl font-bold text-red-600">
+            {orderStats.byStatus.cancelled + orderStats.byStatus.refunded}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">Closed orders</p>
         </div>
       </div>
 
@@ -394,37 +409,27 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th 
-                  className="text-left p-4 font-medium text-sm cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('order_number')}
-                >
+                <th className="text-left p-4 font-medium text-sm cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('order_number')}>
                   Order # {getSortIcon('order_number')}
                 </th>
-                <th 
-                  className="text-left p-4 font-medium text-sm cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('seller')}
-                >
+                <th className="text-left p-4 font-medium text-sm cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('seller')}>
                   Seller {getSortIcon('seller')}
                 </th>
                 <th className="text-left p-4 font-medium text-sm">Customer</th>
-                <th 
-                  className="text-left p-4 font-medium text-sm cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('final_customer_price')}
-                >
+                <th className="text-left p-4 font-medium text-sm cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('final_customer_price')}>
                   Amount {getSortIcon('final_customer_price')}
                 </th>
-                <th 
-                  className="text-left p-4 font-medium text-sm cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('status')}
-                >
+                <th className="text-left p-4 font-medium text-sm cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('status')}>
                   Status {getSortIcon('status')}
                 </th>
                 <th className="text-left p-4 font-medium text-sm">Payment</th>
                 <th className="text-left p-4 font-medium text-sm">Delivery</th>
-                <th 
-                  className="text-left p-4 font-medium text-sm cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('created_at')}
-                >
+                <th className="text-left p-4 font-medium text-sm cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('created_at')}>
                   Date {getSortIcon('created_at')}
                 </th>
                 <th className="text-left p-4 font-medium text-sm">Actions</th>
@@ -505,9 +510,9 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                   </td>
                   <td className="p-4">
                     <div className="text-sm">{order.delivery_company?.name || 'Unassigned'}</div>
-                    {order.tracking_number && (
+                    {order.delivery_tracking_number && (
                       <div className="text-xs text-gray-500 mt-1">
-                        Track: {order.tracking_number}
+                        Track: {order.delivery_tracking_number}
                       </div>
                     )}
                   </td>
@@ -615,16 +620,16 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                 </p>
                 <div className="grid grid-cols-3 gap-4 mt-2 text-sm">
                   <div>
-                    <p className="text-xs text-gray-500">Subtotal</p>
-                    <p>{formatCurrency(selectedOrder.subtotal || selectedOrder.final_customer_price)}</p>
+                    <p className="text-xs text-gray-500">Product Price</p>
+                    <p>{formatCurrency(selectedOrder.product_price || 0)}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Delivery Fee</p>
-                    <p>{formatCurrency(selectedOrder.delivery_fee || 0)}</p>
+                    <p>{formatCurrency(selectedOrder.shipping_fee || 0)}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Commission</p>
-                    <p>{formatCurrency(selectedOrder.commission_amount || 0)}</p>
+                    <p>{formatCurrency(selectedOrder.dealtock_commission || 0)}</p>
                   </div>
                 </div>
               </div>
@@ -666,7 +671,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Tracking Number</p>
-                    <p className="font-medium">{selectedOrder.tracking_number || 'N/A'}</p>
+                    <p className="font-medium">{selectedOrder.delivery_tracking_number || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Delivery Status</p>
@@ -694,24 +699,6 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                 </div>
               </div>
 
-              {/* Timeline */}
-              {selectedOrder.order_status_history && (
-                <div>
-                  <p className="text-xs text-gray-500 mb-2">Status Timeline</p>
-                  <div className="space-y-2">
-                    {selectedOrder.order_status_history.slice(0, 5).map((history, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span className="capitalize">{history.status?.replace('_', ' ')}</span>
-                        <span className="text-xs text-gray-500">
-                          {formatDateTime(history.created_at)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {/* Actions */}
               <div className="border-t pt-4 flex justify-end gap-3">
                 <button
@@ -719,15 +706,6 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                   className="px-4 py-2 border rounded-lg hover:bg-gray-50"
                 >
                   Close
-                </button>
-                <button
-                  onClick={() => {
-                    // You can add more actions here
-                    toast.info('Additional actions coming soon');
-                  }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Update Order
                 </button>
               </div>
             </div>

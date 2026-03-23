@@ -1,6 +1,8 @@
+// src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import RoleProtectedRoute from "./components/RoleProtectedRoute"; // Add this import
 import ForgotPassword from "./components/auth/ForgotPassword";
 import ResetPassword from "./components/auth/ResetPassword";
 import EmailConfirmation from "./components/auth/EmailConfirmation";
@@ -11,7 +13,8 @@ import SignUpForm from "./components/auth/SignUpForm";
 import Dashboard from "./components/dashboard/Dashboard";
 import ProfilePage from "./components/ProfilePage";
 import Navbar from "./components/Navbar";
-import MarketplacePage from "./components/marketplace/MarketplacePage"; // ✅ Added marketplace import
+import MarketplacePage from "./components/marketplace/MarketplacePage";
+import Inventory from "./components/dashboard/seller/Inventory";
 import { Toaster } from "sonner";
 
 export default function App() {
@@ -33,7 +36,17 @@ export default function App() {
       {user && <Navbar />}
 
       <Routes>
-        {/* Public routes */}
+        {/* Public routes - No authentication required */}
+        <Route 
+          path="/marketplace" 
+          element={
+            <ProtectedRoute isPublic={true}>
+              <MarketplacePage />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Auth routes */}
         <Route
           path="/login"
           element={user ? <Navigate to="/dashboard" replace /> : <Login />}
@@ -49,17 +62,21 @@ export default function App() {
           element={user ? <Navigate to="/dashboard" replace /> : <SignUpForm />}
         />
 
-        {/* ✅ Marketplace route - accessible to all authenticated users */}
+        {/* Protected routes - Require authentication */}
+        
+        {/* Inventory - Only sellers and admins can access */}
         <Route
-          path="/marketplace"
+          path="/inventory"
           element={
             <ProtectedRoute>
-              <MarketplacePage />
+              <RoleProtectedRoute allowedRoles={['seller', 'admin']}>
+                <Inventory />
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
 
-        {/* Protected routes */}
+        {/* Dashboard - All authenticated users can access */}
         <Route
           path="/dashboard/*"
           element={
@@ -69,6 +86,7 @@ export default function App() {
           }
         />
 
+        {/* Profile - All authenticated users can access */}
         <Route
           path="/profile"
           element={
@@ -81,7 +99,7 @@ export default function App() {
         {/* Default redirect */}
         <Route 
           path="/" 
-          element={<Navigate to={user ? "/dashboard" : "/login"} replace />} 
+          element={<Navigate to={user ? "/dashboard" : "/marketplace"} replace />} 
         />
         
         {/* Catch-all route */}

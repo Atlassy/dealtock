@@ -1,20 +1,21 @@
 // src/components/marketplace/MarketplacePage.jsx
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMarketplaceProducts } from '../../hooks/useMarketplaceProducts';
-import { useAuth } from '../../contexts/SupabaseAuthContext'; // ✅ Changed from useSupabase to useAuth
-
+import { useAuth } from '../../contexts/SupabaseAuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import ProductDetailModal from './components/ProductDetailModal'; // Add this import
+import ProductDetailModal from './components/ProductDetailModal';
+import { supabase } from '../../lib/supabaseClient';
 import { 
   Search, 
   Filter,
   X,
   MapPin,
   Package,
-  Star,
-  ChevronDown,
-  ChevronUp,
-  SlidersHorizontal
+  ShoppingBag,
+  LogIn,
+  UserPlus,
+  AlertCircle
 } from 'lucide-react';
 
 const CATEGORIES = ["Electronics", "Fashion", "Home", "Beauty", "Sports", "Books", "Automotive", "Other"];
@@ -27,7 +28,7 @@ const MOROCCAN_CITIES = [
 ];
 
 const MarketplacePage = () => {
-  const { user } = useAuth(); // Get the current user
+  const { user } = useAuth();
   const [filters, setFilters] = useState({
     search: '',
     category: '',
@@ -41,16 +42,13 @@ const MarketplacePage = () => {
 
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  
-  // Add state for selected product and modal
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   
-  const { products, loading, error, refetch, userRole, getPriceForRole } = useMarketplaceProducts(filters);
+  const { products, loading, error, userRole, getPriceForRole, refetch } = useMarketplaceProducts(filters);
 
-  // Add handler for order button
   const handleOrderClick = (product, e) => {
-    e.stopPropagation(); // Prevent any parent click events
+    e.stopPropagation();
     setSelectedProduct(product);
     setShowDetailModal(true);
   };
@@ -76,50 +74,59 @@ const MarketplacePage = () => {
     value !== '' && value !== 'created_at' && value !== 'desc'
   );
 
-  // Price formatter
   const formatPrice = (price) => {
+    if (!price && price !== 0) return '0 MAD';
     return new Intl.NumberFormat('fr-MA', {
       style: 'currency',
       currency: 'MAD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
-    }).format(price).replace('MAD', '').trim() + ' MAD';
+    }).format(price);
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-30">
+      <div className="bg-white border-b sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Marketplace</h1>
+            <Link to="/" className="flex items-center gap-2">
+              <ShoppingBag className="w-6 h-6 text-blue-600" />
+              <h1 className="text-2xl font-bold text-gray-900">Marketplace</h1>
+            </Link>
             
-            {/* Desktop Filter Toggle */}
-            <button
-              onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-              className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
-            >
-              <Filter className="w-4 h-4" />
-              {isFilterExpanded ? 'Hide Filters' : 'Show Filters'}
-              {hasActiveFilters && (
-                <span className="ml-2 w-2 h-2 bg-blue-500 rounded-full"></span>
+            <div className="flex items-center gap-4">
+              {user ? (
+                <>
+                  <Link to="/dashboard" className="text-gray-600 hover:text-gray-900 transition">
+                    Dashboard
+                  </Link>
+                  <button 
+                    onClick={() => supabase.auth.signOut()} 
+                    className="text-red-600 hover:text-red-700 transition"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="text-gray-600 hover:text-gray-900 transition flex items-center gap-1">
+                    <LogIn className="w-4 h-4" />
+                    Login
+                  </Link>
+                  <Link 
+                    to="/signup" 
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-1"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    Sign Up
+                  </Link>
+                </>
               )}
-            </button>
-
-            {/* Mobile Filter Button */}
-            <button
-              onClick={() => setShowMobileFilters(true)}
-              className="md:hidden flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg"
-            >
-              <Filter className="w-4 h-4" />
-              Filters
-              {hasActiveFilters && (
-                <span className="ml-2 w-2 h-2 bg-blue-500 rounded-full"></span>
-              )}
-            </button>
+            </div>
           </div>
 
-          {/* Compact Search Bar - Always Visible */}
+          {/* Search Bar */}
           <div className="mt-4 flex gap-2">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -128,13 +135,30 @@ const MarketplacePage = () => {
                 placeholder="Search products..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
+            <button
+              onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+              className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+            >
+              <Filter className="w-4 h-4" />
+              Filters
+              {hasActiveFilters && (
+                <span className="ml-2 w-2 h-2 bg-blue-500 rounded-full"></span>
+              )}
+            </button>
+            <button
+              onClick={() => setShowMobileFilters(true)}
+              className="md:hidden flex items-center gap-2 px-4 py-2.5 bg-gray-100 rounded-lg"
+            >
+              <Filter className="w-4 h-4" />
+              Filters
+            </button>
             <select
               value={filters.sortBy}
               onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
             >
               <option value="created_at">Newest First</option>
               <option value="price_asc">Price: Low to High</option>
@@ -156,7 +180,6 @@ const MarketplacePage = () => {
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
               <div className="grid grid-cols-4 gap-4">
-                {/* Category Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                   <select
@@ -171,7 +194,6 @@ const MarketplacePage = () => {
                   </select>
                 </div>
 
-                {/* Location Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
                   <select
@@ -186,7 +208,6 @@ const MarketplacePage = () => {
                   </select>
                 </div>
 
-                {/* Price Range */}
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Price Range (MAD)</label>
                   <div className="flex gap-2">
@@ -209,7 +230,6 @@ const MarketplacePage = () => {
                   </div>
                 </div>
 
-                {/* Condition */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Condition</label>
                   <select
@@ -228,17 +248,16 @@ const MarketplacePage = () => {
                   </select>
                 </div>
 
-                {/* Clear Filters */}
-                <div className="flex items-end">
-                  {hasActiveFilters && (
+                {hasActiveFilters && (
+                  <div className="flex items-end">
                     <button
                       onClick={clearFilters}
                       className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition w-full"
                     >
                       Clear Filters
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
@@ -270,9 +289,7 @@ const MarketplacePage = () => {
                 </button>
               </div>
 
-              {/* Mobile Filter Options */}
               <div className="space-y-4">
-                {/* Category */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Category</label>
                   <select
@@ -287,7 +304,6 @@ const MarketplacePage = () => {
                   </select>
                 </div>
 
-                {/* Location */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Location</label>
                   <select
@@ -302,7 +318,6 @@ const MarketplacePage = () => {
                   </select>
                 </div>
 
-                {/* Price Range */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Price Range (MAD)</label>
                   <div className="flex gap-2">
@@ -323,7 +338,6 @@ const MarketplacePage = () => {
                   </div>
                 </div>
 
-                {/* Condition */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Condition</label>
                   <select
@@ -343,9 +357,7 @@ const MarketplacePage = () => {
                 </div>
 
                 <button
-                  onClick={() => {
-                    setShowMobileFilters(false);
-                  }}
+                  onClick={() => setShowMobileFilters(false)}
                   className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium"
                 >
                   Apply Filters
@@ -368,7 +380,7 @@ const MarketplacePage = () => {
         )}
       </AnimatePresence>
 
-      {/* Products Grid - COMPACT CARDS */}
+      {/* Products Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -381,8 +393,9 @@ const MarketplacePage = () => {
             ))}
           </div>
         ) : error ? (
-          <div className="text-center py-12 text-red-600">
-            Error loading products: {error}
+          <div className="text-center py-12">
+            <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+            <p className="text-red-600">Error loading products: {error}</p>
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12">
@@ -395,14 +408,19 @@ const MarketplacePage = () => {
             {products.map((product) => {
               const priceInfo = getPriceForRole(product);
               
+              // Skip rendering if product has invalid price
+              if (priceInfo.invalid || priceInfo.price <= 0) {
+                return null;
+              }
+              
               return (
                 <motion.div
                   key={product.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow overflow-hidden"
+                  className="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow overflow-hidden cursor-pointer"
+                  onClick={() => handleOrderClick(product, { stopPropagation: () => {} })}
                 >
-                  {/* Product Image */}
                   <div className="relative h-32 bg-gray-100">
                     {product.image_url ? (
                       <img 
@@ -420,7 +438,6 @@ const MarketplacePage = () => {
                       </div>
                     )}
                     
-                    {/* Stock Badge */}
                     {product.quantity <= 3 && (
                       <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                         Only {product.quantity} left
@@ -428,18 +445,14 @@ const MarketplacePage = () => {
                     )}
                   </div>
 
-                  {/* Product Info - COMPACT */}
                   <div className="p-3">
-                    {/* Title and Location */}
                     <div className="mb-2">
                       <h3 className="font-semibold text-gray-900 text-sm line-clamp-1">
                         {product.name}
                       </h3>
                       <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                        <div className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          <span>{product.location || 'Location?'}</span>
-                        </div>
+                        <MapPin className="w-3 h-3" />
+                        <span>{product.location || 'Location?'}</span>
                         {product.condition && (
                           <span className="px-1.5 py-0.5 bg-gray-100 rounded text-xs">
                             {product.condition === 'new' ? 'New' : 
@@ -450,7 +463,6 @@ const MarketplacePage = () => {
                       </div>
                     </div>
 
-                    {/* Category and Seller */}
                     <div className="flex items-center justify-between text-xs mb-2">
                       <span className="text-gray-500">{product.category || 'Uncategorized'}</span>
                       <span className="text-gray-600 truncate max-w-[100px]">
@@ -458,7 +470,6 @@ const MarketplacePage = () => {
                       </span>
                     </div>
 
-                    {/* Price - NOW SHOWING CORRECTLY */}
                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
                       <div>
                         <p className="text-xs text-gray-500">{priceInfo.label}</p>
@@ -467,19 +478,12 @@ const MarketplacePage = () => {
                         </p>
                       </div>
                       <button
-                        onClick={(e) => handleOrderClick(product, e)} // ✅ Fixed handler
+                        onClick={(e) => handleOrderClick(product, e)}
                         className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition"
                       >
                         Order
                       </button>
                     </div>
-
-                    {/* Marketplace fee info for B2C customers */}
-                    {userRole !== 'dropshipper' && priceInfo.marketplace_fee > 0 && (
-                      <p className="text-xs text-gray-400 mt-1">
-                        +{formatPrice(priceInfo.marketplace_fee)} marketplace fee
-                      </p>
-                    )}
                   </div>
                 </motion.div>
               );
@@ -495,9 +499,11 @@ const MarketplacePage = () => {
           onClose={() => setShowDetailModal(false)}
           product={selectedProduct}
           dropshipperId={user?.id}
-          onOrderSuccess={() => {
+          userRole={userRole}
+          onOrderSuccess={(order) => {
+            console.log('Order placed:', order);
             setShowDetailModal(false);
-            refetch(); // Refresh the product list
+            refetch();
           }}
         />
       )}

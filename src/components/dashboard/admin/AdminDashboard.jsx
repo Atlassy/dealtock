@@ -8,7 +8,8 @@ import {
   Shield, 
   Eye, 
   Percent,
-  RefreshCw
+  RefreshCw,
+  FileText  // Add this import for the invoices icon
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -19,12 +20,16 @@ import EscrowManagementSection from './components/EscrowManagementSection';
 import OrderOversightSection from './components/OrderOversightSection';
 import CommissionRulesManager from './components/CommissionRulesManager';
 
+// Import invoice components
+import InvoicesList from './invoices/InvoicesList';
+
 const TABS = {
   OVERVIEW: 'overview',
   DELIVERY: 'delivery',
   ESCROW: 'escrow',
   ORDERS: 'orders',
-  COMMISSIONS: 'commissions'
+  COMMISSIONS: 'commissions',
+  INVOICES: 'invoices'  // Add new tab
 };
 
 const AdminDashboard = () => {
@@ -46,12 +51,18 @@ const AdminDashboard = () => {
     codOrders: 0,
     codCollected: 0,
     totalSellers: 0,
-    totalDropshippers: 0
+    totalDropshippers: 0,
+    // Add invoice stats
+    totalInvoices: 0,
+    pendingInvoices: 0,
+    paidInvoices: 0,
+    overdueInvoices: 0
   });
   
   const [deliveryCompanies, setDeliveryCompanies] = useState([]);
   const [escrows, setEscrows] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [invoices, setInvoices] = useState([]);  // Add invoices state
   const [recentActivity, setRecentActivity] = useState([]);
 
   useEffect(() => {
@@ -69,7 +80,8 @@ const AdminDashboard = () => {
         escrowResult, 
         ordersResult, 
         activityResult,
-        profilesResult
+        profilesResult,
+        invoicesResult  // Add invoices fetch
       ] = await Promise.allSettled([
         supabase.from('delivery_companies').select('*').order('created_at', { ascending: false }),
         supabase.from('escrow_holdings')
@@ -93,7 +105,9 @@ const AdminDashboard = () => {
           .limit(10),
         supabase.from('profiles')
           .select('role')
-          .in('role', ['seller', 'dropshipper'])
+          .in('role', ['seller', 'dropshipper']),
+        supabase.from('invoices')
+          .select('status')
       ]);
 
       // Process delivery companies
@@ -111,35 +125,50 @@ const AdminDashboard = () => {
         const ordersData = ordersResult.value.data || [];
         setOrders(ordersData);
         
-        // Calculate stats
+        // Calculate order stats
         const pendingEscrows = escrowResult.value?.data?.filter(e => !e.released_at)?.length || 0;
         const totalEscrowAmount = escrowResult.value?.data?.reduce((sum, e) => sum + (e.amount_held || 0), 0) || 0;
         const totalRevenue = ordersData.reduce((sum, o) => sum + (o.final_customer_price || 0), 0);
         
         const ordersDelivered = ordersData.filter(o => o.status === 'delivered').length;
-        const ordersShipped = ordersData.filter(o => ['shipped', 'in_transit', 'out_for_delivery'].includes(o.status)).length;
+		const ordersShipped = ordersData.filter(o => ['shipped', 'in_transit'].includes(o.status)).length;
         const ordersPending = ordersData.filter(o => ['ordered', 'ready', 'picked'].includes(o.status)).length;
         const codOrders = ordersData.filter(o => o.payment_method === 'COD').length;
         const codCollected = ordersData.filter(o => o.cod_collection_status === 'collected').length;
 
-        setStats({
-          totalOrders: ordersData.length,
-          pendingEscrows,
-          activeDeliveries: deliveryResult.value?.data?.filter(d => d.status === 'active').length || 0,
-          deliveredOrders: ordersDelivered,
-          shippedOrders: ordersShipped,
-          pendingOrders: ordersPending,
-          totalRevenue,
-          totalEscrowAmount,
-          codOrders,
-          codCollected,
-          totalSellers: profilesResult.status === 'fulfilled' 
-            ? profilesResult.value.data?.filter(p => p.role === 'seller').length || 0 
-            : 0,
-          totalDropshippers: profilesResult.status === 'fulfilled' 
-            ? profilesResult.value.data?.filter(p => p.role === 'dropshipper').length || 0 
-            : 0
-        });
+        // Process invoice stats
+        if (invoicesResult.status === 'fulfilled') {
+          const invoicesData = invoicesResult.value.data || [];
+          setInvoices(invoicesData);
+          
+          const totalInvoices = invoicesData.length;
+          const pendingInvoices = invoicesData.filter(i => i.status === 'generated' || i.status === 'sent').length;
+          const paidInvoices = invoicesData.filter(i => i.status === 'paid').length;
+          const overdueInvoices = invoicesData.filter(i => i.status === 'overdue').length;
+
+          setStats({
+            totalOrders: ordersData.length,
+            pendingEscrows,
+            activeDeliveries: deliveryResult.value?.data?.filter(d => d.is_active).length || 0,
+            deliveredOrders: ordersDelivered,
+            shippedOrders: ordersShipped,
+            pendingOrders: ordersPending,
+            totalRevenue,
+            totalEscrowAmount,
+            codOrders,
+            codCollected,
+            totalSellers: profilesResult.status === 'fulfilled' 
+              ? profilesResult.value.data?.filter(p => p.role === 'seller').length || 0 
+              : 0,
+            totalDropshippers: profilesResult.status === 'fulfilled' 
+              ? profilesResult.value.data?.filter(p => p.role === 'dropshipper').length || 0 
+              : 0,
+            totalInvoices,
+            pendingInvoices,
+            paidInvoices,
+            overdueInvoices
+          });
+        }
       }
 
       // Process activity
@@ -190,27 +219,34 @@ const AdminDashboard = () => {
   };
 
   const handleExportData = (type, data) => {
+    if (!data || data.length === 0) {
+      toast.warning('No data to export');
+      return;
+    }
+
     const csv = [
       Object.keys(data[0] || {}),
       ...data.map(row => Object.values(row).map(val => 
-        typeof val === 'string' ? `"${val}"` : val
+        typeof val === 'string' ? `"${val.replace(/"/g, '""')}"` : val
       ))
     ].map(row => row.join(',')).join('\n');
 
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `${type}-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
+    toast.success(`Exported ${data.length} ${type}`);
   };
 
   const tabs = [
     { key: TABS.OVERVIEW, label: 'Overview', icon: TrendingUp },
-    { key: TABS.DELIVERY, label: 'Delivery Companies', icon: Truck },
-    { key: TABS.ESCROW, label: 'Escrow Management', icon: Shield },
     { key: TABS.ORDERS, label: 'Order Oversight', icon: Eye },
+    { key: TABS.INVOICES, label: 'Invoices', icon: FileText },  // Add invoices tab
+    { key: TABS.ESCROW, label: 'Escrow Management', icon: Shield },
+    { key: TABS.DELIVERY, label: 'Delivery Companies', icon: Truck },
     { key: TABS.COMMISSIONS, label: 'Commissions', icon: Percent }
   ];
 
@@ -242,7 +278,7 @@ const AdminDashboard = () => {
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50 flex items-center gap-2 text-sm shadow-sm"
+            className="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50 flex items-center gap-2 text-sm shadow-sm disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? 'Refreshing...' : 'Refresh All Data'}
@@ -257,12 +293,17 @@ const AdminDashboard = () => {
               className={`px-4 py-3 font-medium whitespace-nowrap flex items-center gap-2 text-sm transition-all ${
                 activeTab === tab.key 
                   ? 'border-b-2 border-blue-500 text-blue-600 -mb-px' 
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300'
               }`}
               onClick={() => setActiveTab(tab.key)}
             >
               <tab.icon className="w-4 h-4" />
               {tab.label}
+              {tab.key === TABS.INVOICES && stats.pendingInvoices > 0 && (
+                <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                  {stats.pendingInvoices}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -279,12 +320,17 @@ const AdminDashboard = () => {
             />
           )}
           
-          {activeTab === TABS.DELIVERY && (
-            <DeliveryCompaniesSection 
-              companies={deliveryCompanies}
+          {activeTab === TABS.ORDERS && (
+            <OrderOversightSection 
+              orders={orders}
+              stats={stats}
               onRefresh={fetchDashboardData}
-              onExport={() => handleExportData('delivery-companies', deliveryCompanies)}
+              onExport={() => handleExportData('orders', orders)}
             />
+          )}
+          
+          {activeTab === TABS.INVOICES && (
+            <InvoicesList />
           )}
           
           {activeTab === TABS.ESCROW && (
@@ -296,12 +342,11 @@ const AdminDashboard = () => {
             />
           )}
           
-          {activeTab === TABS.ORDERS && (
-            <OrderOversightSection 
-              orders={orders}
-              stats={stats}
+          {activeTab === TABS.DELIVERY && (
+            <DeliveryCompaniesSection 
+              companies={deliveryCompanies}
               onRefresh={fetchDashboardData}
-              onExport={() => handleExportData('orders', orders)}
+              onExport={() => handleExportData('delivery-companies', deliveryCompanies)}
             />
           )}
           

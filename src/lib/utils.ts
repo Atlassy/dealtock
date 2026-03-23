@@ -18,3 +18,25 @@ export function formatPrice(price: number, lang: string = 'fr'): string {
 
   return `${numberFormat.format(price)} ${currencySymbol}`;
 }
+
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'MAD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(amount)
+}
+
+export function formatDate(date: string | null | undefined): string {
+  if (!date) return 'N/A'
+  try {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  } catch (error) {
+    return 'Invalid date'
+  }
+}

@@ -1,28 +1,32 @@
 // src/components/dashboard/dropshipper/Earnings.jsx
 import { useState, useEffect } from 'react';
-import { TrendingUp, Calendar, Download, ArrowUp, ArrowDown } from 'lucide-react';
+import { TrendingUp, Calendar, Download, ArrowUp, ArrowDown, Info } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
 import { useToast } from '../../ui/use-toast';
 
 const Earnings = ({ dropshipperId }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-  const [timeframe, setTimeframe] = useState('month'); // week, month, year, all
+  const [timeframe, setTimeframe] = useState('month');
   const [earnings, setEarnings] = useState({
-    totalCommission: 0,
-    pendingCommission: 0,
-    paidCommission: 0,
+    grossCommission: 0,      // Total markup before commission
+    dealtockFees: 0,          // Total commission paid to Dealtock
+    netEarnings: 0,           // Actual earnings after fees
+    pendingGross: 0,
+    pendingNet: 0,
+    paidGross: 0,
+    paidNet: 0,
     totalOrders: 0,
     averageOrderValue: 0,
-    thisMonth: 0,
-    lastMonth: 0,
+    averageCommission: 0,
+    thisMonthGross: 0,
+    thisMonthNet: 0,
+    lastMonthGross: 0,
+    lastMonthNet: 0,
     growth: 0
   });
   const [transactions, setTransactions] = useState([]);
-  const [dateRange, setDateRange] = useState({
-    start: new Date(new Date().setMonth(new Date().getMonth() - 1)),
-    end: new Date()
-  });
+  const [showBreakdown, setShowBreakdown] = useState(false);
 
   useEffect(() => {
     if (dropshipperId) {
@@ -35,62 +39,113 @@ const Earnings = ({ dropshipperId }) => {
     try {
       setLoading(true);
 
+      // Get date range based on timeframe
+      const now = new Date();
+      let startDate = new Date();
+      
+      switch (timeframe) {
+        case 'week':
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case 'month':
+          startDate.setMonth(now.getMonth() - 1);
+          break;
+        case 'year':
+          startDate.setFullYear(now.getFullYear() - 1);
+          break;
+        default:
+          startDate = new Date(0); // Beginning of time
+      }
+
       // Get all orders for this dropshipper
       const { data: orders, error } = await supabase
         .from('orders')
-        .select('*')
+        .select(`
+          *,
+          products!inner (
+            name,
+            category_id
+          )
+        `)
         .eq('dropshipper_id', dropshipperId)
+        .gte('ordered_at', startDate.toISOString())
         .order('ordered_at', { ascending: false });
 
       if (error) throw error;
 
-      if (!orders) return;
+      if (!orders) {
+        setEarnings(prev => ({ ...prev, totalOrders: 0 }));
+        return;
+      }
 
       // Calculate metrics
-      const now = new Date();
-      const thisMonth = now.getMonth();
-      const thisYear = now.getFullYear();
+      const now_date = new Date();
+      const thisMonth = now_date.getMonth();
+      const thisYear = now_date.getFullYear();
       const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
       const lastMonthYear = thisMonth === 0 ? thisYear - 1 : thisYear;
 
-      let totalCommission = 0;
-      let pendingCommission = 0;
-      let paidCommission = 0;
-      let thisMonthTotal = 0;
-      let lastMonthTotal = 0;
+      let grossCommission = 0;
+      let dealtockFees = 0;
+      let netEarnings = 0;
+      let pendingGross = 0;
+      let pendingNet = 0;
+      let paidGross = 0;
+      let paidNet = 0;
+      let thisMonthGross = 0;
+      let thisMonthNet = 0;
+      let lastMonthGross = 0;
+      let lastMonthNet = 0;
 
       orders.forEach(order => {
-        const commission = Number(order.dropshipper_markup) || 0;
-        totalCommission += commission;
+        const gross = Number(order.dropshipper_markup) || 0;
+        const fee = Number(order.dropshipper_commission_amount) || 0;
+        const net = gross - fee;
 
-        // Check payment status from payouts table if needed
-        if (order.status === 'delivered') {
-          paidCommission += commission;
+        grossCommission += gross;
+        dealtockFees += fee;
+        netEarnings += net;
+
+        // Payment status
+        if (order.status === 'delivered' || order.status === 'settled') {
+          paidGross += gross;
+          paidNet += net;
         } else {
-          pendingCommission += commission;
+          pendingGross += gross;
+          pendingNet += net;
         }
 
+        // Monthly comparison
         const orderDate = new Date(order.ordered_at);
         if (orderDate.getMonth() === thisMonth && orderDate.getFullYear() === thisYear) {
-          thisMonthTotal += commission;
+          thisMonthGross += gross;
+          thisMonthNet += net;
         }
         if (orderDate.getMonth() === lastMonth && orderDate.getFullYear() === lastMonthYear) {
-          lastMonthTotal += commission;
+          lastMonthGross += gross;
+          lastMonthNet += net;
         }
       });
 
-      const growth = lastMonthTotal > 0 
-        ? ((thisMonthTotal - lastMonthTotal) / lastMonthTotal) * 100 
-        : thisMonthTotal > 0 ? 100 : 0;
+      const growth = lastMonthNet > 0 
+        ? ((thisMonthNet - lastMonthNet) / lastMonthNet) * 100 
+        : thisMonthNet > 0 ? 100 : 0;
 
       setEarnings({
-        totalCommission,
-        pendingCommission,
-        paidCommission,
+        grossCommission,
+        dealtockFees,
+        netEarnings,
+        pendingGross,
+        pendingNet,
+        paidGross,
+        paidNet,
         totalOrders: orders.length,
-        averageOrderValue: orders.length > 0 ? totalCommission / orders.length : 0,
-        thisMonth: thisMonthTotal,
-        lastMonth: lastMonthTotal,
+        averageOrderValue: orders.length > 0 ? netEarnings / orders.length : 0,
+        averageCommission: grossCommission > 0 ? (dealtockFees / grossCommission) * 100 : 0,
+        thisMonthGross,
+        thisMonthNet,
+        lastMonthGross,
+        lastMonthNet,
         growth
       });
 
@@ -108,26 +163,28 @@ const Earnings = ({ dropshipperId }) => {
 
   const fetchTransactions = async () => {
     try {
-      // Get payouts for this dropshipper
-      const { data: payouts, error } = await supabase
-        .from('payouts')
+      // Get recent orders as transactions
+      const { data: orders, error } = await supabase
+        .from('orders')
         .select(`
-          *,
-          orders!payouts_order_id_fkey (
-            order_number,
-            products!orders_product_id_fkey (
-              name
-            )
+          id,
+          order_number,
+          ordered_at,
+          dropshipper_markup,
+          dropshipper_commission_amount,
+          dropshipper_net_earnings,
+          status,
+          products!inner (
+            name
           )
         `)
-        .eq('user_id', dropshipperId)
-        .eq('role', 'dropshipper')
-        .order('created_at', { ascending: false })
+        .eq('dropshipper_id', dropshipperId)
+        .order('ordered_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;
 
-      setTransactions(payouts || []);
+      setTransactions(orders || []);
     } catch (error) {
       console.error('Error fetching transactions:', error);
     }
@@ -146,6 +203,10 @@ const Earnings = ({ dropshipperId }) => {
     }
   };
 
+  const formatCurrency = (value) => {
+    return `${Number(value).toFixed(2)} MAD`;
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -158,7 +219,10 @@ const Earnings = ({ dropshipperId }) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Earnings Overview</h2>
+        <div>
+          <h2 className="text-lg font-semibold">Earnings Overview</h2>
+          <p className="text-sm text-gray-500">{getDateRangeText()}</p>
+        </div>
         <div className="flex space-x-2">
           {['week', 'month', 'year', 'all'].map((t) => (
             <button
@@ -176,24 +240,24 @@ const Earnings = ({ dropshipperId }) => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Main Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-1">Total Commission</p>
-          <p className="text-2xl font-bold">{earnings.totalCommission.toFixed(2)} MAD</p>
-          <p className="text-xs text-gray-400 mt-2">{getDateRangeText()}</p>
+          <p className="text-sm text-gray-600 mb-1">Gross Revenue (Markup)</p>
+          <p className="text-2xl font-bold">{formatCurrency(earnings.grossCommission)}</p>
+          <p className="text-xs text-gray-400 mt-2">Total markup before fees</p>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-1">Pending</p>
-          <p className="text-2xl font-bold text-yellow-600">{earnings.pendingCommission.toFixed(2)} MAD</p>
-          <p className="text-xs text-gray-400 mt-2">Awaiting delivery</p>
+          <p className="text-sm text-gray-600 mb-1">Dealtock Fees</p>
+          <p className="text-2xl font-bold text-orange-600">{formatCurrency(earnings.dealtockFees)}</p>
+          <p className="text-xs text-gray-400 mt-2">{earnings.averageCommission.toFixed(1)}% avg commission</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-1">Paid</p>
-          <p className="text-2xl font-bold text-green-600">{earnings.paidCommission.toFixed(2)} MAD</p>
-          <p className="text-xs text-gray-400 mt-2">Settled to your account</p>
+        <div className="bg-white rounded-lg shadow p-6 border-2 border-green-100">
+          <p className="text-sm text-gray-600 mb-1">Net Earnings</p>
+          <p className="text-2xl font-bold text-green-600">{formatCurrency(earnings.netEarnings)}</p>
+          <p className="text-xs text-gray-400 mt-2">After Dealtock fees</p>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
@@ -206,7 +270,58 @@ const Earnings = ({ dropshipperId }) => {
               <ArrowDown className="w-5 h-5 text-red-600 ml-2" />
             )}
           </div>
-          <p className="text-xs text-gray-400 mt-2">vs last month</p>
+          <p className="text-xs text-gray-400 mt-2">vs last month (net)</p>
+        </div>
+      </div>
+
+      {/* Pending vs Paid Breakdown */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="font-medium">Pending Earnings</h3>
+            <Info className="w-4 h-4 text-gray-400" />
+          </div>
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Gross Pending:</span>
+              <span className="font-medium">{formatCurrency(earnings.pendingGross)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Dealtock Fees:</span>
+              <span className="text-orange-600">-{formatCurrency(earnings.pendingGross - earnings.pendingNet)}</span>
+            </div>
+            <div className="flex justify-between font-bold pt-2 border-t">
+              <span>Your Net:</span>
+              <span className="text-yellow-600">{formatCurrency(earnings.pendingNet)}</span>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              ⏳ Available after delivery
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="font-medium">Paid Earnings</h3>
+            <Info className="w-4 h-4 text-gray-400" />
+          </div>
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Gross Paid:</span>
+              <span className="font-medium">{formatCurrency(earnings.paidGross)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Dealtock Fees:</span>
+              <span className="text-orange-600">-{formatCurrency(earnings.paidGross - earnings.paidNet)}</span>
+            </div>
+            <div className="flex justify-between font-bold pt-2 border-t">
+              <span>Your Net:</span>
+              <span className="text-green-600">{formatCurrency(earnings.paidNet)}</span>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              ✅ Settled to your account
+            </p>
+          </div>
         </div>
       </div>
 
@@ -214,14 +329,38 @@ const Earnings = ({ dropshipperId }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="font-medium mb-4">This Month</h3>
-          <p className="text-3xl font-bold text-blue-600">{earnings.thisMonth.toFixed(2)} MAD</p>
-          <p className="text-sm text-gray-600 mt-2">from {earnings.totalOrders} orders</p>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-600">Gross Markup:</span>
+              <span className="font-medium">{formatCurrency(earnings.thisMonthGross)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-600">Dealtock Fees:</span>
+              <span className="text-orange-600">-{formatCurrency(earnings.thisMonthGross - earnings.thisMonthNet)}</span>
+            </div>
+            <div className="flex justify-between font-bold pt-2 border-t">
+              <span>Net Earnings:</span>
+              <span className="text-blue-600">{formatCurrency(earnings.thisMonthNet)}</span>
+            </div>
+          </div>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="font-medium mb-4">Last Month</h3>
-          <p className="text-3xl font-bold text-gray-700">{earnings.lastMonth.toFixed(2)} MAD</p>
-          <p className="text-sm text-gray-600 mt-2">Average order: {earnings.averageOrderValue.toFixed(2)} MAD</p>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-600">Gross Markup:</span>
+              <span className="font-medium">{formatCurrency(earnings.lastMonthGross)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-600">Dealtock Fees:</span>
+              <span className="text-orange-600">-{formatCurrency(earnings.lastMonthGross - earnings.lastMonthNet)}</span>
+            </div>
+            <div className="flex justify-between font-bold pt-2 border-t">
+              <span>Net Earnings:</span>
+              <span className="text-gray-700">{formatCurrency(earnings.lastMonthNet)}</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -230,14 +369,37 @@ const Earnings = ({ dropshipperId }) => {
         <div className="p-6 border-b">
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">Recent Transactions</h3>
-            <button className="flex items-center text-sm text-blue-600 hover:text-blue-700">
+            <button 
+              onClick={() => {
+                const csv = [
+                  ['Order', 'Product', 'Date', 'Gross Markup', 'Dealtock Fee', 'Net Earnings', 'Status'],
+                  ...transactions.map(t => [
+                    t.order_number,
+                    t.products?.name,
+                    new Date(t.ordered_at).toLocaleDateString(),
+                    t.dropshipper_markup,
+                    t.dropshipper_commission_amount,
+                    t.dropshipper_net_earnings,
+                    t.status
+                  ])
+                ].map(row => row.join(',')).join('\n');
+                
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `earnings-${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+              }}
+              className="flex items-center text-sm text-blue-600 hover:text-blue-700"
+            >
               <Download className="w-4 h-4 mr-1" />
               Export
             </button>
           </div>
         </div>
 
-        <div className="divide-y">
+        <div className="divide-y max-h-96 overflow-auto">
           {transactions.length === 0 ? (
             <div className="p-12 text-center text-gray-500">
               <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -246,29 +408,37 @@ const Earnings = ({ dropshipperId }) => {
           ) : (
             transactions.map((transaction) => (
               <div key={transaction.id} className="p-4 hover:bg-gray-50">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">
-                      Order #{transaction.orders?.order_number}
-                    </p>
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium">Order #{transaction.order_number}</p>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        transaction.status === 'delivered' || transaction.status === 'settled'
+                          ? 'bg-green-100 text-green-800'
+                          : transaction.status === 'ordered' || transaction.status === 'approved'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {transaction.status}
+                      </span>
+                    </div>
                     <p className="text-sm text-gray-600">
-                      {transaction.orders?.products?.name}
+                      {transaction.products?.name}
                     </p>
                     <p className="text-xs text-gray-400">
-                      {new Date(transaction.created_at).toLocaleDateString()}
+                      {new Date(transaction.ordered_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-green-600">
-                      +{Number(transaction.amount).toFixed(2)} MAD
+                    <p className="text-sm text-gray-600">
+                      Gross: <span className="font-medium">{formatCurrency(transaction.dropshipper_markup)}</span>
                     </p>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      transaction.status === 'paid' 
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {transaction.status}
-                    </span>
+                    <p className="text-xs text-orange-600">
+                      Fee: -{formatCurrency(transaction.dropshipper_commission_amount)}
+                    </p>
+                    <p className="font-bold text-green-600">
+                      Net: {formatCurrency(transaction.dropshipper_net_earnings)}
+                    </p>
                   </div>
                 </div>
               </div>

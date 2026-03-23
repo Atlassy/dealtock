@@ -1,4 +1,4 @@
-﻿// CommissionRulesManager.jsx - Fixed for your schema
+﻿// CommissionRulesManager.jsx - Updated for new commission rules structure
 import React, { useState, useEffect } from "react";
 import { supabase } from "../../../../lib/supabaseClient";
 import { 
@@ -8,9 +8,11 @@ import {
   Trash2, 
   X,
   Save,
-  Filter,
   RefreshCw,
-  AlertCircle
+  Users,
+  Truck,
+  Star,
+  Crown
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,15 +23,26 @@ const CommissionRulesManager = () => {
   const [showAddRule, setShowAddRule] = useState(false);
   const [editingRule, setEditingRule] = useState(null);
   const [ruleForm, setRuleForm] = useState({
-    applies_to: 'dealtock', // 'seller', 'dropshipper', 'dealtock'
+    applies_to: 'B2C',
     category: '',
-    percentage: '10',
+    percentage: '30',
     min_amount: '',
     max_amount: '',
     is_active: true,
     valid_from: new Date().toISOString().split('T')[0],
     valid_to: ''
   });
+
+  // Calculate stats based on current rules
+  const stats = {
+    total: rules.length,
+    active: rules.filter(r => r.is_active).length,
+    b2c: rules.filter(r => r.applies_to === 'B2C').length,
+    seller: rules.filter(r => r.applies_to === 'Seller').length,
+    dropshipper: rules.filter(r => r.applies_to === 'dropshipper').length,
+    proSeller: rules.filter(r => r.applies_to === 'Pro_Seller').length,
+    proDropshipper: rules.filter(r => r.applies_to === 'Pro_dropshipper').length
+  };
 
   useEffect(() => {
     loadCommissionData();
@@ -38,35 +51,46 @@ const CommissionRulesManager = () => {
   const loadCommissionData = async () => {
     try {
       setLoading(true);
+      console.log('🔍 Loading commission data...');
       
-      // Fetch commission rules
+      // Fetch commission rules with categories join
       const { data: rulesData, error: rulesError } = await supabase
         .from('commission_rules')
-        .select('*')
+        .select(`
+          *,
+          categories (
+            id,
+            name
+          )
+        `)
+        .order('applies_to', { ascending: true })
+        .order('priority', { ascending: false })
         .order('created_at', { ascending: false });
-      
+
       if (rulesError) {
-        console.error('Rules fetch error:', rulesError);
+        console.error('❌ Rules fetch error:', rulesError);
         toast.error('Failed to load commission rules');
         setRules([]);
       } else {
         setRules(rulesData || []);
+        console.log(`✅ Loaded ${rulesData?.length || 0} commission rules`);
       }
 
-      // Fetch categories
+      // Fetch categories for dropdown
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
-        .select('id, name');
+        .select('id, name')
+        .order('name', { ascending: true });
       
       if (categoriesError) {
-        console.error('Categories fetch error:', categoriesError);
+        console.error('❌ Categories fetch error:', categoriesError);
         setCategories([]);
       } else {
         setCategories(categoriesData || []);
       }
 
     } catch (error) {
-      console.error('Error loading commission data:', error);
+      console.error('❌ Error loading commission data:', error);
       toast.error('Failed to load commission data');
     } finally {
       setLoading(false);
@@ -81,20 +105,37 @@ const CommissionRulesManager = () => {
         return;
       }
 
-      if (!ruleForm.percentage || parseFloat(ruleForm.percentage) <= 0) {
+      if (!ruleForm.percentage || parseFloat(ruleForm.percentage) < 0) {
         toast.error('Please enter a valid percentage');
         return;
       }
 
+      // Find category name if ID is selected
+      let categoryName = null;
+      if (ruleForm.category) {
+        const selectedCategory = categories.find(c => c.id === ruleForm.category);
+        categoryName = selectedCategory?.name || null;
+      }
+
+      // Determine priority based on rule type and category
+      let priority = 10;
+      if (!ruleForm.category) {
+        priority = 0; // Default rules have lower priority
+      }
+
       const ruleData = {
         applies_to: ruleForm.applies_to,
-        category: ruleForm.category || null,
+        category: categoryName,
+        category_id: ruleForm.category || null,
         percentage: parseFloat(ruleForm.percentage),
         min_amount: ruleForm.min_amount ? parseFloat(ruleForm.min_amount) : null,
         max_amount: ruleForm.max_amount ? parseFloat(ruleForm.max_amount) : null,
         is_active: ruleForm.is_active,
+        is_default: !ruleForm.category, // No category means default rule
+        priority: priority,
         valid_from: ruleForm.valid_from || new Date().toISOString().split('T')[0],
-        valid_to: ruleForm.valid_to || null
+        valid_to: ruleForm.valid_to || null,
+        rule_type: 'commission'
       };
 
       let result;
@@ -116,6 +157,7 @@ const CommissionRulesManager = () => {
       toast.success(editingRule ? 'Rule updated successfully' : 'Rule created successfully');
       setShowAddRule(false);
       setEditingRule(null);
+      resetForm();
       loadCommissionData();
       
     } catch (error) {
@@ -127,9 +169,9 @@ const CommissionRulesManager = () => {
   const handleEditRule = (rule) => {
     setEditingRule(rule);
     setRuleForm({
-      applies_to: rule.applies_to || 'dealtock',
-      category: rule.category || '',
-      percentage: rule.percentage?.toString() || '10',
+      applies_to: rule.applies_to || 'B2C',
+      category: rule.category_id || '',
+      percentage: rule.percentage?.toString() || '',
       min_amount: rule.min_amount?.toString() || '',
       max_amount: rule.max_amount?.toString() || '',
       is_active: rule.is_active ?? true,
@@ -177,9 +219,9 @@ const CommissionRulesManager = () => {
 
   const resetForm = () => {
     setRuleForm({
-      applies_to: 'dealtock',
+      applies_to: 'B2C',
       category: '',
-      percentage: '10',
+      percentage: '',
       min_amount: '',
       max_amount: '',
       is_active: true,
@@ -189,19 +231,50 @@ const CommissionRulesManager = () => {
     setEditingRule(null);
   };
 
-  // Calculate stats
-  const stats = {
-    total: rules.length,
-    active: rules.filter(r => r.is_active).length,
-    seller: rules.filter(r => r.applies_to === 'seller').length,
-    dropshipper: rules.filter(r => r.applies_to === 'dropshipper').length,
-    dealtock: rules.filter(r => r.applies_to === 'dealtock').length
+  const getCategoryName = (rule) => {
+    // First try to get from category_id join
+    if (rule.categories?.name) {
+      return rule.categories.name;
+    }
+    // Fallback to old category text field
+    if (rule.category) {
+      return rule.category;
+    }
+    return 'All Categories';
   };
 
-  const getCategoryName = (categoryId) => {
-    if (!categoryId) return 'All Categories';
-    const category = categories.find(c => c.id === categoryId);
-    return category?.name || categoryId;
+  const getAppliesToIcon = (appliesTo) => {
+    switch (appliesTo) {
+      case 'B2C':
+        return <Users className="w-4 h-4" />;
+      case 'Seller':
+        return <Star className="w-4 h-4" />;
+      case 'dropshipper':
+        return <Truck className="w-4 h-4" />;
+      case 'Pro_Seller':
+        return <Crown className="w-4 h-4" />;
+      case 'Pro_dropshipper':
+        return <Crown className="w-4 h-4" />;
+      default:
+        return <Percent className="w-4 h-4" />;
+    }
+  };
+
+  const getAppliesToColor = (appliesTo) => {
+    switch (appliesTo) {
+      case 'B2C':
+        return 'bg-green-100 text-green-800';
+      case 'Seller':
+        return 'bg-blue-100 text-blue-800';
+      case 'dropshipper':
+        return 'bg-purple-100 text-purple-800';
+      case 'Pro_Seller':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'Pro_dropshipper':
+        return 'bg-orange-100 text-orange-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
@@ -214,7 +287,7 @@ const CommissionRulesManager = () => {
             Commission Rules Management
           </h2>
           <p className="text-gray-600 text-sm mt-1">
-            Configure platform fees for sellers, dropshippers, and Dealtock
+            Configure platform fees for B2C, Sellers, Dropshippers, and Premium users
           </p>
         </div>
         <div className="flex gap-2">
@@ -239,7 +312,7 @@ const CommissionRulesManager = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="bg-white p-4 rounded-lg shadow">
           <p className="text-sm text-gray-600">Total Rules</p>
           <p className="text-2xl font-bold">{stats.total}</p>
@@ -247,6 +320,10 @@ const CommissionRulesManager = () => {
         <div className="bg-white p-4 rounded-lg shadow">
           <p className="text-sm text-gray-600">Active Rules</p>
           <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <p className="text-sm text-gray-600">B2C Rules</p>
+          <p className="text-2xl font-bold text-green-600">{stats.b2c}</p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow">
           <p className="text-sm text-gray-600">Seller Rules</p>
@@ -257,8 +334,8 @@ const CommissionRulesManager = () => {
           <p className="text-2xl font-bold text-purple-600">{stats.dropshipper}</p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600">Dealtock Rules</p>
-          <p className="text-2xl font-bold text-orange-600">{stats.dealtock}</p>
+          <p className="text-sm text-gray-600">Premium Rules</p>
+          <p className="text-2xl font-bold text-yellow-600">{stats.proSeller + stats.proDropshipper}</p>
         </div>
       </div>
 
@@ -287,22 +364,21 @@ const CommissionRulesManager = () => {
                 {rules.map((rule) => (
                   <tr key={rule.id} className="border-t hover:bg-gray-50">
                     <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        rule.applies_to === 'seller' ? 'bg-blue-100 text-blue-800' :
-                        rule.applies_to === 'dropshipper' ? 'bg-purple-100 text-purple-800' :
-                        'bg-orange-100 text-orange-800'
-                      }`}>
-                        {rule.applies_to?.charAt(0).toUpperCase() + rule.applies_to?.slice(1)}
+                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getAppliesToColor(rule.applies_to)}`}>
+                        {getAppliesToIcon(rule.applies_to)}
+                        {rule.applies_to === 'Pro_Seller' ? 'Pro Seller' :
+                         rule.applies_to === 'Pro_dropshipper' ? 'Pro Dropshipper' :
+                         rule.applies_to}
                       </span>
                     </td>
                     <td className="p-4 text-sm">
-                      {getCategoryName(rule.category)}
+                      {getCategoryName(rule)}
                     </td>
                     <td className="p-4 font-medium">
-                      {rule.percentage}%
+                      <span className="text-blue-600 font-bold">{rule.percentage}%</span>
                     </td>
                     <td className="p-4 text-sm text-gray-600">
-                      {rule.min_amount || 0} - {rule.max_amount || '∞'}
+                      {rule.min_amount !== null ? `${rule.min_amount} MAD` : '0 MAD'} - {rule.max_amount !== null ? `${rule.max_amount} MAD` : '∞'}
                     </td>
                     <td className="p-4 text-sm">
                       <div>{new Date(rule.valid_from).toLocaleDateString()}</div>
@@ -315,7 +391,7 @@ const CommissionRulesManager = () => {
                     <td className="p-4">
                       <button
                         onClick={() => handleToggleActive(rule)}
-                        className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer ${
+                        className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors ${
                           rule.is_active 
                             ? 'bg-green-100 text-green-800 hover:bg-green-200' 
                             : 'bg-red-100 text-red-800 hover:bg-red-200'
@@ -328,14 +404,14 @@ const CommissionRulesManager = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleEditRule(rule)}
-                          className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                          className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                           title="Edit"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteRule(rule.id)}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded"
+                          className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
                           title="Delete"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -389,10 +465,19 @@ const CommissionRulesManager = () => {
                   className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   required
                 >
-                  <option value="dealtock">Dealtock (Platform)</option>
-                  <option value="seller">Seller</option>
+                  <option value="B2C">B2C (Customer Direct)</option>
+                  <option value="Seller">Seller</option>
                   <option value="dropshipper">Dropshipper</option>
+                  <option value="Pro_Seller">Pro Seller (Premium)</option>
+                  <option value="Pro_dropshipper">Pro Dropshipper (Premium)</option>
                 </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  {ruleForm.applies_to === 'B2C' && '30% commission on final price'}
+                  {ruleForm.applies_to === 'Seller' && 'Commission charged to sellers'}
+                  {ruleForm.applies_to === 'dropshipper' && 'Commission on dropshipper markup'}
+                  {ruleForm.applies_to === 'Pro_Seller' && 'Premium sellers get 80% discount on regular seller rates'}
+                  {ruleForm.applies_to === 'Pro_dropshipper' && 'Premium dropshippers get 80% discount on regular rates'}
+                </p>
               </div>
 
               {/* Category */}
@@ -403,13 +488,13 @@ const CommissionRulesManager = () => {
                   onChange={(e) => setRuleForm({...ruleForm, category: e.target.value})}
                   className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">All Categories</option>
+                  <option value="">All Categories (Default Rule)</option>
                   {categories.map(cat => (
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
                 <p className="text-xs text-gray-500 mt-1">
-                  Leave empty to apply to all categories
+                  Leave empty for default rule (applies to all categories)
                 </p>
               </div>
 
@@ -424,36 +509,41 @@ const CommissionRulesManager = () => {
                     max="100"
                     value={ruleForm.percentage}
                     onChange={(e) => setRuleForm({...ruleForm, percentage: e.target.value})}
-                    className="w-full p-2 border rounded-lg pr-8"
+                    className="w-full p-2 border rounded-lg pr-8 focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., 30"
                     required
                   />
                   <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
                 </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {ruleForm.applies_to === 'Pro_Seller' && 'Pro sellers get 80% discount (20% of regular rates)'}
+                  {ruleForm.applies_to === 'Pro_dropshipper' && 'Pro dropshippers get 80% discount (20% of regular rates)'}
+                </p>
               </div>
 
               {/* Order Amount Range */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Min Order (MAD)</label>
+                  <label className="block text-sm font-medium mb-1">Min Order Amount (MAD)</label>
                   <input
                     type="number"
                     step="0.01"
                     min="0"
                     value={ruleForm.min_amount}
                     onChange={(e) => setRuleForm({...ruleForm, min_amount: e.target.value})}
-                    className="w-full p-2 border rounded-lg"
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="0"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Max Order (MAD)</label>
+                  <label className="block text-sm font-medium mb-1">Max Order Amount (MAD)</label>
                   <input
                     type="number"
                     step="0.01"
                     min="0"
                     value={ruleForm.max_amount}
                     onChange={(e) => setRuleForm({...ruleForm, max_amount: e.target.value})}
-                    className="w-full p-2 border rounded-lg"
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="No max"
                   />
                 </div>
@@ -467,7 +557,7 @@ const CommissionRulesManager = () => {
                     type="date"
                     value={ruleForm.valid_from}
                     onChange={(e) => setRuleForm({...ruleForm, valid_from: e.target.value})}
-                    className="w-full p-2 border rounded-lg"
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
@@ -476,7 +566,7 @@ const CommissionRulesManager = () => {
                     type="date"
                     value={ruleForm.valid_to}
                     onChange={(e) => setRuleForm({...ruleForm, valid_to: e.target.value})}
-                    className="w-full p-2 border rounded-lg"
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -488,7 +578,7 @@ const CommissionRulesManager = () => {
                   id="isActive"
                   checked={ruleForm.is_active}
                   onChange={(e) => setRuleForm({...ruleForm, is_active: e.target.checked})}
-                  className="rounded text-blue-600 mr-2"
+                  className="rounded text-blue-600 mr-2 focus:ring-blue-500"
                 />
                 <label htmlFor="isActive" className="text-sm font-medium">
                   Rule is active
@@ -503,13 +593,13 @@ const CommissionRulesManager = () => {
                     setShowAddRule(false);
                     resetForm();
                   }}
-                  className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                  className="px-4 py-2 border rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveRule}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-colors"
                 >
                   <Save className="w-4 h-4" />
                   {editingRule ? 'Update Rule' : 'Add Rule'}

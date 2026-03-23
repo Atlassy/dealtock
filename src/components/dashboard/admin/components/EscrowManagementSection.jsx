@@ -14,17 +14,60 @@ import {
   Calendar,
   User,
   Truck,
-  Package
+  Package,
+  X
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "../../../../lib/supabaseClient";
-import { formatCurrency, formatDate, formatDateTime, downloadCSV } from '../utils/helpers';
+
+// Helper functions
+const formatCurrency = (amount, currency = 'MAD') => {
+  return new Intl.NumberFormat('fr-MA', { style: 'currency', currency }).format(amount || 0);
+};
+
+const formatDate = (date) => {
+  if (!date) return 'N/A';
+  return new Date(date).toLocaleDateString('fr-MA', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+const formatDateTime = (date) => {
+  if (!date) return 'N/A';
+  return new Date(date).toLocaleString('fr-MA', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+const downloadCSV = (data, filename) => {
+  if (!data || data.length === 0) return;
+  
+  const headers = Object.keys(data[0]);
+  const csv = [
+    headers.join(','),
+    ...data.map(row => headers.map(header => JSON.stringify(row[header] || '')).join(','))
+  ].join('\n');
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${filename}-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+};
 
 const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRelease, onExport }) => {
   const [escrows, setEscrows] = useState(initialEscrows || []);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('pending');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [selectedEscrows, setSelectedEscrows] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [releasingIds, setReleasingIds] = useState(new Set());
@@ -35,6 +78,14 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
     setEscrows(initialEscrows || []);
   }, [initialEscrows]);
 
+  // Calculate days held
+  const getDaysHeld = (heldAt) => {
+    if (!heldAt) return 0;
+    const held = new Date(heldAt);
+    const now = new Date();
+    return Math.floor((now - held) / (1000 * 60 * 60 * 24));
+  };
+
   // Calculate escrow statistics
   const stats = {
     total: escrows.length,
@@ -42,8 +93,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
     released: escrows.filter(e => e.released_at).length,
     totalAmount: escrows.reduce((sum, e) => sum + (e.amount_held || 0), 0),
     pendingAmount: escrows.filter(e => !e.released_at).reduce((sum, e) => sum + (e.amount_held || 0), 0),
-    releasedAmount: escrows.filter(e => e.released_at).reduce((sum, e) => sum + (e.amount_held || 0), 0),
-    eligibleCount: escrows.filter(e => !e.released_at && getDaysHeld(e.held_at) >= 3).length
+    releasedAmount: escrows.filter(e => e.released_at).reduce((sum, e) => sum + (e.amount_held || 0), 0)
   };
 
   // Filter escrows based on search and status
@@ -52,7 +102,6 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
       // Status filter
       if (statusFilter === 'pending') return !escrow.released_at;
       if (statusFilter === 'released') return escrow.released_at;
-      if (statusFilter === 'eligible') return !escrow.released_at && getDaysHeld(escrow.held_at) >= 3;
       return true; // 'all'
     })
     .filter(escrow => {
@@ -66,14 +115,6 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
       return orderNumber.includes(searchLower) || companyName.includes(searchLower);
     });
 
-  // Calculate days held
-  const getDaysHeld = (heldAt) => {
-    if (!heldAt) return 0;
-    const held = new Date(heldAt);
-    const now = new Date();
-    return Math.floor((now - held) / (1000 * 60 * 60 * 24));
-  };
-
   // Get status color and text
   const getEscrowStatus = (escrow) => {
     if (escrow.released_at) {
@@ -84,17 +125,8 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
       };
     }
     
-    const daysHeld = getDaysHeld(escrow.held_at);
-    if (daysHeld >= 3) {
-      return {
-        label: 'Ready for Release',
-        color: 'bg-blue-100 text-blue-800',
-        icon: Clock
-      };
-    }
-    
     return {
-      label: `Held (${3 - daysHeld} days left)`,
+      label: 'Pending',
       color: 'bg-yellow-100 text-yellow-800',
       icon: AlertCircle
     };
@@ -116,7 +148,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
         .from('escrow_holdings')
         .update({ 
           released_at: new Date().toISOString(),
-          release_reason: 'manual_release'
+          release_reason: 'admin_release'
         })
         .eq('id', escrowId)
         .is('released_at', null);
@@ -153,11 +185,30 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
     }
 
     try {
-      await onBulkRelease(selectedEscrows);
+      // Call the parent's bulk release function
+      if (onBulkRelease) {
+        await onBulkRelease(selectedEscrows);
+      } else {
+        // Fallback direct update if parent function not provided
+        const { error } = await supabase
+          .from('escrow_holdings')
+          .update({ 
+            released_at: new Date().toISOString(),
+            release_reason: 'bulk_admin_release'
+          })
+          .in('id', selectedEscrows)
+          .is('released_at', null);
+
+        if (error) throw error;
+        toast.success(`${selectedEscrows.length} escrow(s) released`);
+        onRefresh();
+      }
+      
       setSelectedEscrows([]);
       setSelectAll(false);
     } catch (error) {
       console.error('Bulk release error:', error);
+      toast.error('Failed to release some escrows');
     }
   };
 
@@ -215,7 +266,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
             Escrow Management
           </h2>
           <p className="text-gray-600 text-sm mt-1">
-            Manage COD funds held for delivery partners (3-day hold period)
+            Manage COD funds held for delivery partners
           </p>
         </div>
         <div className="flex gap-2">
@@ -258,14 +309,14 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
           <p className="text-xs text-gray-500 mt-1">{formatCurrency(stats.pendingAmount)}</p>
         </div>
         <div className="bg-white p-4 rounded-lg border">
-          <p className="text-sm text-gray-600">Ready to Release</p>
-          <p className="text-2xl font-bold text-green-600">{stats.eligibleCount}</p>
-          <p className="text-xs text-gray-500 mt-1">Eligible (3+ days held)</p>
+          <p className="text-sm text-gray-600">Released</p>
+          <p className="text-2xl font-bold text-green-600">{stats.released}</p>
+          <p className="text-xs text-gray-500 mt-1">{formatCurrency(stats.releasedAmount)}</p>
         </div>
         <div className="bg-white p-4 rounded-lg border">
-          <p className="text-sm text-gray-600">Released</p>
-          <p className="text-2xl font-bold text-blue-600">{stats.released}</p>
-          <p className="text-xs text-gray-500 mt-1">{formatCurrency(stats.releasedAmount)}</p>
+          <p className="text-sm text-gray-600">Total Value</p>
+          <p className="text-2xl font-bold text-blue-600">{formatCurrency(stats.totalAmount)}</p>
+          <p className="text-xs text-gray-500 mt-1">All escrows combined</p>
         </div>
       </div>
 
@@ -291,7 +342,6 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
             className="px-3 py-2 border rounded-lg min-w-[150px] text-sm"
           >
             <option value="pending">Pending Only</option>
-            <option value="eligible">Ready to Release</option>
             <option value="released">Released</option>
             <option value="all">All Escrows</option>
           </select>
@@ -346,13 +396,8 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                       </div>
                       <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                         <Package className="w-3 h-3" />
-                        Order ID: {escrow.order_id?.substring(0, 8)}...
+                        ID: {escrow.order_id?.substring(0, 8)}...
                       </div>
-                      {escrow.orders?.final_customer_price && (
-                        <div className="text-xs text-gray-500 mt-1">
-                          Total: {formatCurrency(escrow.orders.final_customer_price)}
-                        </div>
-                      )}
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-1">
@@ -387,9 +432,6 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                           <Calendar className="w-3 h-3 text-gray-400" />
                           {formatDate(escrow.held_at)}
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {escrow.held_at ? new Date(escrow.held_at).toLocaleTimeString() : ''}
-                        </div>
                       </div>
                     </td>
                     <td className="p-4">
@@ -405,11 +447,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                           <button
                             onClick={() => handleReleaseEscrow(escrow.id)}
                             disabled={isReleasing}
-                            className={`px-3 py-1 rounded text-xs font-medium ${
-                              daysHeld >= 3
-                                ? 'bg-green-600 text-white hover:bg-green-700'
-                                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                            }`}
+                            className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium disabled:opacity-50"
                           >
                             {isReleasing ? (
                               <RefreshCw className="w-3 h-3 animate-spin" />
@@ -454,9 +492,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                 onClick={() => setSelectedEscrow(null)} 
                 className="p-2 hover:bg-gray-100 rounded-lg"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-5 h-5" />
               </button>
             </div>
             
@@ -515,8 +551,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                       handleReleaseEscrow(selectedEscrow.id);
                       setSelectedEscrow(null);
                     }}
-                    disabled={getDaysHeld(selectedEscrow.held_at) < 3}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                   >
                     Release Escrow
                   </button>

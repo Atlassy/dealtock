@@ -7,1133 +7,36 @@ import {
   Package, 
   TrendingUp,
   Percent,
-  Euro,
-  Filter,
+  DollarSign,
   RefreshCw,
   MapPin,
-  Tag,
   Layers,
-  FileText,
-  Image as ImageIcon,
-  DollarSign,
-  Hash,
+  AlertCircle,
+  Info,
+  Truck,
+  Clock,
+  ShoppingBag,
+  BarChart3,
+  Smartphone,
+  Monitor,
+  Target,
+  Zap,
+  Award,
+  ArrowUpRight,
+  ArrowDownRight,
   CheckCircle,
   XCircle,
-  AlertCircle,
-  Info
+  Shield,
+  Wallet,
+  CreditCard,
+  ChevronUp,
+  ChevronDown
 } from "lucide-react";
 import { toast } from "sonner";
 
-// ============================================
-// CONSTANTS
-// ============================================
-const CATEGORIES = [
-  "Electronics", 
-  "Fashion", 
-  "Home", 
-  "Beauty", 
-  "Sports", 
-  "Books", 
-  "Automotive", 
-  "Other"
-];
-
-const CONDITIONS = [
-  { value: "new", label: "New", color: "green" },
-  { value: "opened_like_new", label: "Opened - Like New", color: "blue" },
-  { value: "damaged", label: "Damaged / For Parts", color: "orange" }
-];
-
-const STATUSES = [
-  { value: "available", label: "Available", color: "green" },
-  { value: "pending", label: "Pending", color: "yellow" },
-  { value: "sold", label: "Sold", color: "purple" },
-  { value: "shipped", label: "Shipped", color: "blue" },
-  { value: "delivered", label: "Delivered", color: "indigo" },
-  { value: "returned", label: "Returned", color: "red" }
-];
-
-const MOROCCAN_CITIES = [
-  "Casablanca", "Rabat", "Fes", "Marrakech", "Agadir", "Tanger", 
-  "Meknes", "Oujda", "Kenitra", "Sale", "Temara", "Safi", 
-  "El Jadida", "Beni Mellal", "Khouribga", "Mohammedia", "Settat",
-  "Berrechid", "Nador", "Taza", "Essaouira", "Laayoune", "Dakhla"
-];
-
-// ============================================
-// PRODUCT TABLE COMPONENT
-// ============================================
-const ProductTable = ({ products, onEdit, onDelete, onToggleAvailability }) => {
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 text-gray-700">
-          <tr>
-            <th className="text-left p-4 font-medium">Product</th>
-            <th className="text-left p-4 font-medium">SKU</th>
-            <th className="text-left p-4 font-medium">Your Price</th>
-            <th className="text-left p-4 font-medium">Quantity</th>
-            <th className="text-left p-4 font-medium">Location</th>
-            <th className="text-left p-4 font-medium">Status</th>
-            <th className="text-left p-4 font-medium">Condition</th>
-            <th className="text-left p-4 font-medium">Marketplace Price</th>
-            <th className="text-left p-4 font-medium">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map(product => {
-            const marketplacePrice = product.purchase_price 
-              ? (product.purchase_price * 1.20).toFixed(2) 
-              : '0.00';
-            
-            return (
-              <tr key={product.id} className="border-b hover:bg-gray-50/50 transition">
-                <td className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      {product.image_url ? (
-                        <img 
-                          src={product.image_url} 
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = 'https://via.placeholder.com/48?text=No+Image';
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300">
-                          <ImageIcon className="w-6 h-6 text-gray-500" />
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{product.name || "Unnamed Product"}</p>
-                      <p className="text-xs text-gray-500 mt-1">{product.category || "Uncategorized"}</p>
-                      {product.description && (
-                        <p className="text-xs text-gray-500 mt-1 line-clamp-1">{product.description}</p>
-                      )}
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4">
-                  <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
-                    {product.sku || '—'}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <div>
-                    <span className="font-bold text-gray-900">{product.purchase_price?.toFixed(2) || '0.00'} MAD</span>
-                    <p className="text-xs text-green-600 mt-1">You receive this</p>
-                  </div>
-                </td>
-                <td className="p-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    product.quantity > 10 
-                      ? 'bg-green-100 text-green-800' 
-                      : product.quantity > 0 
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {product.quantity || 0} units
-                  </span>
-                </td>
-                <td className="p-4">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-gray-500" />
-                    <span className="text-sm">{product.location || 'Not set'}</span>
-                  </div>
-                </td>
-                <td className="p-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    product.status === 'available' ? 'bg-green-100 text-green-800' :
-                    product.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                    product.status === 'sold' ? 'bg-purple-100 text-purple-800' :
-                    product.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                    product.status === 'delivered' ? 'bg-indigo-100 text-indigo-800' :
-                    product.status === 'returned' ? 'bg-red-100 text-red-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {product.status || 'available'}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    product.condition === 'new' ? 'bg-green-100 text-green-800' :
-                    product.condition === 'opened_like_new' ? 'bg-blue-100 text-blue-800' :
-                    product.condition === 'damaged' ? 'bg-orange-100 text-orange-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {CONDITIONS.find(c => c.value === product.condition)?.label || product.condition || 'new'}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <div>
-                    <span className="font-medium text-blue-600">{marketplacePrice} MAD</span>
-                    <p className="text-xs text-gray-500 mt-1">B2C (20% markup)</p>
-                    <p className="text-xs text-gray-500">+ delivery fee</p>
-                  </div>
-                </td>
-                <td className="p-4">
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => onEdit(product)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                      title="Edit product"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
-                    <button 
-                      onClick={() => onToggleAvailability(product.id, !product.available_for_sale)}
-                      className={`p-2 rounded-lg transition ${
-                        product.available_for_sale 
-                          ? 'text-green-600 hover:bg-green-50' 
-                          : 'text-gray-400 hover:bg-gray-50'
-                      }`}
-                      title={product.available_for_sale ? 'Mark as unavailable' : 'Mark as available'}
-                    >
-                      {product.available_for_sale ? (
-                        <CheckCircle className="w-4 h-4" />
-                      ) : (
-                        <XCircle className="w-4 h-4" />
-                      )}
-                    </button>
-                    <button 
-                      onClick={() => onDelete(product.id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                      title="Delete product"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
-// ============================================
-// ADD PRODUCT FORM - COMPLETE VERSION
-// ============================================
-const AddProductForm = ({ onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    category: '',
-    sku: '',
-    purchase_price: '',
-    quantity: 1,
-    location: '',
-    condition: 'new',
-    image_url: '',
-    available_for_sale: true,
-    status: 'available'
-  });
-  
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : 
-              name === 'purchase_price' ? (value === '' ? '' : Number(value)) :
-              name === 'quantity' ? (value === '' ? '' : parseInt(value) || 0) :
-              value
-    }));
-    // Clear error for this field
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: null }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name?.trim()) newErrors.name = 'Product name is required';
-    if (!formData.purchase_price || formData.purchase_price <= 0) {
-      newErrors.purchase_price = 'Price must be greater than 0';
-    }
-    if (!formData.quantity || formData.quantity < 1) {
-      newErrors.quantity = 'Quantity must be at least 1';
-    }
-    if (!formData.location?.trim()) {
-      newErrors.location = 'Location is required for shipping';
-    }
-    if (formData.image_url && !formData.image_url.match(/^https?:\/\/.+/)) {
-      newErrors.image_url = 'Please enter a valid URL';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) {
-      toast.error('Please fix the errors in the form');
-      return;
-    }
-    
-    setLoading(true);
-    
-    const submissionData = {
-      ...formData,
-      purchase_price: parseFloat(formData.purchase_price),
-      quantity: parseInt(formData.quantity),
-      sku: formData.sku || `SKU-${Date.now()}`,
-      // NO sale_price - will be calculated by marketplace
-    };
-
-    await onSubmit(submissionData);
-    setLoading(false);
-  };
-
-  // Calculate marketplace price preview
-  const marketplacePrice = formData.purchase_price 
-    ? (parseFloat(formData.purchase_price) * 1.20).toFixed(2) 
-    : '0.00';
-  const marketplaceFee = formData.purchase_price 
-    ? (parseFloat(formData.purchase_price) * 0.20).toFixed(2) 
-    : '0.00';
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Basic Information Section */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <Info className="w-5 h-5 text-blue-500" />
-          Basic Information
-        </h3>
-        
-        <div className="space-y-4">
-          {/* Product Name - Required */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Product Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'
-              }`}
-              placeholder="e.g., iPhone 13 Pro Max"
-              required
-            />
-            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows="3"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Detailed description of your product..."
-            />
-          </div>
-
-          {/* Category & SKU */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-              >
-                <option value="">Select category</option>
-                {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                SKU (Optional)
-              </label>
-              <input
-                type="text"
-                name="sku"
-                value={formData.sku}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Auto-generated if empty"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Pricing & Inventory Section */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <DollarSign className="w-5 h-5 text-green-500" />
-          Pricing & Inventory
-        </h3>
-        
-        <div className="space-y-4">
-          {/* Purchase Price - SELLER'S PRICE */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Your Selling Price (MAD) <span className="text-red-500">*</span>
-              <span className="ml-2 text-xs text-gray-500">You receive this amount</span>
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-500">DH</span>
-              </div>
-              <input
-                type="number"
-                name="purchase_price"
-                value={formData.purchase_price}
-                onChange={handleChange}
-                className={`w-full pl-12 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.purchase_price ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-                required
-              />
-            </div>
-            {errors.purchase_price && (
-              <p className="text-xs text-red-500 mt-1">{errors.purchase_price}</p>
-            )}
-            
-            {/* Price Preview */}
-            {formData.purchase_price > 0 && (
-              <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-600">Your Price:</span>
-                  <span className="font-semibold text-gray-900">{formData.purchase_price} MAD</span>
-                </div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-600">Marketplace Fee (20%):</span>
-                  <span className="text-blue-600 font-medium">+{marketplaceFee} MAD</span>
-                </div>
-                <div className="flex justify-between items-center pt-2 border-t border-blue-200">
-                  <span className="text-sm font-medium text-gray-700">Customer Pays:</span>
-                  <span className="font-bold text-green-600">{marketplacePrice} MAD</span>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  ⚡ B2B buyers see your price directly • B2C customers pay with 20% markup
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Quantity & Condition */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quantity <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="quantity"
-                value={formData.quantity}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.quantity ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                min="1"
-                step="1"
-                required
-              />
-              {errors.quantity && <p className="text-xs text-red-500 mt-1">{errors.quantity}</p>}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Condition
-              </label>
-              <select
-                name="condition"
-                value={formData.condition}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                {CONDITIONS.map(cond => (
-                  <option key={cond.value} value={cond.value}>{cond.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Location & Shipping Section */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <MapPin className="w-5 h-5 text-orange-500" />
-          Location & Shipping
-        </h3>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Product Location (City) <span className="text-red-500">*</span>
-            <span className="ml-2 text-xs text-gray-500">Used to calculate delivery fees</span>
-          </label>
-          <select
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              errors.location ? 'border-red-500 bg-red-50' : 'border-gray-300'
-            }`}
-            required
-          >
-            <option value="">Select your city</option>
-            {MOROCCAN_CITIES.sort().map(city => (
-              <option key={city} value={city}>{city}</option>
-            ))}
-          </select>
-          {errors.location && (
-            <p className="text-xs text-red-500 mt-1">{errors.location}</p>
-          )}
-          <p className="text-xs text-gray-500 mt-2">
-            📦 Delivery fees will be calculated automatically based on customer's location
-          </p>
-        </div>
-      </div>
-
-      {/* Media Section */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <ImageIcon className="w-5 h-5 text-purple-500" />
-          Media
-        </h3>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Image URL
-          </label>
-          <input
-            type="url"
-            name="image_url"
-            value={formData.image_url}
-            onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              errors.image_url ? 'border-red-500 bg-red-50' : 'border-gray-300'
-            }`}
-            placeholder="https://example.com/image.jpg"
-          />
-          {errors.image_url && <p className="text-xs text-red-500 mt-1">{errors.image_url}</p>}
-          
-          {/* Image Preview */}
-          {formData.image_url && (
-            <div className="mt-3 flex items-center gap-3">
-              <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
-                <img 
-                  src={formData.image_url} 
-                  alt="Preview"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = 'https://via.placeholder.com/64?text=Invalid+URL';
-                  }}
-                />
-              </div>
-              <span className="text-xs text-gray-500">Image preview</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Status & Availability */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-gray-700">
-              Available for sale
-            </label>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                name="available_for_sale"
-                checked={formData.available_for_sale}
-                onChange={handleChange}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-          <span className="text-xs text-gray-500">
-            {formData.available_for_sale ? 'Product will appear in marketplace' : 'Product hidden from buyers'}
-          </span>
-        </div>
-      </div>
-
-      {/* Form Actions */}
-      <div className="flex gap-4 pt-4 border-t border-gray-200">
-        <button 
-          type="button" 
-          onClick={onCancel}
-          className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium"
-          disabled={loading}
-        >
-          Cancel
-        </button>
-        <button 
-          type="submit"
-          className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={loading}
-        >
-          {loading ? (
-            <span className="flex items-center justify-center gap-2">
-              <RefreshCw className="w-4 h-4 animate-spin" />
-              Adding Product...
-            </span>
-          ) : (
-            'Add Product'
-          )}
-        </button>
-      </div>
-    </form>
-  );
-};
-
-// ============================================
-// EDIT PRODUCT FORM - COMPLETE VERSION
-// ============================================
-// ============================================
-// EDIT PRODUCT FORM - COMPLETE CORRECTED VERSION
-// ============================================
-const EditProductForm = ({ product, onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    category: '',
-    sku: '',
-    purchase_price: 0,
-    quantity: 0,
-    location: '',
-    condition: 'new',
-    image_url: '',
-    available_for_sale: true,
-    status: 'available'
-  });
-  
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [originalSku, setOriginalSku] = useState(''); // Store original SKU
-  const [isCheckingSku, setIsCheckingSku] = useState(false);
-
-  useEffect(() => {
-    if (product) {
-      setFormData({
-        name: product.name || '',
-        description: product.description || '',
-        category: product.category || '',
-        sku: product.sku || '',
-        purchase_price: product.purchase_price || 0,
-        quantity: product.quantity || 0,
-        location: product.location || '',
-        condition: product.condition || 'new',
-        image_url: product.image_url || '',
-        available_for_sale: product.available_for_sale !== false,
-        status: product.status || 'available'
-      });
-      setOriginalSku(product.sku || ''); // Store original SKU for comparison
-    }
-  }, [product]);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : 
-              name === 'purchase_price' ? (value === '' ? '' : Number(value)) :
-              name === 'quantity' ? (value === '' ? '' : parseInt(value) || 0) :
-              value
-    }));
-    // Clear error for this field
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: null }));
-    }
-  };
-
-  // SKU Validation Function
-  const checkSkuAvailability = async (sku) => {
-    if (!sku || sku === originalSku) return true; // Same SKU, no need to check
-    
-    setIsCheckingSku(true);
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('id, sku')
-        .eq('sku', sku)
-        .neq('id', product.id) // Exclude current product
-        .maybeSingle();
-
-      if (error) throw error;
-      return !data; // Return true if no duplicate found
-    } catch (error) {
-      console.error('SKU validation error:', error);
-      return false;
-    } finally {
-      setIsCheckingSku(false);
-    }
-  };
-
-  const validateForm = async () => {
-    const newErrors = {};
-    
-    // Required fields validation
-    if (!formData.name?.trim()) {
-      newErrors.name = 'Product name is required';
-    }
-    
-    if (!formData.purchase_price || formData.purchase_price <= 0) {
-      newErrors.purchase_price = 'Price must be greater than 0';
-    }
-    
-    if (!formData.quantity || formData.quantity < 0) {
-      newErrors.quantity = 'Quantity cannot be negative';
-    }
-    
-    if (!formData.location?.trim()) {
-      newErrors.location = 'Location is required for shipping';
-    }
-
-    // SKU UNIQUE VALIDATION - Only check if SKU changed
-    if (formData.sku && formData.sku !== originalSku) {
-      const isAvailable = await checkSkuAvailability(formData.sku);
-      if (!isAvailable) {
-        newErrors.sku = 'This SKU already exists. Please use a different SKU.';
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const isValid = await validateForm();
-    if (!isValid) {
-      toast.error('Please fix the errors in the form');
-      return;
-    }
-    
-    setLoading(true);
-    
-    // Prepare submission data - Auto-generate SKU if empty
-    const submissionData = {
-      ...formData,
-      sku: formData.sku?.trim() || `SKU-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      purchase_price: parseFloat(formData.purchase_price) || 0,
-      quantity: parseInt(formData.quantity) || 0,
-      updated_at: new Date().toISOString()
-    };
-
-    await onSubmit(submissionData);
-    setLoading(false);
-  };
-
-  const marketplacePrice = formData.purchase_price 
-    ? (formData.purchase_price * 1.20).toFixed(2) 
-    : '0.00';
-  const marketplaceFee = formData.purchase_price 
-    ? (formData.purchase_price * 0.20).toFixed(2) 
-    : '0.00';
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Basic Information */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <Info className="w-5 h-5 text-blue-500" />
-          Basic Information
-        </h3>
-        
-        <div className="space-y-4">
-          {/* Product Name - Required */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Product Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'
-              }`}
-              placeholder="e.g., iPhone 13 Pro Max"
-              required
-            />
-            {errors.name && (
-              <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
-                {errors.name}
-              </p>
-            )}
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows="3"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Detailed description of your product..."
-            />
-          </div>
-
-          {/* Category & SKU */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-              >
-                <option value="">Select category</option>
-                {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            
-            {/* SKU Field with Validation */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                SKU
-                <span className="ml-2 text-xs text-gray-500 font-normal">
-                  {formData.sku === originalSku ? '(unchanged)' : '(optional)'}
-                </span>
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="sku"
-                  value={formData.sku}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.sku ? 'border-red-500 bg-red-50' : 
-                    formData.sku && formData.sku !== originalSku && !errors.sku ? 'border-yellow-300 bg-yellow-50' : 
-                    'border-gray-300'
-                  }`}
-                  placeholder="Auto-generated if empty"
-                />
-                {isCheckingSku && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <RefreshCw className="w-4 h-4 animate-spin text-gray-400" />
-                  </div>
-                )}
-              </div>
-              {errors.sku ? (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {errors.sku}
-                </p>
-              ) : formData.sku && formData.sku !== originalSku ? (
-                <p className="text-xs text-yellow-600 mt-1 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  ⚠️ SKU will be updated
-                </p>
-              ) : !formData.sku ? (
-                <p className="text-xs text-gray-500 mt-1">
-                  ℹ️ Leave empty to auto-generate SKU
-                </p>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Pricing & Inventory */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <DollarSign className="w-5 h-5 text-green-500" />
-          Pricing & Inventory
-        </h3>
-        
-        <div className="space-y-4">
-          {/* Purchase Price - ONLY price field for sellers */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Your Selling Price (MAD) <span className="text-red-500">*</span>
-              <span className="ml-2 text-xs text-gray-500">You receive this amount</span>
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-500">DH</span>
-              </div>
-              <input
-                type="number"
-                name="purchase_price"
-                value={formData.purchase_price}
-                onChange={handleChange}
-                className={`w-full pl-12 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.purchase_price ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                min="0"
-                step="0.01"
-                required
-              />
-            </div>
-            {errors.purchase_price && (
-              <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
-                {errors.purchase_price}
-              </p>
-            )}
-          </div>
-
-          {/* Marketplace Price Display - READ ONLY */}
-          {formData.purchase_price > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
-                <Tag className="w-4 h-4" />
-                Marketplace Pricing Preview
-              </h4>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Your Price:</span>
-                  <span className="font-semibold text-gray-900">{formData.purchase_price} MAD</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Marketplace Fee (20%):</span>
-                  <span className="text-blue-600 font-medium">+{marketplaceFee} MAD</span>
-                </div>
-                <div className="flex justify-between items-center pt-2 border-t border-blue-200">
-                  <span className="text-sm font-medium text-gray-700">Customer Pays:</span>
-                  <span className="font-bold text-green-600">{marketplacePrice} MAD</span>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  ⚡ B2B buyers see your price directly • B2C customers pay with 20% markup • Delivery fee added at checkout
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Quantity & Condition */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quantity <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="quantity"
-                value={formData.quantity}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.quantity ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                min="0"
-                step="1"
-                required
-              />
-              {errors.quantity && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {errors.quantity}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Condition
-              </label>
-              <select
-                name="condition"
-                value={formData.condition}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                {CONDITIONS.map(cond => (
-                  <option key={cond.value} value={cond.value}>{cond.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Location & Shipping */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <MapPin className="w-5 h-5 text-orange-500" />
-          Location & Shipping
-        </h3>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Product Location (City) <span className="text-red-500">*</span>
-            <span className="ml-2 text-xs text-gray-500">Used to calculate delivery fees</span>
-          </label>
-          <select
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              errors.location ? 'border-red-500 bg-red-50' : 'border-gray-300'
-            }`}
-            required
-          >
-            <option value="">Select your city</option>
-            {MOROCCAN_CITIES.sort().map(city => (
-              <option key={city} value={city}>{city}</option>
-            ))}
-          </select>
-          {errors.location && (
-            <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-              <AlertCircle className="w-3 h-3" />
-              {errors.location}
-            </p>
-          )}
-          <p className="text-xs text-gray-500 mt-2">
-            📦 Delivery fees will be calculated automatically based on customer's location
-          </p>
-        </div>
-      </div>
-
-      {/* Media */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <ImageIcon className="w-5 h-5 text-purple-500" />
-          Media
-        </h3>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Image URL
-          </label>
-          <input
-            type="url"
-            name="image_url"
-            value={formData.image_url}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="https://example.com/image.jpg"
-          />
-          {formData.image_url && (
-            <div className="mt-3">
-              <p className="text-xs text-gray-500 mb-2">Image Preview:</p>
-              <img 
-                src={formData.image_url} 
-                alt="Preview"
-                className="w-24 h-24 object-cover rounded-lg border border-gray-200"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = 'https://via.placeholder.com/96?text=Invalid+URL';
-                }}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Status & Availability */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <Layers className="w-5 h-5 text-gray-600" />
-          Status & Availability
-        </h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Order Status
-            </label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              {STATUSES.map(s => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 mt-1">
-              Note: Only 'Available' products appear in marketplace
-            </p>
-          </div>
-          <div className="flex items-center gap-3 pt-7">
-            <input
-              type="checkbox"
-              name="available_for_sale"
-              id="available_checkbox"
-              checked={formData.available_for_sale}
-              onChange={handleChange}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="available_checkbox" className="text-sm font-medium text-gray-700">
-              Available for sale
-            </label>
-            <span className="text-xs text-gray-500 ml-2">
-              {formData.available_for_sale ? '✅ Visible' : '❌ Hidden'}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Form Actions */}
-      <div className="flex gap-4 pt-4 border-t border-gray-200">
-        <button 
-          type="button" 
-          onClick={onCancel}
-          className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium flex items-center justify-center gap-2"
-          disabled={loading}
-        >
-          <XCircle className="w-4 h-4" />
-          Cancel
-        </button>
-        <button 
-          type="submit"
-          className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          disabled={loading || isCheckingSku}
-        >
-          {loading ? (
-            <>
-              <RefreshCw className="w-4 h-4 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            <>
-              <CheckCircle className="w-4 h-4" />
-              Save Changes
-            </>
-          )}
-        </button>
-      </div>
-    </form>
-  );
-};
+// Import components
+import SellerOrders from './SellerOrders';
+import ProductTable from '../ProductTable';
 
 // ============================================
 // DASHBOARD SKELETON
@@ -1147,30 +50,477 @@ const DashboardSkeleton = () => (
           <div key={i} className="h-32 bg-gray-700/30 rounded-xl"></div>
         ))}
       </div>
-      <div className="h-96 bg-gray-700/30 rounded-xl"></div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-64 bg-gray-700/30 rounded-xl"></div>
+        ))}
+      </div>
     </div>
   </div>
 );
 
 // ============================================
+// HELPER COMPONENTS
+// ============================================
+const StatCard = ({ title, value, icon: Icon, color = "blue", trend, trendValue, subtext }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="glass-effect border-white/20 rounded-xl p-5 hover:border-blue-500/50 transition-all duration-300"
+  >
+    <div className="flex items-start justify-between">
+      <div className="flex-1">
+        <p className="text-sm font-medium text-gray-400">{title}</p>
+        <p className="text-2xl font-bold text-white mt-1">{value}</p>
+        {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
+        {trend && (
+          <div className={`flex items-center mt-2 text-xs ${
+            trend > 0 ? 'text-green-400' : 'text-red-400'
+          }`}>
+            {trend > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+            <span>{Math.abs(trend)}% vs last month</span>
+          </div>
+        )}
+      </div>
+      <div className={`w-10 h-10 bg-gradient-to-br from-${color}-500 to-${color}-600 rounded-lg flex items-center justify-center flex-shrink-0`}>
+        <Icon className="w-5 h-5 text-white" />
+      </div>
+    </div>
+  </motion.div>
+);
+
+const SalesTrendChart = ({ data }) => {
+  if (!data || data.length === 0) {
+    return (
+      <div className="glass-effect border-white/20 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">📈 Sales Trend (Last 30 Days)</h3>
+        <div className="h-40 flex items-center justify-center">
+          <p className="text-gray-400">No sales data available</p>
+        </div>
+      </div>
+    );
+  }
+  
+  const maxSales = Math.max(...data.map(d => d.sales), 1);
+  
+  return (
+    <div className="glass-effect border-white/20 rounded-xl p-6">
+      <h3 className="text-lg font-semibold text-white mb-4">📈 Sales Trend (Last 30 Days)</h3>
+      <div className="h-40 flex items-end gap-1">
+        {data.map((day, i) => (
+          <div key={i} className="flex-1 flex flex-col items-center group">
+            <div className="relative w-full">
+              <div 
+                className="bg-gradient-to-t from-blue-500 to-blue-400 hover:from-blue-600 hover:to-blue-500 transition cursor-pointer rounded-t"
+                style={{ height: `${Math.max((day.sales / maxSales) * 100, 2)}px` }}
+              >
+                <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">
+                  {day.date}: {day.sales.toFixed(0)} MAD ({day.orders} orders)
+                </div>
+              </div>
+            </div>
+            <span className="text-xs text-gray-400 mt-2 hidden md:block">
+              {day.date.slice(-5)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const CategoryProgressBar = ({ category, percentage, count, color = "blue" }) => (
+  <div className="mb-3">
+    <div className="flex justify-between text-sm mb-1">
+      <span className="text-gray-300">{category}</span>
+      <span className="text-gray-400">{count} products</span>
+    </div>
+    <div className="w-full bg-gray-700 rounded-full h-2">
+      <div 
+        className={`bg-gradient-to-r from-${color}-500 to-${color}-400 h-2 rounded-full`}
+        style={{ width: `${percentage}%` }}
+      ></div>
+    </div>
+  </div>
+);
+
+const TopListItem = ({ rank, name, value, unit, color = "blue" }) => (
+  <div className="flex items-center justify-between py-2 border-b border-gray-700 last:border-0">
+    <div className="flex items-center gap-3">
+      <div className={`w-6 h-6 rounded-full bg-${color}-500/20 flex items-center justify-center text-xs font-bold text-${color}-400`}>
+        {rank}
+      </div>
+      <span className="text-gray-300">{name}</span>
+    </div>
+    <span className="text-white font-medium">{value} {unit}</span>
+  </div>
+);
+
+const DeviceBreakdown = ({ mobile, desktop }) => {
+  const total = mobile + desktop;
+  const mobilePercent = total > 0 ? Math.round((mobile / total) * 100) : 0;
+  const desktopPercent = total > 0 ? Math.round((desktop / total) * 100) : 0;
+
+  return (
+    <div className="glass-effect border-white/20 rounded-xl p-6">
+      <h3 className="text-lg font-semibold text-white mb-4">📱 Device Breakdown</h3>
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <div className="flex-1">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-gray-300 flex items-center gap-1">
+                <Smartphone className="w-4 h-4" /> Mobile
+              </span>
+              <span className="text-gray-400">{mobile} orders</span>
+            </div>
+            <div className="w-full bg-gray-700 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-purple-500 to-purple-400 h-2 rounded-full"
+                style={{ width: `${mobilePercent}%` }}
+              ></div>
+            </div>
+          </div>
+          <span className="text-white font-bold">{mobilePercent}%</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex-1">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-gray-300 flex items-center gap-1">
+                <Monitor className="w-4 h-4" /> Desktop
+              </span>
+              <span className="text-gray-400">{desktop} orders</span>
+            </div>
+            <div className="w-full bg-gray-700 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-blue-500 to-blue-400 h-2 rounded-full"
+                style={{ width: `${desktopPercent}%` }}
+              ></div>
+            </div>
+          </div>
+          <span className="text-white font-bold">{desktopPercent}%</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// ESCROW TAB COMPONENT
+// ============================================
+const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
+  const [escrowOrders, setEscrowOrders] = useState([]);
+  const [payoutHistory, setPayoutHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchEscrowDetails();
+  }, [sellerId]);
+
+  const fetchEscrowDetails = async () => {
+    setLoading(true);
+    try {
+      // Get products
+      const { data: products } = await supabase
+        .from('products')
+        .select('id, name')
+        .eq('user_id', sellerId);
+
+      if (!products || products.length === 0) {
+        setLoading(false);
+        return;
+      }
+
+      const productIds = products.map(p => p.id);
+
+      // Get escrow orders
+      const { data: orders } = await supabase
+        .from('orders')
+        .select(`
+          id,
+          order_number,
+          product_id,
+          product_price,
+          final_customer_price,
+          status,
+          payment_status,
+          delivered_at,
+          created_at,
+          settlements (
+            id,
+            settlement_status,
+            wholesaler_net,
+            dealtock_commission,
+            created_at
+          )
+        `)
+        .in('product_id', productIds)
+        .in('status', ['delivered', 'settled'])
+        .order('delivered_at', { ascending: false });
+
+      // Get payout history
+      const { data: payouts } = await supabase
+        .from('payouts')
+        .select('*')
+        .eq('user_id', sellerId)
+        .eq('role', 'seller')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      // Map product names to orders
+      const ordersWithProductNames = orders?.map(order => ({
+        ...order,
+        product_name: products.find(p => p.id === order.product_id)?.name || 'Unknown Product'
+      })) || [];
+
+      setEscrowOrders(ordersWithProductNames);
+      setPayoutHistory(payouts || []);
+
+      // Calculate escrow metrics
+      let escrowBalance = 0;
+      let availableForPayout = 0;
+      let totalReleased = 0;
+      let pendingEscrowCount = 0;
+
+      orders?.forEach(order => {
+        if (order.settlements && order.settlements.length > 0) {
+          const settlement = order.settlements[0];
+          if (settlement.settlement_status === 'completed') {
+            totalReleased += order.product_price || 0;
+          } else if (settlement.settlement_status === 'pending') {
+            escrowBalance += order.product_price || 0;
+            pendingEscrowCount++;
+          }
+        } else if (order.status === 'delivered') {
+          escrowBalance += order.product_price || 0;
+          pendingEscrowCount++;
+        }
+      });
+
+      availableForPayout = escrowBalance;
+
+      // Update dashboardData with escrow metrics
+      setDashboardData(prev => ({
+        ...prev,
+        escrowBalance,
+        availableForPayout,
+        totalReleased,
+        pendingEscrowCount
+      }));
+
+    } catch (error) {
+      console.error('Error fetching escrow details:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('fr-MA', {
+      style: 'currency',
+      currency: 'MAD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value).replace('MAD', '').trim() + ' MAD';
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white/5 rounded-xl p-8">
+        <div className="flex justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Escrow Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="glass-effect border-white/20 rounded-xl p-5">
+          <p className="text-sm text-gray-400 mb-1">Escrow Balance</p>
+          <p className="text-2xl font-bold text-blue-400">{formatCurrency(dashboardData.escrowBalance || 0)}</p>
+          <p className="text-xs text-gray-400 mt-1">{dashboardData.pendingEscrowCount || 0} orders pending</p>
+        </div>
+        
+        <div className="glass-effect border-white/20 rounded-xl p-5">
+          <p className="text-sm text-gray-400 mb-1">Available for Payout</p>
+          <p className="text-2xl font-bold text-green-400">{formatCurrency(dashboardData.availableForPayout || 0)}</p>
+          <p className="text-xs text-gray-400 mt-1">Ready to withdraw</p>
+        </div>
+        
+        <div className="glass-effect border-white/20 rounded-xl p-5">
+          <p className="text-sm text-gray-400 mb-1">Total Released</p>
+          <p className="text-2xl font-bold text-purple-400">{formatCurrency(dashboardData.totalReleased || 0)}</p>
+          <p className="text-xs text-gray-400 mt-1">Paid to you</p>
+        </div>
+      </div>
+
+      {/* Escrow Orders Table */}
+      <div className="bg-white/5 rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/10">
+          <h3 className="text-lg font-semibold text-white">Orders in Escrow</h3>
+        </div>
+        
+        <div className="p-4">
+          {escrowOrders.length === 0 ? (
+            <p className="text-gray-400 text-center py-8">No escrow orders found</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left text-gray-400 text-sm">
+                    <th className="pb-3">Order #</th>
+                    <th className="pb-3">Product</th>
+                    <th className="pb-3">Amount</th>
+                    <th className="pb-3">Status</th>
+                    <th className="pb-3">Delivery Date</th>
+                    <th className="pb-3">Release Date</th>
+                   </tr>
+                </thead>
+                <tbody className="text-gray-300">
+                  {escrowOrders.map((order) => {
+                    const settlement = order.settlements?.[0];
+                    const isReleased = order.status === 'settled' || settlement?.settlement_status === 'completed';
+                    const releaseDate = settlement?.created_at;
+                    
+                    return (
+                      <tr key={order.id} className="border-t border-white/10">
+                        <td className="py-3 font-mono text-sm">{order.order_number}</td>
+                        <td className="py-3">{order.product_name}</td>
+                        <td className="py-3 font-medium">{formatCurrency(order.product_price)}</td>
+                        <td className="py-3">
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            isReleased 
+                              ? 'bg-green-500/20 text-green-400' 
+                              : 'bg-yellow-500/20 text-yellow-400'
+                          }`}>
+                            {isReleased ? 'Released' : 'Held'}
+                          </span>
+                        </td>
+                        <td className="py-3">{formatDate(order.delivered_at)}</td>
+                        <td className="py-3">{releaseDate ? formatDate(releaseDate) : '—'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Payout History */}
+      {payoutHistory.length > 0 && (
+        <div className="bg-white/5 rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-white/10">
+            <h3 className="text-lg font-semibold text-white">Recent Payouts</h3>
+          </div>
+          
+          <div className="p-4">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left text-gray-400 text-sm">
+                    <th className="pb-3">Date</th>
+                    <th className="pb-3">Amount</th>
+                    <th className="pb-3">Status</th>
+                    <th className="pb-3">Reference</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-300">
+                  {payoutHistory.map((payout) => (
+                    <tr key={payout.id} className="border-t border-white/10">
+                      <td className="py-3">{formatDate(payout.created_at)}</td>
+                      <td className="py-3 font-medium text-green-400">{formatCurrency(payout.amount)}</td>
+                      <td className="py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          payout.status === 'paid' 
+                            ? 'bg-green-500/20 text-green-400' 
+                            : payout.status === 'pending'
+                            ? 'bg-yellow-500/20 text-yellow-400'
+                            : 'bg-red-500/20 text-red-400'
+                        }`}>
+                          {payout.status}
+                        </span>
+                      </td>
+                      <td className="py-3 text-sm">{payout.payout_reference || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
 // MAIN SELLER DASHBOARD COMPONENT
 // ============================================
 const SellerDashboard = () => {
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [products, setProducts] = useState([]);
-  const [productsLoading, setProductsLoading] = useState(true);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
   const [editingProduct, setEditingProduct] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState("all");
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
-  const [stats, setStats] = useState({
-    totalProducts: 0,
-    totalSales: 0,
-    totalCommission: 0,
-    averageCommissionRate: 0,
+  const [dashboardData, setDashboardData] = useState({
+    // Products
+    totalActiveProducts: 0,
+    topQuantityProducts: [],
+    
+    // Inventory Value
+    totalInventoryValue: 0,
+    topInventoryProducts: [],
+    
+    // Order Stats
+    orderCounts: {
+      total: 0,
+      pendingApproval: 0,
+      inTransit: 0,
+      failed: 0,
+      delivered: 0
+    },
+    
+    // Low Stock
+    lowStockProducts: [],
+    
+    // Financials
     netAmount: 0,
-    totalPotentialValue: 0,
-    activeProducts: 0
+    totalCommission: 0,
+    totalTurnover: 0,
+    
+    // Top Sold
+    topSoldProducts: [],
+    
+    // New Metrics
+    salesTrend: [],
+    conversionRate: 0,
+    averageOrderValue: 0,
+    topCategories: [],
+    deviceBreakdown: { mobile: 0, desktop: 0 },
+    averageFulfillmentTime: 0,
+    codSuccessRate: 0,
+    totalProductViews: 0,
+    
+    // Escrow Metrics
+    escrowBalance: 0,
+    availableForPayout: 0,
+    totalReleased: 0,
+    pendingEscrowCount: 0
   });
 
   // Fetch user profile
@@ -1179,7 +529,7 @@ const SellerDashboard = () => {
       if (user) {
         const { data } = await supabase
           .from('profiles')
-          .select('full_name, company, avatar_url, city')
+          .select('full_name, company, avatar_url, city, address, phone, subscription_tier')
           .eq('id', user.id)
           .single();
         if (data) setProfile(data);
@@ -1188,117 +538,376 @@ const SellerDashboard = () => {
     fetchProfile();
   }, [user]);
 
-  // Fetch products
+  // Fetch all data
   useEffect(() => {
     if (user) {
-      fetchProducts();
+      fetchDashboardData();
     } else {
-      setProductsLoading(false);
+      setLoading(false);
     }
   }, [user]);
 
-  const fetchProducts = async () => {
-    setProductsLoading(true);
+  const fetchDashboardData = async () => {
+    setLoading(true);
     try {
-      // Use RPC function for reliable authentication
-      const { data: rpcData, error: rpcError } = await supabase
-        .rpc('get_seller_dashboard_products_v2');
+      // Fetch products
+      const { data: productsData, error: productsError } = await supabase
+        .from("products")
+        .select("*")
+        .eq("user_id", user.id)
+        .order('created_at', { ascending: false });
 
-      if (!rpcError && rpcData?.success) {
-        setProducts(rpcData.products || []);
-        calculateStats(rpcData.products || []);
-      } else {
-        // Fallback to direct query
-        const { data, error } = await supabase
-          .from("products")
-          .select("*")
-          .eq("user_id", user.id)
-          .order('created_at', { ascending: false });
+      if (productsError) throw productsError;
 
-        if (error) throw error;
-        setProducts(data || []);
-        calculateStats(data || []);
-      }
-    } catch (err) {
-      console.error("Error fetching products:", err);
-      toast.error("Failed to load products");
-    } finally {
-      setProductsLoading(false);
-    }
-  };
-
-  const calculateStats = (allProducts) => {
-    const totalProducts = allProducts.length;
-    const activeProducts = allProducts.filter(p => p.available_for_sale && p.quantity > 0).length;
-    const soldProducts = allProducts.filter(p => p.status === 'sold');
-    const totalSales = soldProducts.reduce((sum, p) => sum + ((p.purchase_price || 0) * (p.quantity || 1)), 0);
-    const totalCommission = soldProducts.reduce((sum, p) => sum + ((p.commission || 0)), 0);
-    const averageCommissionRate = totalSales > 0 ? ((totalCommission / totalSales) * 100).toFixed(1) : 0;
-    const netAmount = totalSales - totalCommission;
-    const totalPotentialValue = allProducts.reduce((sum, p) => 
-      sum + ((p.purchase_price || 0) * (p.quantity || 0)), 0);
-
-    setStats({
-      totalProducts,
-      activeProducts,
-      totalSales,
-      totalCommission,
-      averageCommissionRate,
-      netAmount,
-      totalPotentialValue
-    });
-  };
-
-  const handleAddProduct = async (productData) => {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .insert([{
-          ...productData,
-          user_id: user.id,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      await fetchProducts(); // Refresh
-      setShowAddForm(false);
-      toast.success("Product added successfully");
-      return { success: true };
-    } catch (error) {
-      console.error('Error adding product:', error);
-      toast.error(error.message || "Failed to add product");
-      return { success: false };
-    }
-  };
-
-  const handleUpdateProduct = async (id, updates) => {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString()
+      // Fetch commission rates for each product
+      const productsWithCommission = await Promise.all(
+        (productsData || []).map(async (product) => {
+          // Determine which applies_to to use based on seller type
+          const isPremium = profile?.subscription_tier === 'premium' || false;
+          const appliesTo = isPremium ? 'Pro_Seller' : 'Seller';
+          
+          // Get commission rule for seller based on category and price
+          const { data: commissionRule } = await supabase
+            .from('commission_rules')
+            .select('percentage, min_amount, max_amount')
+            .eq('applies_to', appliesTo)
+            .eq('is_active', true)
+            .eq('category', product.category || 'Other')
+            .lte('min_amount', product.purchase_price || 0)
+            .gte('max_amount', product.purchase_price || 0)
+            .maybeSingle();
+          
+          let commissionRate = commissionRule?.percentage || 0;
+          let commissionMinAmount = commissionRule?.min_amount;
+          let commissionMaxAmount = commissionRule?.max_amount;
+          
+          // If no specific rule, get default for that applies_to
+          if (commissionRate === 0) {
+            const { data: defaultRule } = await supabase
+              .from('commission_rules')
+              .select('percentage')
+              .eq('applies_to', appliesTo)
+              .eq('is_active', true)
+              .eq('is_default', true)
+              .maybeSingle();
+            commissionRate = defaultRule?.percentage || 0;
+          }
+          
+          // Calculate commission amount and net amount
+          const commissionAmount = (product.purchase_price || 0) * (commissionRate / 100);
+          const netAmount = (product.purchase_price || 0) - commissionAmount;
+          
+          return {
+            ...product,
+            commission_rate: commissionRate,
+            commission: commissionAmount,
+            net_amount: netAmount,
+            is_premium: isPremium,
+            commission_min_amount: commissionMinAmount,
+            commission_max_amount: commissionMaxAmount
+          };
         })
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .select()
-        .single();
+      );
 
-      if (error) throw error;
+      setProducts(productsWithCommission || []);
 
-      await fetchProducts(); // Refresh
-      setEditingProduct(null);
-      toast.success("Product updated successfully");
-      return { success: true };
-    } catch (error) {
-      console.error('Error updating product:', error);
-      toast.error(error.message || "Failed to update product");
-      return { success: false };
+      // Fetch orders for this seller
+      const productIds = (productsData || []).map(p => p.id);
+      
+      if (productIds.length > 0) {
+        const { data: ordersData, error: ordersError } = await supabase
+          .from('orders')
+          .select(`
+            *,
+            products!inner(name, category)
+          `)
+          .in('product_id', productIds);
+
+        if (ordersError) throw ordersError;
+        setOrders(ordersData || []);
+        
+        // Calculate all metrics
+        const metrics = calculateAllMetrics(productsWithCommission || [], ordersData || []);
+        setDashboardData(prev => ({
+          ...prev,
+          ...metrics
+        }));
+      } else {
+        // No products, set empty metrics
+        setDashboardData(prev => ({
+          ...prev,
+          totalActiveProducts: 0,
+          topQuantityProducts: [],
+          totalInventoryValue: 0,
+          topInventoryProducts: [],
+          orderCounts: { total: 0, pendingApproval: 0, inTransit: 0, failed: 0, delivered: 0 },
+          lowStockProducts: [],
+          netAmount: 0,
+          totalCommission: 0,
+          totalTurnover: 0,
+          topSoldProducts: [],
+          salesTrend: [],
+          conversionRate: 0,
+          averageOrderValue: 0,
+          topCategories: [],
+          deviceBreakdown: { mobile: 0, desktop: 0 },
+          averageFulfillmentTime: 0,
+          codSuccessRate: 0,
+          totalProductViews: 0
+        }));
+      }
+
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+      toast.error("Failed to load dashboard data");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const calculateAllMetrics = (products, orders) => {
+    // Filter active products
+    const activeProducts = products.filter(p => 
+      p.available_for_sale && p.quantity > 0 && p.status === 'available'
+    );
+    
+    // 1. Total Active Products
+    const totalActiveProducts = activeProducts.length;
+
+    // 2. Top 5 Products by Quantity
+    const topQuantityProducts = [...products]
+      .sort((a, b) => (b.quantity || 0) - (a.quantity || 0))
+      .slice(0, 5)
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        quantity: p.quantity || 0,
+        value: (p.purchase_price || 0) * (p.quantity || 0)
+      }));
+
+    // 3. Inventory Value
+    const totalInventoryValue = products.reduce(
+      (sum, p) => sum + ((p.purchase_price || 0) * (p.quantity || 0)), 
+      0
+    );
+
+    // 4. Top 5 Products by Inventory Value
+    const topInventoryProducts = [...products]
+      .sort((a, b) => 
+        ((b.purchase_price || 0) * (b.quantity || 0)) - 
+        ((a.purchase_price || 0) * (a.quantity || 0))
+      )
+      .slice(0, 5)
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        quantity: p.quantity || 0,
+        value: (p.purchase_price || 0) * (p.quantity || 0)
+      }));
+
+    // 5. Order Counts by Status
+    const orderCounts = {
+      total: orders.length,
+      pendingApproval: orders.filter(o => o.status === 'ordered' || o.status === 'ready').length,
+      inTransit: orders.filter(o => ['picked', 'shipped'].includes(o.status)).length,
+      failed: orders.filter(o => o.status === 'failed' || o.payment_status === 'failed').length,
+      delivered: orders.filter(o => o.status === 'delivered').length
+    };
+
+    // 6. Low Stock Products (quantity <= 3)
+    const lowStockProducts = products
+      .filter(p => p.quantity > 0 && p.quantity <= 3 && p.available_for_sale)
+      .sort((a, b) => (a.quantity || 0) - (b.quantity || 0))
+      .slice(0, 5)
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        quantity: p.quantity || 0,
+        threshold: 3
+      }));
+
+    // 7. Financials
+    const deliveredOrders = orders.filter(o => o.status === 'delivered');
+    const totalRevenue = deliveredOrders.reduce(
+      (sum, o) => sum + (o.final_customer_price || 0), 
+      0
+    );
+    
+    const totalCommission = products.reduce(
+      (sum, p) => sum + (p.commission || 0), 
+      0
+    );
+
+    const netAmount = totalRevenue - totalCommission;
+
+    // 8. Turnover (total purchase_price of sold products)
+    const totalTurnover = deliveredOrders.reduce(
+      (sum, o) => sum + ((o.product_price || 0) * (o.ordered_quantity || 1)), 
+      0
+    );
+
+    // 9. Top 5 Sold Products
+    const soldProductCounts = {};
+    deliveredOrders.forEach(o => {
+      const productId = o.product_id;
+      if (!soldProductCounts[productId]) {
+        soldProductCounts[productId] = {
+          id: productId,
+          name: o.products?.name || 'Unknown',
+          quantity: 0,
+          revenue: 0
+        };
+      }
+      soldProductCounts[productId].quantity += (o.ordered_quantity || 1);
+      soldProductCounts[productId].revenue += (o.final_customer_price || 0);
+    });
+
+    const topSoldProducts = Object.values(soldProductCounts)
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 5);
+
+    // 10. Sales Trend (last 30 days)
+    const last30Days = [...Array(30)].map((_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      return date.toISOString().split('T')[0];
+    }).reverse();
+
+    const salesTrend = last30Days.map(date => {
+      const dayOrders = deliveredOrders.filter(o => 
+        o.delivered_at?.startsWith(date)
+      );
+      return {
+        date,
+        sales: dayOrders.reduce((sum, o) => sum + (o.final_customer_price || 0), 0),
+        orders: dayOrders.length
+      };
+    });
+
+    // 11. Conversion Rate
+    const totalProductViews = products.reduce((sum, p) => sum + (p.view_count || 0), 0);
+    const conversionRate = totalProductViews > 0 
+      ? Number(((deliveredOrders.length / totalProductViews) * 100).toFixed(1))
+      : 0;
+
+    // 12. Average Order Value
+    const averageOrderValue = deliveredOrders.length > 0
+      ? totalRevenue / deliveredOrders.length
+      : 0;
+
+    // 13. Top Categories
+    const categoryData = {};
+    products.forEach(p => {
+      if (p.category) {
+        if (!categoryData[p.category]) {
+          categoryData[p.category] = { count: 0, products: [] };
+        }
+        categoryData[p.category].count++;
+        categoryData[p.category].products.push(p.id);
+      }
+    });
+
+    const topCategories = Object.entries(categoryData)
+      .map(([category, data]) => ({ 
+        category, 
+        count: data.count,
+        percentage: products.length > 0 ? Math.round((data.count / products.length) * 100) : 0
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    // 14. Device Breakdown (simulated)
+    const deviceBreakdown = {
+      mobile: orders.filter((_, i) => i % 3 === 0).length,
+      desktop: orders.filter((_, i) => i % 3 !== 0).length
+    };
+
+    // 15. Average Fulfillment Time (hours from order to shipped)
+    const fulfilledOrders = orders.filter(o => o.shipped_at && o.ordered_at);
+    const totalFulfillmentTime = fulfilledOrders.reduce((sum, o) => {
+      const orderTime = new Date(o.ordered_at).getTime();
+      const shipTime = new Date(o.shipped_at).getTime();
+      return sum + (shipTime - orderTime) / (1000 * 60 * 60);
+    }, 0);
+    const averageFulfillmentTime = fulfilledOrders.length > 0
+      ? Math.round(totalFulfillmentTime / fulfilledOrders.length)
+      : 0;
+
+    // 16. COD Success Rate
+    const codOrders = orders.filter(o => o.payment_method === 'COD');
+    const successfulCod = codOrders.filter(o => o.payment_status === 'collected');
+    const codSuccessRate = codOrders.length > 0
+      ? Math.round((successfulCod.length / codOrders.length) * 100)
+      : 0;
+
+    return {
+      totalActiveProducts,
+      topQuantityProducts,
+      totalInventoryValue,
+      topInventoryProducts,
+      orderCounts,
+      lowStockProducts,
+      netAmount,
+      totalCommission,
+      totalTurnover,
+      topSoldProducts,
+      salesTrend,
+      conversionRate,
+      averageOrderValue,
+      topCategories,
+      deviceBreakdown,
+      averageFulfillmentTime,
+      codSuccessRate,
+      totalProductViews
+    };
+  };
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('fr-MA', {
+      style: 'currency',
+      currency: 'MAD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value).replace('MAD', '').trim() + ' MAD';
+  };
+
+  const formatNumber = (value) => {
+    return new Intl.NumberFormat('fr-MA').format(value);
+  };
+
+  const handleRefresh = () => {
+    fetchDashboardData();
+    toast.success("Dashboard refreshed");
+  };
+
+  const handleSort = (column) => {
+    let direction = 'asc';
+    if (sortConfig.key === column && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key: column, direction });
+    
+    // Sort products
+    const sorted = [...products].sort((a, b) => {
+      let aVal = a[column];
+      let bVal = b[column];
+      
+      if (column === 'name') {
+        aVal = aVal?.toLowerCase() || '';
+        bVal = bVal?.toLowerCase() || '';
+      } else if (column === 'purchase_price' || column === 'commission' || column === 'net_amount' || column === 'quantity' || column === 'commission_rate') {
+        aVal = aVal || 0;
+        bVal = bVal || 0;
+      }
+      
+      if (direction === 'asc') {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
+      }
+    });
+    
+    setProducts(sorted);
   };
 
   const handleDeleteProduct = async (id) => {
@@ -1308,47 +917,22 @@ const SellerDashboard = () => {
       const { error } = await supabase
         .from('products')
         .delete()
-        .eq('id', id)
-        .eq('user_id', user.id);
+        .eq('id', id);
 
       if (error) throw error;
-
-      await fetchProducts(); // Refresh
+      
+      const updatedProducts = products.filter(p => p.id !== id);
+      setProducts(updatedProducts);
+      
       toast.success("Product deleted successfully");
-      return { success: true };
+      fetchDashboardData(); // Refresh all data
     } catch (error) {
       console.error('Error deleting product:', error);
       toast.error(error.message || "Failed to delete product");
-      return { success: false };
     }
   };
 
-  const handleToggleAvailability = async (id, available) => {
-    try {
-      const { error } = await supabase
-        .from('products')
-        .update({
-          available_for_sale: available,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', id)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      await fetchProducts();
-      toast.success(available ? "Product is now available" : "Product is now hidden");
-    } catch (error) {
-      console.error('Error toggling availability:', error);
-      toast.error("Failed to update product status");
-    }
-  };
-
-  const filteredProducts = selectedStatus === "all" 
-    ? products 
-    : products.filter(product => product.status === selectedStatus);
-
-  if (productsLoading) return <DashboardSkeleton />;
+  if (loading) return <DashboardSkeleton />;
 
   if (!user) {
     return (
@@ -1389,241 +973,397 @@ const SellerDashboard = () => {
             <div className="flex items-center gap-3">
               <button
                 className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 text-white"
-                onClick={() => fetchProducts()}
-                disabled={productsLoading}
+                onClick={handleRefresh}
+                disabled={loading}
               >
-                <RefreshCw className={`w-4 h-4 ${productsLoading ? 'animate-spin' : ''}`} />
-                {productsLoading ? 'Refreshing...' : 'Refresh'}
-              </button>
-              <button
-                className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg font-medium hover:from-purple-600 hover:to-blue-600 transition-all text-white shadow-lg hover:shadow-xl"
-                onClick={() => setShowAddForm(true)}
-              >
-                + Add Product
+                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                {loading ? 'Refreshing...' : 'Refresh'}
               </button>
             </div>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="flex gap-4 mt-4 border-t border-white/10 pt-4">
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                activeTab === 'dashboard'
+                  ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              Dashboard
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('products')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                activeTab === 'products'
+                  ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <Package className="w-4 h-4" />
+              Products
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('escrow')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all relative ${
+                activeTab === 'escrow'
+                  ? 'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <Shield className="w-4 h-4" />
+              Escrow
+              {dashboardData.pendingEscrowCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {dashboardData.pendingEscrowCount}
+                </span>
+              )}
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('orders')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all relative ${
+                activeTab === 'orders'
+                  ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <ShoppingBag className="w-4 h-4" />
+              Orders
+              {dashboardData.orderCounts.pendingApproval > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {dashboardData.orderCounts.pendingApproval}
+                </span>
+              )}
+            </button>
           </div>
         </div>
       </motion.header>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
-        >
-          <div className="glass-effect border-white/20 rounded-xl p-6 hover:border-blue-500/50 transition-all duration-300">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-400">Total Products</p>
-                <p className="text-3xl font-bold text-white mt-2">{stats.totalProducts}</p>
-                <p className="text-xs text-gray-400 mt-1">{stats.activeProducts} active</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
-                <Package className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
+        {activeTab === 'dashboard' ? (
+          <>
+            {/* Key Metrics Row */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8"
+            >
+              <StatCard 
+                title="Active Products" 
+                value={formatNumber(dashboardData.totalActiveProducts)} 
+                icon={Package} 
+                color="blue"
+                subtext={`${products.length} total products`}
+              />
+              <StatCard 
+                title="Inventory Value" 
+                value={formatCurrency(dashboardData.totalInventoryValue)} 
+                icon={DollarSign} 
+                color="green"
+                subtext="Based on your price"
+              />
+              <StatCard 
+                title="Total Orders" 
+                value={formatNumber(dashboardData.orderCounts.total)} 
+                icon={ShoppingBag} 
+                color="purple"
+                subtext={`${dashboardData.orderCounts.delivered} delivered`}
+              />
+              <StatCard 
+                title="Net Revenue" 
+                value={formatCurrency(dashboardData.netAmount)} 
+                icon={TrendingUp} 
+                color="orange"
+                subtext={`${formatCurrency(dashboardData.totalCommission)} commission`}
+              />
+              <StatCard 
+                title="Escrow Balance" 
+                value={formatCurrency(dashboardData.escrowBalance)} 
+                icon={Shield} 
+                color="teal"
+                subtext={`${dashboardData.pendingEscrowCount} orders`}
+              />
+            </motion.div>
 
-          <div className="glass-effect border-white/20 rounded-xl p-6 hover:border-green-500/50 transition-all duration-300">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-400">Inventory Value</p>
-                <p className="text-3xl font-bold text-white mt-2">{stats.totalPotentialValue.toFixed(2)} MAD</p>
-                <p className="text-xs text-gray-400 mt-1">Based on your price</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
+            {/* Second Row - More Metrics */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+            >
+              <StatCard 
+                title="Conversion Rate" 
+                value={`${dashboardData.conversionRate}%`} 
+                icon={Target} 
+                color="pink"
+                subtext={`${formatNumber(dashboardData.totalProductViews)} views`}
+              />
+              <StatCard 
+                title="Avg Order Value" 
+                value={formatCurrency(dashboardData.averageOrderValue)} 
+                icon={Zap} 
+                color="yellow"
+                subtext="Per order"
+              />
+              <StatCard 
+                title="COD Success" 
+                value={`${dashboardData.codSuccessRate}%`} 
+                icon={CheckCircle} 
+                color="green"
+                subtext="Cash on delivery"
+              />
+              <StatCard 
+                title="Fulfillment Time" 
+                value={`${dashboardData.averageFulfillmentTime}h`} 
+                icon={Clock} 
+                color="cyan"
+                subtext="Order to shipped"
+              />
+            </motion.div>
 
-          <div className="glass-effect border-white/20 rounded-xl p-6 hover:border-orange-500/50 transition-all duration-300">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-400">Total Sales</p>
-                <p className="text-3xl font-bold text-white mt-2">{stats.totalSales.toFixed(2)} MAD</p>
-                <p className="text-xs text-gray-400 mt-1">You receive this</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
+            {/* Sales Trend Chart */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mb-8"
+            >
+              <SalesTrendChart data={dashboardData.salesTrend} />
+            </motion.div>
 
-          <div className="glass-effect border-white/20 rounded-xl p-6 hover:border-red-500/50 transition-all duration-300">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-400">Net Amount</p>
-                <p className="text-3xl font-bold text-white mt-2">{stats.netAmount.toFixed(2)} MAD</p>
-                <p className="text-xs text-gray-400 mt-1">After commission</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-500 rounded-xl flex items-center justify-center">
-                <Percent className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Products Table Section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-xl shadow-2xl overflow-hidden"
-        >
-          <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                  <Package className="w-5 h-5 text-blue-600" />
-                  Your Products
-                </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  Manage your inventory and pricing
-                </p>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <select
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="appearance-none bg-white border border-gray-300 px-4 py-2 pr-10 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                  >
-                    <option value="all">All Status</option>
-                    {STATUSES.map(s => (
-                      <option key={s.value} value={s.value}>{s.label}</option>
-                    ))}
-                  </select>
-                  <Filter className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                </div>
-                <span className="text-sm bg-gray-100 px-3 py-1.5 rounded-lg text-gray-700 font-medium">
-                  {filteredProducts.length} product(s)
-                </span>
-                <button
-                  className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
-                  onClick={() => setShowAddForm(true)}
-                >
-                  + Add New
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6">
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-12">
-                <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                  No products found
+            {/* Three Column Layout for Top Lists */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              {/* Top Products by Quantity */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.25 }}
+                className="glass-effect border-white/20 rounded-xl p-6"
+              >
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <Package className="w-5 h-5 text-blue-400" />
+                  Top Products by Quantity
                 </h3>
-                <p className="text-gray-500 mb-6">
-                  {selectedStatus === "all" 
-                    ? "Start selling by adding your first product!" 
-                    : `No ${selectedStatus} products found.`}
-                </p>
+                <div className="space-y-1">
+                  {dashboardData.topQuantityProducts.length > 0 ? (
+                    dashboardData.topQuantityProducts.map((product, index) => (
+                      <TopListItem 
+                        key={product.id}
+                        rank={index + 1}
+                        name={product.name}
+                        value={product.quantity}
+                        unit="units"
+                        color="blue"
+                      />
+                    ))
+                  ) : (
+                    <p className="text-gray-400 text-center py-4">No products found</p>
+                  )}
+                </div>
+              </motion.div>
+
+              {/* Top Products by Inventory Value */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="glass-effect border-white/20 rounded-xl p-6"
+              >
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-green-400" />
+                  Top by Inventory Value
+                </h3>
+                <div className="space-y-1">
+                  {dashboardData.topInventoryProducts.length > 0 ? (
+                    dashboardData.topInventoryProducts.map((product, index) => (
+                      <TopListItem 
+                        key={product.id}
+                        rank={index + 1}
+                        name={product.name}
+                        value={formatCurrency(product.value)}
+                        unit=""
+                        color="green"
+                      />
+                    ))
+                  ) : (
+                    <p className="text-gray-400 text-center py-4">No products found</p>
+                  )}
+                </div>
+              </motion.div>
+
+              {/* Low Stock Warning */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.35 }}
+                className="glass-effect border-white/20 rounded-xl p-6"
+              >
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-red-400" />
+                  Low Stock Alert
+                </h3>
+                <div className="space-y-1">
+                  {dashboardData.lowStockProducts.length > 0 ? (
+                    dashboardData.lowStockProducts.map((product, index) => (
+                      <div key={product.id} className="flex items-center justify-between py-2 border-b border-gray-700 last:border-0">
+                        <div className="flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center text-xs font-bold text-red-400">
+                            {index + 1}
+                          </div>
+                          <span className="text-gray-300">{product.name}</span>
+                        </div>
+                        <span className="text-red-400 font-medium">{product.quantity} left</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-400 text-center py-4">All stock levels are healthy</p>
+                  )}
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Top Categories and Device Breakdown */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {/* Top Categories */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="glass-effect border-white/20 rounded-xl p-6"
+              >
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <Award className="w-5 h-5 text-yellow-400" />
+                  Top Categories
+                </h3>
+                <div className="space-y-3">
+                  {dashboardData.topCategories.length > 0 ? (
+                    dashboardData.topCategories.map((cat, index) => {
+                      const colors = ['blue', 'purple', 'green', 'orange', 'pink'];
+                      return (
+                        <CategoryProgressBar 
+                          key={cat.category}
+                          category={cat.category}
+                          percentage={cat.percentage}
+                          count={cat.count}
+                          color={colors[index % colors.length]}
+                        />
+                      );
+                    })
+                  ) : (
+                    <p className="text-gray-400 text-center py-4">No categories found</p>
+                  )}
+                </div>
+              </motion.div>
+
+              {/* Device Breakdown */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.45 }}
+              >
+                <DeviceBreakdown 
+                  mobile={dashboardData.deviceBreakdown.mobile}
+                  desktop={dashboardData.deviceBreakdown.desktop}
+                />
+              </motion.div>
+            </div>
+
+            {/* Top Sold Products */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="glass-effect border-white/20 rounded-xl p-6 mb-8"
+            >
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-green-400" />
+                Best Selling Products
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {dashboardData.topSoldProducts.length > 0 ? (
+                  dashboardData.topSoldProducts.map((product, index) => (
+                    <div key={product.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium text-gray-400">#{index + 1}</span>
+                        <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">
+                          {product.quantity} sold
+                        </span>
+                      </div>
+                      <p className="text-white font-medium mb-1">{product.name}</p>
+                      <p className="text-sm text-gray-400">Revenue: {formatCurrency(product.revenue)}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-400 text-center col-span-3 py-4">No sales data yet</p>
+                )}
+              </div>
+            </motion.div>
+
+            {/* Info Box */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 }}
+              className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Info className="w-5 h-5 text-blue-400" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-blue-400 mb-2">Business Insights</h4>
+                  <p className="text-sm text-gray-300">
+                    • Your conversion rate of <strong>{dashboardData.conversionRate}%</strong> means {dashboardData.totalProductViews} product views led to {dashboardData.orderCounts.delivered} sales.<br/>
+                    • Average order value is <strong>{formatCurrency(dashboardData.averageOrderValue)}</strong> - {dashboardData.averageOrderValue > 500 ? 'great!' : 'consider bundling products to increase this.'}<br/>
+                    • COD success rate is <strong>{dashboardData.codSuccessRate}%</strong> - {dashboardData.codSuccessRate > 90 ? 'excellent!' : 'you may want to follow up on failed deliveries.'}<br/>
+                    • Your top category is <strong>{dashboardData.topCategories[0]?.category || 'N/A'}</strong> - consider adding more products in this category.<br/>
+                    • You have <strong>{formatCurrency(dashboardData.escrowBalance)}</strong> in escrow across {dashboardData.pendingEscrowCount} orders.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        ) : activeTab === 'products' ? (
+          /* PRODUCTS SECTION */
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold text-gray-900">Your Products</h2>
                 <button
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition shadow-lg hover:shadow-xl"
-                  onClick={() => setShowAddForm(true)}
+                  onClick={() => {}} // Add product modal trigger
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                 >
-                  + Add Your First Product
+                  + Add Product
                 </button>
               </div>
-            ) : (
-              <ProductTable
-                products={filteredProducts}
-                onEdit={setEditingProduct}
-                onDelete={handleDeleteProduct}
-                onToggleAvailability={handleToggleAvailability}
-              />
-            )}
-          </div>
-        </motion.div>
-
-        {/* Pricing Info Box */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6"
-        >
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Info className="w-5 h-5 text-blue-600" />
             </div>
-            <div>
-              <h4 className="font-semibold text-blue-900 mb-2">Marketplace Pricing</h4>
-              <p className="text-sm text-blue-800">
-                • <strong>Your Price:</strong> This is what you receive per sale<br/>
-                • <strong>B2B Buyers:</strong> See your price directly (no markup)<br/>
-                • <strong>B2C Customers:</strong> Pay your price + 20% marketplace fee + delivery fee<br/>
-                • <strong>Delivery fees</strong> are calculated automatically based on customer location
-              </p>
-            </div>
+            <ProductTable 
+              products={products}
+              onEdit={setEditingProduct}
+              onDelete={handleDeleteProduct}
+              onSort={handleSort}
+              sortConfig={sortConfig}
+            />
           </div>
-        </motion.div>
+        ) : activeTab === 'escrow' ? (
+          <EscrowTab 
+            dashboardData={dashboardData} 
+            setDashboardData={setDashboardData}
+            sellerId={user.id} 
+          />
+        ) : (
+          <SellerOrders sellerId={user.id} />
+        )}
       </div>
-
-      {/* Modals */}
-      {showAddForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl"
-          >
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800">Add New Product</h2>
-              <button
-                className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-lg transition"
-                onClick={() => setShowAddForm(false)}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="p-6">
-              <AddProductForm
-                onSubmit={handleAddProduct}
-                onCancel={() => setShowAddForm(false)}
-              />
-            </div>
-          </motion.div>
-        </div>
-      )}
-
-      {editingProduct && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl"
-          >
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800">Edit Product</h2>
-              <button
-                className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-lg transition"
-                onClick={() => setEditingProduct(null)}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="p-6">
-              <EditProductForm
-                product={editingProduct}
-                onSubmit={(updates) => handleUpdateProduct(editingProduct.id, updates)}
-                onCancel={() => setEditingProduct(null)}
-              />
-            </div>
-          </motion.div>
-        </div>
-      )}
     </div>
   );
 };
