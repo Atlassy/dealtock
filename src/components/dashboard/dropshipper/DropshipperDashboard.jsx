@@ -12,25 +12,23 @@ import {
 } from 'lucide-react';
 import { useAuth } from "../../../contexts/SupabaseAuthContext";
 import { supabase } from "../../../lib/supabaseClient";
-import DashboardLayout from "../DashboardLayout";
 import StatCard from "./StatCard";
 import MarketplaceProducts from "./MarketplaceProducts";
 import DropshipperOrders from "./DropshipperOrders";
-import CustomerList from "./CustomerList";
-import Earnings from "./Earnings";
+import DropshipperCustomersPage from "./DropshipperCustomersPage";
+import DropshipperEarningsPage from "./DropshipperEarningsPage";
 import AddCustomerModal from "./AddCustomerModal";
 import PlaceOrderModal from "./PlaceOrderModal";
-import { useToast } from "../../ui/use-toast";
+import { toast } from "sonner";
 
 const DropshipperDashboard = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalOrders: 0,
-    grossMarkup: 0,        // Total markup before fees
-    dealtockFees: 0,        // Total commission paid to Dealtock
-    netEarnings: 0,         // Actual earnings after fees
+    grossMarkup: 0,
+    dealtockFees: 0,
+    netEarnings: 0,
     pendingOrders: 0,
     activeCustomers: 0,
     avgMarkup: 0,
@@ -61,7 +59,6 @@ const DropshipperDashboard = () => {
     try {
       setLoading(true);
       
-      // Fetch all orders for this dropshipper
       const { data: orders, error } = await supabase
         .from('orders')
         .select(`
@@ -78,7 +75,6 @@ const DropshipperDashboard = () => {
       if (error) throw error;
 
       if (orders) {
-        // Calculate correct metrics
         const totalGrossMarkup = orders.reduce((sum, order) => 
           sum + (Number(order.dropshipper_markup) || 0), 0
         );
@@ -96,10 +92,8 @@ const DropshipperDashboard = () => {
            'with_delivery_partner', 'in_transit', 'out_for_delivery'].includes(o.status)
         ).length;
 
-        // Count unique customers
         const uniqueCustomers = new Set(orders.map(o => o.customer_id).filter(Boolean)).size;
 
-        // Calculate average markup and commission rate
         const ordersWithMarkup = orders.filter(o => o.dropshipper_markup > 0);
         const avgMarkup = ordersWithMarkup.length > 0
           ? totalGrossMarkup / ordersWithMarkup.length
@@ -122,11 +116,7 @@ const DropshipperDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching stats:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load dashboard stats",
-        variant: "destructive",
-      });
+      toast.error("Failed to load dashboard stats");
     } finally {
       setLoading(false);
     }
@@ -144,147 +134,145 @@ const DropshipperDashboard = () => {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <DashboardLayout role="dropshipper">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Dropshipper Dashboard
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Track your earnings and manage your business
-            </p>
-          </div>
-          <button
-            onClick={() => setShowAddCustomer(true)}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <PlusCircle className="w-5 h-5 mr-2" />
-            Add Customer
-          </button>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Dropshipper Dashboard
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Track your earnings and manage your business
+          </p>
         </div>
+        <button
+          onClick={() => setShowAddCustomer(true)}
+          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <PlusCircle className="w-5 h-5 mr-2" />
+          Add Customer
+        </button>
+      </div>
 
-        {/* Stats Cards - UPDATED to show correct metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <StatCard
-            title="Total Orders"
-            value={stats.totalOrders}
-            icon={Package}
-            color="blue"
-          />
-          <StatCard
-            title="Gross Markup"
-            value={formatCurrency(stats.grossMarkup)}
-            subtitle="Before fees"
-            icon={TrendingUp}
-            color="green"
-          />
-          <StatCard
-            title="Dealtock Fees"
-            value={formatCurrency(stats.dealtockFees)}
-            subtitle={`${stats.avgCommissionRate.toFixed(1)}% avg rate`}
-            icon={Percent}
-            color="orange"
-          />
-          <StatCard
-            title="Net Earnings"
-            value={formatCurrency(stats.netEarnings)}
-            subtitle="After fees"
-            icon={DollarSign}
-            color="purple"
-          />
-          <StatCard
-            title="Pending Orders"
-            value={stats.pendingOrders}
-            icon={Clock}
-            color="yellow"
-          />
-        </div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <StatCard
+          title="Total Orders"
+          value={stats.totalOrders}
+          icon={Package}
+          color="blue"
+        />
+        <StatCard
+          title="Gross Markup"
+          value={formatCurrency(stats.grossMarkup)}
+          subtitle="Before fees"
+          icon={TrendingUp}
+          color="green"
+        />
+        <StatCard
+          title="Dealtock Fees"
+          value={formatCurrency(stats.dealtockFees)}
+          subtitle={`${stats.avgCommissionRate.toFixed(1)}% avg rate`}
+          icon={Percent}
+          color="orange"
+        />
+        <StatCard
+          title="Net Earnings"
+          value={formatCurrency(stats.netEarnings)}
+          subtitle="After fees"
+          icon={DollarSign}
+          color="purple"
+        />
+        <StatCard
+          title="Pending Orders"
+          value={stats.pendingOrders}
+          icon={Clock}
+          color="yellow"
+        />
+      </div>
 
-        {/* Secondary Stats Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Active Customers</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.activeCustomers}</p>
-              </div>
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Users className="w-5 h-5 text-blue-600" />
-              </div>
+      {/* Secondary Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Active Customers</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.activeCustomers}</p>
             </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Average Markup</p>
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.avgMarkup)}</p>
-              </div>
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-green-600" />
-              </div>
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Users className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
-
-        {/* Tabs */}
-        <div className="border-b border-gray-200">
-          <nav className="flex -mb-px space-x-8">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`
-                  flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors
-                  ${activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }
-                `}
-              >
-                <tab.icon className="w-5 h-5 mr-2" />
-                {tab.label}
-              </button>
-            ))}
-          </nav>
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Average Markup</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.avgMarkup)}</p>
+            </div>
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-green-600" />
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Tab Content */}
-        <div className="mt-6">
-          {activeTab === 'marketplace' && (
-            <MarketplaceProducts onPlaceOrder={handlePlaceOrder} />
-          )}
-          
-          {activeTab === 'orders' && (
-            <DropshipperOrders 
-              dropshipperId={user?.id}
-              onUpdate={fetchStats} // Refresh stats when orders change
-            />
-          )}
-          
-          {activeTab === 'customers' && (
-            <CustomerList 
-              dropshipperId={user?.id}
-              onAddCustomer={() => setShowAddCustomer(true)}
-              onUpdate={fetchStats}
-            />
-          )}
-          
-          {activeTab === 'earnings' && (
-            <Earnings 
-              dropshipperId={user?.id}
-              onUpdate={fetchStats}
-            />
-          )}
-        </div>
+      {/* Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="flex -mb-px space-x-8">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`
+                flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                ${activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }
+              `}
+            >
+              <tab.icon className="w-5 h-5 mr-2" />
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      <div className="mt-6">
+        {activeTab === 'marketplace' && (
+          <MarketplaceProducts onPlaceOrder={handlePlaceOrder} />
+        )}
+        
+        {activeTab === 'orders' && (
+          <DropshipperOrders 
+            dropshipperId={user?.id}
+            onUpdate={fetchStats}
+          />
+        )}
+        
+        {activeTab === 'customers' && (
+          <DropshipperCustomersPage 
+            dropshipperId={user?.id}
+            onAddCustomer={() => setShowAddCustomer(true)}
+            onUpdate={fetchStats}
+          />
+        )}
+        
+        {activeTab === 'earnings' && (
+          <DropshipperEarningsPage 
+            dropshipperId={user?.id}
+            onUpdate={fetchStats}
+          />
+        )}
       </div>
 
       {/* Modals */}
@@ -313,7 +301,7 @@ const DropshipperDashboard = () => {
           }}
         />
       )}
-    </DashboardLayout>
+    </div>
   );
 };
 

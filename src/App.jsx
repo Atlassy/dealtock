@@ -2,7 +2,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import RoleProtectedRoute from "./components/RoleProtectedRoute"; // Add this import
 import ForgotPassword from "./components/auth/ForgotPassword";
 import ResetPassword from "./components/auth/ResetPassword";
 import EmailConfirmation from "./components/auth/EmailConfirmation";
@@ -14,13 +13,18 @@ import Dashboard from "./components/dashboard/Dashboard";
 import ProfilePage from "./components/ProfilePage";
 import Navbar from "./components/Navbar";
 import MarketplacePage from "./components/marketplace/MarketplacePage";
+import CartPage from "./components/marketplace/CartPage";
 import Inventory from "./components/dashboard/seller/Inventory";
 import { Toaster } from "sonner";
 
-export default function App() {
-  const { user, loading } = useAuth();
+// Dropshipper components
+import DropshipperOrders from "./components/dashboard/dropshipper/DropshipperOrders";
+import DropshipperCustomersPage from "./components/dashboard/dropshipper/DropshipperCustomersPage";
+import DropshipperEarningsPage from "./components/dashboard/dropshipper/DropshipperEarningsPage";
 
-  // While session is loading → show loading screen
+export default function App() {
+  const { user, loading, profile } = useAuth();
+
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center text-gray-600">
@@ -30,81 +34,97 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <Toaster richColors position="top-right" />
-      {/* Show navbar only if logged in */}
-      {user && <Navbar />}
+      
+      {/* Unified Navbar - Shows for all users */}
+      <Navbar />
 
-      <Routes>
-        {/* Public routes - No authentication required */}
-        <Route 
-          path="/marketplace" 
-          element={
-            <ProtectedRoute isPublic={true}>
-              <MarketplacePage />
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* Auth routes */}
-        <Route
-          path="/login"
-          element={user ? <Navigate to="/dashboard" replace /> : <Login />}
-        />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/check-email" element={<CheckEmail />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/password-updated" element={<PasswordUpdated />} />
-        <Route path="/email-confirmation" element={<EmailConfirmation />} />
+      {/* Main content with proper padding for navbar */}
+      <div className={`pt-16 ${user ? 'pl-16' : ''}`}>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<MarketplacePage />} />
+          <Route path="/marketplace" element={<MarketplacePage />} />
+          <Route path="/cart" element={<CartPage />} />
+          
+          {/* Auth routes */}
+          <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+          <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <SignUpForm />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/check-email" element={<CheckEmail />} />
+          <Route path="/password-updated" element={<PasswordUpdated />} />
+          <Route path="/email-confirmation" element={<EmailConfirmation />} />
 
-        <Route
-          path="/signup"
-          element={user ? <Navigate to="/dashboard" replace /> : <SignUpForm />}
-        />
+          {/* Protected routes */}
+          <Route
+            path="/dashboard/*"
+            element={
+              <ProtectedRoute>
+                <div className="pl-16">
+                  <Dashboard />
+                </div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/inventory"
+            element={
+              <ProtectedRoute>
+                <div className="pl-16">
+                  <Inventory />
+                </div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <div className="pl-16">
+                  <ProfilePage />
+                </div>
+              </ProtectedRoute>
+            }
+          />
 
-        {/* Protected routes - Require authentication */}
-        
-        {/* Inventory - Only sellers and admins can access */}
-        <Route
-          path="/inventory"
-          element={
-            <ProtectedRoute>
-              <RoleProtectedRoute allowedRoles={['seller', 'admin']}>
-                <Inventory />
-              </RoleProtectedRoute>
-            </ProtectedRoute>
-          }
-        />
+          {/* Dropshipper Routes */}
+          <Route
+            path="/dropshipper/orders"
+            element={
+              <ProtectedRoute requiredRole="dropshipper">
+                <div className="pl-16">
+                  <DropshipperOrders dropshipperId={user?.id} />
+                </div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dropshipper/customers"
+            element={
+              <ProtectedRoute requiredRole="dropshipper">
+                <div className="pl-16">
+                  <DropshipperCustomersPage dropshipperId={user?.id} />
+                </div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dropshipper/earnings"
+            element={
+              <ProtectedRoute requiredRole="dropshipper">
+                <div className="pl-16">
+                  <DropshipperEarningsPage dropshipperId={user?.id} />
+                </div>
+              </ProtectedRoute>
+            }
+          />
 
-        {/* Dashboard - All authenticated users can access */}
-        <Route
-          path="/dashboard/*"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Profile - All authenticated users can access */}
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Default redirect */}
-        <Route 
-          path="/" 
-          element={<Navigate to={user ? "/dashboard" : "/marketplace"} replace />} 
-        />
-        
-        {/* Catch-all route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Catch-all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
     </div>
   );
 }

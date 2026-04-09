@@ -5,8 +5,14 @@ module.exports = {
     // Update these paths to match your actual file structure
     './src/**/*.{js,jsx,ts,tsx}',
     './src/components/**/*.{js,jsx,ts,tsx}',
+    './src/components/dashboard/**/*.{js,jsx,ts,tsx}',
+    './src/components/marketplace/**/*.{js,jsx,ts,tsx}',
+    './src/components/auth/**/*.{js,jsx,ts,tsx}',
     './src/pages/**/*.{js,jsx,ts,tsx}',
     './src/app/**/*.{js,jsx,ts,tsx}',
+    './src/contexts/**/*.{js,jsx,ts,tsx}',
+    './src/hooks/**/*.{js,jsx,ts,tsx}',
+    './src/lib/**/*.{js,jsx,ts,tsx}',
     './public/index.html',
   ],
   theme: {
@@ -58,6 +64,15 @@ module.exports = {
           '3': 'hsl(var(--chart-3))',
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))'
+        },
+        // Amazon-style colors
+        amazon: {
+          navy: '#131921',
+          dark: '#232f3e',
+          orange: '#febd69',
+          orangeDark: '#f3a847',
+          light: '#ffffff',
+          gray: '#eaeded'
         }
       },
       borderRadius: {
@@ -81,11 +96,42 @@ module.exports = {
           to: {
             height: 0
           }
+        },
+        'fade-in': {
+          from: {
+            opacity: 0
+          },
+          to: {
+            opacity: 1
+          }
+        },
+        'slide-in-left': {
+          from: {
+            transform: 'translateX(-100%)'
+          },
+          to: {
+            transform: 'translateX(0)'
+          }
+        },
+        'slide-out-left': {
+          from: {
+            transform: 'translateX(0)'
+          },
+          to: {
+            transform: 'translateX(-100%)'
+          }
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out'
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-in': 'fade-in 0.3s ease-out',
+        'slide-in-left': 'slide-in-left 0.3s ease-out',
+        'slide-out-left': 'slide-out-left 0.3s ease-out'
+      },
+      spacing: {
+        '14': '3.5rem', // For navbar height
+        '16': '4rem',   // For sidebar width
       }
     }
   },

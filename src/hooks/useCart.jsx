@@ -1,88 +1,462 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+// src/hooks/useCart.js
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useAuth } from '../contexts/SupabaseAuthContext';
+import { supabase } from '../lib/supabaseClient';
 
-const CartContext = createContext();
+const CART_EXPIRATION_DAYS = 7;
+const LEGACY_GUEST_KEY = 'cart';
+const GUEST_CART_KEY = 'cart_guest';
 
-const CART_STORAGE_KEY = 'e-commerce-cart';
+export const useCart = () => {
+  const { user, profile } = useAuth();
 
-export const useCart = () => useContext(CartContext);
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [commissionRules, setCommissionRules] = useState([]);
+  const [rulesLoaded, setRulesLoaded] = useState(false);
 
-export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState(() => {
-    try {
-      const storedCart = localStorage.getItem(CART_STORAGE_KEY);
+  const channelRef = useRef(null);
+  const isSyncingRef = useRef(false);
 
-      return storedCart ? JSON.parse(storedCart) : [];
-    } catch (error) {
-      return [];
-    }
-  });
-
+  // -----------------------------
+  // FETCH COMMISSION RULES
+  // -----------------------------
   useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
-  }, [cartItems]);
+    const fetchCommissionRules = async () => {
+      console.log('📡 Fetching commission rules...');
+      const { data, error } = await supabase
+        .from('commission_rules')
+        .select('*')
+        .eq('is_active', true)
+        .order('priority', { ascending: false });
 
-  const addToCart = useCallback((product, variant, quantity, availableQuantity) => {
-    return new Promise((resolve, reject) => {
-      if (variant.manage_inventory) {
-        const existingItem = cartItems.find(item => item.variant.id === variant.id);
-        const currentCartQuantity = existingItem ? existingItem.quantity : 0;
-        if ((currentCartQuantity + quantity) > availableQuantity) {
-          const error = new Error(`Not enough stock for ${product.title} (${variant.title}). Only ${availableQuantity} left.`);
-          reject(error);
-          return;
+      if (!error && data) {
+        const processed = data.map(r => ({
+          ...r,
+          min_amount: r.min_amount !== null ? Number(r.min_amount) : 0,
+          max_amount: r.max_amount !== null ? Number(r.max_amount) : Infinity,
+          percentage: Number(r.percentage),
+          category: r.category || 'default',
+          applies_to: (r.applies_to || '').toLowerCase().trim(),
+        }));
+        console.log('✅ Commission rules loaded:', processed.length);
+        setCommissionRules(processed);
+        setRulesLoaded(true);
+      }
+    };
+    fetchCommissionRules();
+  }, []);
+
+  // -----------------------------
+  // FIND COMMISSION RULE
+  // -----------------------------
+  const findCommissionRule = useCallback((category, price, role) => {
+    if (!commissionRules.length) return null;
+
+    let applies = (role || 'customer').toLowerCase();
+    if (applies === 'customer') applies = 'b2c';
+    if (applies === 'admin') applies = 'seller';
+
+    const cat = category || 'default';
+    const p = Number(price);
+
+    // First try exact category match
+    let rule = commissionRules.find(r =>
+      r.applies_to === applies &&
+      r.category === cat &&
+      p >= r.min_amount &&
+      p <= r.max_amount
+    );
+
+    // If no exact match, try default category
+    if (!rule) {
+      rule = commissionRules.find(r =>
+        r.applies_to === applies &&
+        r.category === 'default' &&
+        p >= r.min_amount &&
+        p <= r.max_amount
+      );
+    }
+
+    return rule;
+  }, [commissionRules]);
+
+  // -----------------------------
+  // GET ROLE-BASED PRICE (FIXED - WITH FALLBACKS)
+  // -----------------------------
+  const getRoleBasedPrice = useCallback((product) => {
+    // If product has no data, return 0
+    if (!product) return 0;
+
+    const basePrice = Number(product.purchase_price || 0);
+    
+    // If no user or customer role - use B2C pricing
+    if (!user || !profile?.role || profile.role === 'customer') {
+      // Try sale_price first
+      if (product.sale_price && product.sale_price > 0) {
+        return Number(product.sale_price);
+      }
+      // If no sale_price, calculate from purchase_price with B2C markup
+      if (basePrice > 0) {
+        // Find B2C commission rule
+        const rule = findCommissionRule(product.category, basePrice, 'B2C');
+        if (rule) {
+          const finalPrice = basePrice * (1 + rule.percentage / 100);
+          console.log(`💰 B2C price for ${product.name}: ${basePrice} + ${rule.percentage}% = ${finalPrice}`);
+          return Number(finalPrice.toFixed(2));
         }
+        // Default B2C markup 30%
+        console.log(`💰 B2C fallback for ${product.name}: ${basePrice} * 1.3 = ${basePrice * 1.3}`);
+        return Number((basePrice * 1.3).toFixed(2));
+      }
+      return 0;
+    }
+
+    // Dropshipper pricing
+    if (profile.role === 'dropshipper') {
+      if (basePrice === 0) return 0;
+      
+      const rule = findCommissionRule(product.category, basePrice, 'dropshipper');
+      if (rule) {
+        const finalPrice = basePrice * (1 + rule.percentage / 100);
+        console.log(`💰 Dropshipper price for ${product.name}: ${basePrice} + ${rule.percentage}% = ${finalPrice}`);
+        return Number(finalPrice.toFixed(2));
+      }
+      // Default dropshipper markup 10%
+      console.log(`💰 Dropshipper fallback for ${product.name}: ${basePrice} * 1.1 = ${basePrice * 1.1}`);
+      return Number((basePrice * 1.1).toFixed(2));
+    }
+
+    // Seller/Admin pricing - just purchase price
+    if (profile.role === 'seller' || profile.role === 'admin' || profile.role === 'warehouser') {
+      return Number(basePrice);
+    }
+
+    // Fallback
+    return Number(basePrice);
+  }, [user, profile, findCommissionRule]);
+
+  // -----------------------------
+  // GET CART ITEMS WITH PRICES
+  // -----------------------------
+  const getCartItemsWithPrices = useCallback(async (items) => {
+    if (!items.length) return [];
+
+    const productIds = items.map(i => i.id);
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('id, name, sale_price, purchase_price, quantity, category, image_url, location, condition')
+      .in('id', productIds);
+
+    if (error || !products) {
+      console.error('Error fetching products:', error);
+      return items;
+    }
+
+    const productMap = {};
+    products.forEach(p => productMap[p.id] = p);
+
+    return items.map(item => {
+      const product = productMap[item.id];
+      if (!product) return item;
+
+      const price = getRoleBasedPrice(product);
+      const b2cPrice = product.sale_price || (product.purchase_price * 1.3) || 0;
+
+      return {
+        ...item,
+        name: product.name,
+        price: price,
+        originalB2CPrice: b2cPrice,
+        stock: product.quantity,
+        category: product.category,
+        image_url: product.image_url || item.image_url,
+        location: product.location,
+        condition: product.condition,
+      };
+    });
+  }, [getRoleBasedPrice]);
+
+  // -----------------------------
+  // MIGRATE LEGACY CART
+  // -----------------------------
+  const migrateLegacyCart = useCallback(() => {
+    const legacyCart = localStorage.getItem(LEGACY_GUEST_KEY);
+    if (legacyCart) {
+      const parsedCart = JSON.parse(legacyCart);
+      if (parsedCart.length > 0) {
+        console.log('🔄 Migrating legacy cart to new format:', parsedCart.length, 'items');
+        localStorage.setItem(GUEST_CART_KEY, legacyCart);
+        return parsedCart;
+      }
+    }
+    return null;
+  }, []);
+
+  // -----------------------------
+  // LOAD CART
+  // -----------------------------
+  const loadCart = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      let items = [];
+
+      if (user) {
+        console.log('📡 Loading cart from Supabase for user:', user.id);
+        
+        const { data, error } = await supabase
+          .from('user_carts')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (!error && data) {
+          items = data.items || [];
+          console.log('📦 Loaded', items.length, 'items from Supabase');
+          
+          // Update prices with current user role
+          if (items.length > 0 && rulesLoaded) {
+            items = await getCartItemsWithPrices(items);
+            // Save updated prices back
+            await supabase
+              .from('user_carts')
+              .upsert({
+                user_id: user.id,
+                items: items,
+                expires_at: new Date(Date.now() + CART_EXPIRATION_DAYS * 24 * 60 * 60 * 1000).toISOString(),
+                updated_at: new Date().toISOString()
+              }, { onConflict: 'user_id' });
+          }
+        }
+
+        // Merge guest cart
+        let guestCart = JSON.parse(localStorage.getItem(GUEST_CART_KEY) || '[]');
+        if (guestCart.length === 0) {
+          const legacyCart = migrateLegacyCart();
+          if (legacyCart) guestCart = legacyCart;
+        }
+
+        if (guestCart.length > 0) {
+          console.log('🔄 Merging guest cart:', guestCart.length, 'items');
+          const merged = {};
+          [...items, ...guestCart].forEach(item => {
+            if (merged[item.id]) {
+              merged[item.id].quantity += item.quantity;
+            } else {
+              merged[item.id] = { ...item };
+            }
+          });
+          items = Object.values(merged);
+          
+          localStorage.removeItem(GUEST_CART_KEY);
+          localStorage.removeItem(LEGACY_GUEST_KEY);
+          
+          // Update prices for merged items
+          if (items.length > 0 && rulesLoaded) {
+            items = await getCartItemsWithPrices(items);
+          }
+          
+          await supabase
+            .from('user_carts')
+            .upsert({
+              user_id: user.id,
+              items: items,
+              expires_at: new Date(Date.now() + CART_EXPIRATION_DAYS * 24 * 60 * 60 * 1000).toISOString(),
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+        }
+
+      } else {
+        // Guest user
+        let items = JSON.parse(localStorage.getItem(GUEST_CART_KEY) || '[]');
+        if (items.length === 0) {
+          const legacyCart = migrateLegacyCart();
+          if (legacyCart) {
+            items = legacyCart;
+            localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
+          }
+        }
+        
+        // Update prices for guest
+        if (items.length > 0 && rulesLoaded) {
+          items = await getCartItemsWithPrices(items);
+          localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
+        }
+        
+        console.log('📦 Loaded', items.length, 'items from localStorage (guest)');
+        setCartItems(items);
+        setLoading(false);
+        return;
       }
 
-      setCartItems(prevItems => {
-        const existingItem = prevItems.find(item => item.variant.id === variant.id);
-        if (existingItem) {
-          return prevItems.map(item =>
-            item.variant.id === variant.id
-              ? { ...item, quantity: item.quantity + quantity }
-              : item
-          );
-        }
-        return [...prevItems, { product, variant, quantity }];
-      });
-      resolve();
-    });
-  }, [cartItems]);
+      setCartItems(items);
 
-  const removeFromCart = useCallback((variantId) => {
-    setCartItems(prevItems => prevItems.filter(item => item.variant.id !== variantId));
-  }, []);
+    } catch (err) {
+      console.error('Load cart error:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [user, rulesLoaded, getCartItemsWithPrices, migrateLegacyCart]);
 
-  const updateQuantity = useCallback((variantId, quantity) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.variant.id === variantId ? { ...item, quantity } : item
-      )
+  // -----------------------------
+  // SAVE CART
+  // -----------------------------
+  const saveCart = useCallback(async (items) => {
+    try {
+      if (user) {
+        const { error } = await supabase
+          .from('user_carts')
+          .upsert({
+            user_id: user.id,
+            items: items,
+            expires_at: new Date(Date.now() + CART_EXPIRATION_DAYS * 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+
+        if (error) throw error;
+      } else {
+        localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
+      }
+
+      setCartItems(items);
+      window.dispatchEvent(new Event('cartUpdated'));
+
+    } catch (err) {
+      console.error('Save cart error:', err);
+    }
+  }, [user]);
+
+  // -----------------------------
+  // ACTIONS
+  // -----------------------------
+  // In useCart.js, update addToCart to store seller_id
+const addToCart = useCallback(async (product, qty = 1) => {
+  // Fetch fresh product data
+  const { data: freshProduct, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('id', product.id)
+    .single();
+
+  if (error || !freshProduct) return false;
+
+  const price = getRoleBasedPrice(freshProduct);
+  const existing = cartItems.find(i => i.id === product.id);
+
+  let updated;
+  if (existing) {
+    updated = cartItems.map(i =>
+      i.id === product.id
+        ? { ...i, quantity: i.quantity + qty, price }
+        : i
     );
-  }, []);
+  } else {
+    updated = [
+      ...cartItems,
+      {
+        id: freshProduct.id,
+        name: freshProduct.name,
+        price,
+        quantity: qty,
+        image_url: freshProduct.image_url,
+        category: freshProduct.category,
+        originalB2CPrice: freshProduct.sale_price || (freshProduct.purchase_price * 1.3),
+        stock: freshProduct.quantity,
+        location: freshProduct.location,
+        condition: freshProduct.condition,
+        seller_id: freshProduct.user_id,  // ← Add this!
+      }
+    ];
+  }
 
-  const clearCart = useCallback(() => {
+  await saveCart(updated);
+  return true;
+}, [cartItems, saveCart, getRoleBasedPrice]);
+  const removeItem = useCallback(async (id) => {
+    await saveCart(cartItems.filter(i => i.id !== id));
+  }, [cartItems, saveCart]);
+
+  const updateQuantity = useCallback(async (id, qty) => {
+    if (qty < 1) return;
+    const updated = cartItems.map(i => i.id === id ? { ...i, quantity: qty } : i);
+    await saveCart(updated);
+  }, [cartItems, saveCart]);
+
+  const clearCart = useCallback(async () => {
+    if (user) {
+      await supabase.from('user_carts').delete().eq('user_id', user.id);
+    } else {
+      localStorage.removeItem(GUEST_CART_KEY);
+      localStorage.removeItem(LEGACY_GUEST_KEY);
+    }
     setCartItems([]);
-  }, []);
+    window.dispatchEvent(new Event('cartUpdated'));
+  }, [user]);
 
-  const getCartTotal = useCallback(() => {
-    return cartItems.reduce((total, item) => {
-      const price = item.variant.sale_price_in_cents ?? item.variant.price_in_cents;
-      return total + price * item.quantity;
-    }, 0);
+  const refreshCartPrices = useCallback(async () => {
+    console.log('🔄 Refreshing cart prices...');
+    await loadCart();
+  }, [loadCart]);
+
+  const getCartCount = useCallback(() => {
+    return cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
   }, [cartItems]);
 
-  const value = useMemo(() => ({
-    cartItems,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    getCartTotal,
-  }), [cartItems, addToCart, removeFromCart, updateQuantity, clearCart, getCartTotal]);
+  // -----------------------------
+  // INIT
+  // -----------------------------
+  useEffect(() => {
+    if (rulesLoaded) {
+      loadCart();
+    }
+  }, [rulesLoaded, user]);
 
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
-  )
+  // -----------------------------
+  // REALTIME SYNC
+  // -----------------------------
+  useEffect(() => {
+    if (!user) return;
+
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+    }
+
+    channelRef.current = supabase
+      .channel('cart-sync')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_carts',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('🔄 Realtime cart update');
+          if (payload.new?.items) {
+            setCartItems(payload.new.items);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
+    };
+  }, [user]);
+
+  return {
+    cartItems,
+    loading,
+    addToCart,
+    updateQuantity,
+    removeItem,
+    clearCart,
+    loadCart,
+    refreshCartPrices,
+    getCartCount,
+  };
 };

@@ -1,3 +1,4 @@
+// src/contexts/SupabaseAuthContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -5,7 +6,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null); // Add profile state
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Function to fetch user profile
@@ -58,6 +59,7 @@ export function AuthProvider({ children }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const currentUser = session?.user ?? null;
+      const previousUser = user;
       setUser(currentUser);
       
       // Fetch profile when user changes
@@ -65,6 +67,18 @@ export function AuthProvider({ children }) {
         await fetchProfile(currentUser.id);
       } else {
         setProfile(null);
+      }
+      
+      // 🔥 ONLY dispatch event on actual login/logout, not on initial load
+      if (previousUser !== currentUser) {
+        if (!previousUser && currentUser) {
+          console.log('👤 User logged in, dispatching userLoggedIn event');
+          window.dispatchEvent(new Event('userLoggedIn'));
+        }
+        if (previousUser && !currentUser) {
+          console.log('👤 User logged out, dispatching userLoggedOut event');
+          window.dispatchEvent(new Event('userLoggedOut'));
+        }
       }
       
       setLoading(false);
@@ -84,6 +98,7 @@ export function AuthProvider({ children }) {
 
     if (data?.user) {
       await fetchProfile(data.user.id);
+      // 🔥 REMOVED duplicate event - onAuthStateChange will handle this
     }
 
     setLoading(false);
@@ -96,6 +111,7 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+    // 🔥 REMOVED duplicate event - onAuthStateChange will handle this
     setLoading(false);
   };
 
@@ -103,11 +119,11 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider
       value={{
         user,
-        profile, // Add profile to the context value
+        profile,
         loading,
         signIn,
         signOut,
-        fetchProfile, // Optional: expose fetchProfile for manual refreshes
+        fetchProfile,
       }}
     >
       {children}

@@ -106,17 +106,6 @@ export const useMarketplaceProducts = (filters) => {
   const getPriceForRole = useCallback((product) => {
     const basePrice = product.purchase_price || 0;
     
-    // If product has zero price, return zero
-    if (basePrice <= 0) {
-      return {
-        price: 0,
-        label: 'Price',
-        marketplace_fee: 0,
-        commission_rate: 0,
-        invalid: true
-      };
-    }
-    
     if (userRole === 'dropshipper' || userRole === 'seller') {
       return {
         price: basePrice,
@@ -139,13 +128,12 @@ export const useMarketplaceProducts = (filters) => {
     };
   }, [userRole, getCommissionRate]);
 
-  // Fetch products - EXCLUDE zero price products
+  // 🔧 FIXED: Fetch products with all filters applied
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
     
     try {
-      // Only select columns that exist in your products table
       let query = supabase
         .from('products')
         .select(`
@@ -172,35 +160,45 @@ export const useMarketplaceProducts = (filters) => {
         .eq('available_for_sale', true)
         .eq('status', 'available')
         .gt('quantity', 0)
-        .gt('purchase_price', 0);  // EXCLUDE products with zero or negative price
+        .gt('purchase_price', 0);
 
-      // Apply filters
-      if (filters.search) {
+      // 🔧 Apply search filter
+      if (filters.search && filters.search !== '') {
         query = query.ilike('name', `%${filters.search}%`);
       }
-      if (filters.category) {
+      
+      // 🔧 Apply category filter
+      if (filters.category && filters.category !== '') {
         query = query.eq('category', filters.category);
       }
-      if (filters.location) {
+      
+      // 🔧 Apply location/city filter
+      if (filters.location && filters.location !== '') {
         query = query.eq('location', filters.location);
       }
-      if (filters.minPrice) {
-        query = query.gte('purchase_price', parseFloat(filters.minPrice));
-      }
-      if (filters.maxPrice) {
-        query = query.lte('purchase_price', parseFloat(filters.maxPrice));
-      }
-      if (filters.condition) {
+      
+      // 🔧 Apply condition filter
+      if (filters.condition && filters.condition !== '') {
         query = query.eq('condition', filters.condition);
       }
+      
+      // 🔧 Apply price range filters
+      if (filters.minPrice && filters.minPrice !== '') {
+        query = query.gte('purchase_price', parseFloat(filters.minPrice));
+      }
+      if (filters.maxPrice && filters.maxPrice !== '') {
+        query = query.lte('purchase_price', parseFloat(filters.maxPrice));
+      }
 
-      // Apply sorting
-      if (filters.sortBy === 'price_asc') {
+      // 🔧 Apply sorting
+      if (filters.sortBy === 'price_low') {
         query = query.order('purchase_price', { ascending: true });
-      } else if (filters.sortBy === 'price_desc') {
+      } else if (filters.sortBy === 'price_high') {
         query = query.order('purchase_price', { ascending: false });
       } else if (filters.sortBy === 'name') {
         query = query.order('name', { ascending: true });
+      } else if (filters.sortBy === 'rating') {
+        query = query.order('created_at', { ascending: false });
       } else {
         query = query.order('created_at', { ascending: false });
       }
@@ -209,11 +207,8 @@ export const useMarketplaceProducts = (filters) => {
       
       if (error) throw error;
       
-      // Filter out any remaining zero-price products (double-check)
-      const validProducts = (data || []).filter(product => (product.purchase_price || 0) > 0);
-      
-      console.log('Products fetched:', validProducts.length);
-      setProducts(validProducts);
+      console.log('Products fetched with filters:', filters, 'Count:', data?.length);
+      setProducts(data || []);
       
     } catch (err) {
       console.error('Error fetching products:', err);

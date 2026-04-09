@@ -384,7 +384,7 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
                     <th className="pb-3">Status</th>
                     <th className="pb-3">Delivery Date</th>
                     <th className="pb-3">Release Date</th>
-                   </tr>
+                    </tr>
                 </thead>
                 <tbody className="text-gray-300">
                   {escrowOrders.map((order) => {
@@ -948,102 +948,68 @@ const SellerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
-      {/* Header */}
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass-effect border-b border-white/10 sticky top-0 z-50 backdrop-blur-xl bg-slate-900/50"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Package className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                  Seller Dashboard
-                </h1>
-                <p className="text-sm text-gray-400">
-                  Welcome back, {profile?.full_name || user.email?.split('@')[0] || 'Seller'}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 text-white"
-                onClick={handleRefresh}
-                disabled={loading}
-              >
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                {loading ? 'Refreshing...' : 'Refresh'}
-              </button>
-            </div>
-          </div>
-
-          {/* Tab Navigation */}
-          <div className="flex gap-4 mt-4 border-t border-white/10 pt-4">
-            <button
-              onClick={() => setActiveTab('dashboard')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                activeTab === 'dashboard'
-                  ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <BarChart3 className="w-4 h-4" />
-              Dashboard
-            </button>
-            
-            <button
-              onClick={() => setActiveTab('products')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                activeTab === 'products'
-                  ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <Package className="w-4 h-4" />
-              Products
-            </button>
-            
-            <button
-              onClick={() => setActiveTab('escrow')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all relative ${
-                activeTab === 'escrow'
-                  ? 'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <Shield className="w-4 h-4" />
-              Escrow
-              {dashboardData.pendingEscrowCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {dashboardData.pendingEscrowCount}
-                </span>
-              )}
-            </button>
-            
-            <button
-              onClick={() => setActiveTab('orders')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all relative ${
-                activeTab === 'orders'
-                  ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <ShoppingBag className="w-4 h-4" />
-              Orders
-              {dashboardData.orderCounts.pendingApproval > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {dashboardData.orderCounts.pendingApproval}
-                </span>
-              )}
-            </button>
-          </div>
+      {/* Tab Navigation - Simplified, no duplicate header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div className="flex gap-4 flex-wrap">
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+              activeTab === 'dashboard'
+                ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
+                : 'text-gray-400 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" />
+            Dashboard
+          </button>
+          
+          <button
+            onClick={() => setActiveTab('products')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+              activeTab === 'products'
+                ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
+                : 'text-gray-400 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <Package className="w-4 h-4" />
+            Products
+          </button>
+          
+          <button
+            onClick={() => setActiveTab('escrow')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all relative ${
+              activeTab === 'escrow'
+                ? 'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg'
+                : 'text-gray-400 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <Shield className="w-4 h-4" />
+            Escrow
+            {dashboardData.pendingEscrowCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {dashboardData.pendingEscrowCount}
+              </span>
+            )}
+          </button>
+          
+          <button
+            onClick={() => setActiveTab('orders')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all relative ${
+              activeTab === 'orders'
+                ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
+                : 'text-gray-400 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <ShoppingBag className="w-4 h-4" />
+            Orders
+            {dashboardData.orderCounts.pendingApproval > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {dashboardData.orderCounts.pendingApproval}
+              </span>
+            )}
+          </button>
         </div>
-      </motion.header>
+      </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

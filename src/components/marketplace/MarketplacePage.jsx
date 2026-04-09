@@ -1,34 +1,145 @@
 // src/components/marketplace/MarketplacePage.jsx
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useMarketplaceProducts } from '../../hooks/useMarketplaceProducts';
 import { useAuth } from '../../contexts/SupabaseAuthContext';
-import { motion, AnimatePresence } from 'framer-motion';
-import ProductDetailModal from './components/ProductDetailModal';
-import { supabase } from '../../lib/supabaseClient';
+import { useCart } from '../../hooks/useCart';
+import { motion } from 'framer-motion';
 import { 
-  Search, 
-  Filter,
-  X,
-  MapPin,
+  MapPin, 
   Package,
-  ShoppingBag,
-  LogIn,
-  UserPlus,
-  AlertCircle
+  Eye,
+  ZoomIn,
+  ShoppingCart,
+  Truck
 } from 'lucide-react';
+import { toast } from 'sonner';
 
-const CATEGORIES = ["Electronics", "Fashion", "Home", "Beauty", "Sports", "Books", "Automotive", "Other"];
-const CONDITIONS = ["new", "opened_like_new", "damaged"];
-const MOROCCAN_CITIES = [
-  "Casablanca", "Rabat", "Fes", "Marrakech", "Agadir", "Tanger", 
-  "Meknes", "Oujda", "Kenitra", "Sale", "Temara", "Safi", 
-  "El Jadida", "Beni Mellal", "Khouribga", "Mohammedia", "Settat",
-  "Berrechid", "Nador", "Taza", "Essaouira", "Laayoune", "Dakhla"
+const CATEGORIES = [
+  { name: 'Electronics', icon: '📱', color: 'bg-blue-100 text-blue-600' },
+  { name: 'Fashion', icon: '👕', color: 'bg-pink-100 text-pink-600' },
+  { name: 'Home', icon: '🏠', color: 'bg-green-100 text-green-600' },
+  { name: 'Beauty', icon: '💄', color: 'bg-purple-100 text-purple-600' },
+  { name: 'Sports', icon: '⚽', color: 'bg-orange-100 text-orange-600' },
+  { name: 'Books', icon: '📚', color: 'bg-yellow-100 text-yellow-600' },
+  { name: 'Promotions', icon: '🎉', color: 'bg-red-100 text-red-600', isPromo: true }
 ];
 
+// Category Card Component
+const CategoryCard = ({ name, icon, color, onClick }) => (
+  <div 
+    onClick={onClick}
+    className="bg-white dark:bg-gray-800 rounded-lg p-3 text-center hover:shadow-lg transition cursor-pointer border border-gray-200 dark:border-gray-700 group"
+  >
+    <div className={`w-10 h-10 ${color} rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform`}>
+      <span className="text-xl">{icon}</span>
+    </div>
+    <p className="font-medium text-gray-900 dark:text-white text-sm">{name}</p>
+  </div>
+);
+
+// Product Card Component
+const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCart }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
+  
+  const handleAddToCart = async (e) => {
+    e.stopPropagation();
+    setAddingToCart(true);
+    await onAddToCart(product, priceInfo.price);
+    setAddingToCart(false);
+  };
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer group"
+    >
+      <div className="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
+        {product.image_url && !imageError ? (
+          <>
+            <img 
+              src={product.image_url} 
+              alt={product.name}
+              className={`w-full h-full object-contain transition-all duration-500 ${
+                isHovered ? 'scale-110' : 'scale-100'
+              }`}
+              onError={() => setImageError(true)}
+            />
+            <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            }`}>
+              <div className="bg-white/90 rounded-full p-1.5">
+                <ZoomIn className="w-4 h-4 text-gray-700" />
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Package className="w-10 h-10 text-gray-400" />
+          </div>
+        )}
+        
+        {product.quantity <= 3 && product.quantity > 0 && (
+          <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+            Only {product.quantity} left
+          </div>
+        )}
+      </div>
+
+      <div className="p-3">
+        <h3 className="font-semibold text-gray-900 dark:text-white text-sm line-clamp-1 mb-1">
+          {product.name}
+        </h3>
+        
+        <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-2">
+          <MapPin className="w-3 h-3" />
+          <span className="truncate">{product.location || 'Morocco'}</span>
+        </div>
+        
+        <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{priceInfo.label}</p>
+            <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+              {formatPrice(priceInfo.price)}
+            </p>
+          </div>
+          <div className="flex gap-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewDetails(e);
+              }}
+              className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+              title="View Details"
+            >
+              <Eye className="w-4 h-4 text-gray-600" />
+            </button>
+            <button
+              onClick={handleAddToCart}
+              disabled={addingToCart}
+              className="p-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg transition disabled:opacity-50"
+              title="Add to Cart"
+            >
+              <ShoppingCart className="w-4 h-4 text-white" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 const MarketplacePage = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const { addToCart: addToCartHook } = useCart();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const [filters, setFilters] = useState({
     search: '',
     category: '',
@@ -40,12 +151,48 @@ const MarketplacePage = () => {
     sortOrder: 'desc'
   });
 
-  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   
   const { products, loading, error, userRole, getPriceForRole, refetch } = useMarketplaceProducts(filters);
+
+  // Add to cart function using the hook
+  const addToCart = async (product, price) => {
+    console.log('Adding to cart:', product, 'Price:', price);
+    
+    if (product.quantity <= 0) {
+      toast.error(`${product.name} is out of stock`);
+      return false;
+    }
+
+    const success = await addToCartHook(product, 1);
+    if (success) {
+      toast.success(`${product.name} added to cart`);
+    } else {
+      toast.error(`Cannot add ${product.name}. Insufficient stock.`);
+    }
+    return success;
+  };
+
+  // Read all filter parameters from URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    
+    const newFilters = {
+      search: params.get('search') || '',
+      category: params.get('category') || '',
+      location: params.get('city') || '',
+      minPrice: params.get('min_price') || '',
+      maxPrice: params.get('max_price') || '',
+      condition: params.get('condition') || '',
+      sortBy: params.get('sort') === 'price_low' ? 'price_asc' : 
+               params.get('sort') === 'price_high' ? 'price_desc' : 
+               params.get('sort') === 'name' ? 'name' : 'created_at',
+      sortOrder: 'desc'
+    };
+    
+    setFilters(newFilters);
+  }, [location.search]);
 
   const handleOrderClick = (product, e) => {
     e.stopPropagation();
@@ -53,26 +200,15 @@ const MarketplacePage = () => {
     setShowDetailModal(true);
   };
 
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+  const handleCategoryClick = (categoryName) => {
+    const params = new URLSearchParams(location.search);
+    if (categoryName === 'Promotions') {
+      params.set('promo', 'true');
+    } else {
+      params.set('category', categoryName);
+    }
+    navigate(`/marketplace?${params.toString()}`);
   };
-
-  const clearFilters = () => {
-    setFilters({
-      search: '',
-      category: '',
-      location: '',
-      minPrice: '',
-      maxPrice: '',
-      condition: '',
-      sortBy: 'created_at',
-      sortOrder: 'desc'
-    });
-  };
-
-  const hasActiveFilters = Object.values(filters).some(value => 
-    value !== '' && value !== 'created_at' && value !== 'desc'
-  );
 
   const formatPrice = (price) => {
     if (!price && price !== 0) return '0 MAD';
@@ -85,407 +221,63 @@ const MarketplacePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-30 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <ShoppingBag className="w-6 h-6 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">Marketplace</h1>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        {/* Category Grid */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Shop by Category</h2>
+            <Link to="/categories" className="text-sm text-blue-600 hover:text-blue-700">
+              View All
             </Link>
-            
-            <div className="flex items-center gap-4">
-              {user ? (
-                <>
-                  <Link to="/dashboard" className="text-gray-600 hover:text-gray-900 transition">
-                    Dashboard
-                  </Link>
-                  <button 
-                    onClick={() => supabase.auth.signOut()} 
-                    className="text-red-600 hover:text-red-700 transition"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link to="/login" className="text-gray-600 hover:text-gray-900 transition flex items-center gap-1">
-                    <LogIn className="w-4 h-4" />
-                    Login
-                  </Link>
-                  <Link 
-                    to="/signup" 
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-1"
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    Sign Up
-                  </Link>
-                </>
-              )}
-            </div>
           </div>
-
-          {/* Search Bar */}
-          <div className="mt-4 flex gap-2">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2">
+            {CATEGORIES.map((category) => (
+              <CategoryCard 
+                key={category.name} 
+                {...category} 
+                onClick={() => handleCategoryClick(category.name)}
               />
-            </div>
-            <button
-              onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-              className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
-            >
-              <Filter className="w-4 h-4" />
-              Filters
-              {hasActiveFilters && (
-                <span className="ml-2 w-2 h-2 bg-blue-500 rounded-full"></span>
-              )}
-            </button>
-            <button
-              onClick={() => setShowMobileFilters(true)}
-              className="md:hidden flex items-center gap-2 px-4 py-2.5 bg-gray-100 rounded-lg"
-            >
-              <Filter className="w-4 h-4" />
-              Filters
-            </button>
-            <select
-              value={filters.sortBy}
-              onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-              className="px-4 py-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="created_at">Newest First</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-              <option value="name">Name</option>
-            </select>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Expandable Filter Bar - Desktop */}
-      <AnimatePresence>
-        {isFilterExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="hidden md:block bg-white border-b overflow-hidden"
-          >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-              <div className="grid grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                  <select
-                    value={filters.category}
-                    onChange={(e) => handleFilterChange('category', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  >
-                    <option value="">All Categories</option>
-                    {CATEGORIES.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                  <select
-                    value={filters.location}
-                    onChange={(e) => handleFilterChange('location', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  >
-                    <option value="">All Locations</option>
-                    {MOROCCAN_CITIES.sort().map(city => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Price Range (MAD)</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      placeholder="Min"
-                      value={filters.minPrice}
-                      onChange={(e) => handleFilterChange('minPrice', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                      min="0"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Max"
-                      value={filters.maxPrice}
-                      onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                      min="0"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Condition</label>
-                  <select
-                    value={filters.condition}
-                    onChange={(e) => handleFilterChange('condition', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  >
-                    <option value="">All Conditions</option>
-                    {CONDITIONS.map(cond => (
-                      <option key={cond} value={cond}>
-                        {cond === 'new' ? 'New' : 
-                         cond === 'opened_like_new' ? 'Like New' : 
-                         'Damaged'}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {hasActiveFilters && (
-                  <div className="flex items-end">
-                    <button
-                      onClick={clearFilters}
-                      className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition w-full"
-                    >
-                      Clear Filters
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Mobile Filters Modal */}
-      <AnimatePresence>
-        {showMobileFilters && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 md:hidden"
-            onClick={() => setShowMobileFilters(false)}
-          >
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'tween' }}
-              className="absolute right-0 top-0 bottom-0 w-4/5 bg-white p-6 overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold">Filters</h3>
-                <button onClick={() => setShowMobileFilters(false)}>
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Category</label>
-                  <select
-                    value={filters.category}
-                    onChange={(e) => handleFilterChange('category', e.target.value)}
-                    className="w-full p-2 border rounded-lg"
-                  >
-                    <option value="">All Categories</option>
-                    {CATEGORIES.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">Location</label>
-                  <select
-                    value={filters.location}
-                    onChange={(e) => handleFilterChange('location', e.target.value)}
-                    className="w-full p-2 border rounded-lg"
-                  >
-                    <option value="">All Locations</option>
-                    {MOROCCAN_CITIES.sort().map(city => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">Price Range (MAD)</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      placeholder="Min"
-                      value={filters.minPrice}
-                      onChange={(e) => handleFilterChange('minPrice', e.target.value)}
-                      className="w-1/2 p-2 border rounded-lg"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Max"
-                      value={filters.maxPrice}
-                      onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-                      className="w-1/2 p-2 border rounded-lg"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">Condition</label>
-                  <select
-                    value={filters.condition}
-                    onChange={(e) => handleFilterChange('condition', e.target.value)}
-                    className="w-full p-2 border rounded-lg"
-                  >
-                    <option value="">All Conditions</option>
-                    {CONDITIONS.map(cond => (
-                      <option key={cond} value={cond}>
-                        {cond === 'new' ? 'New' : 
-                         cond === 'opened_like_new' ? 'Like New' : 
-                         'Damaged'}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <button
-                  onClick={() => setShowMobileFilters(false)}
-                  className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium"
-                >
-                  Apply Filters
-                </button>
-
-                {hasActiveFilters && (
-                  <button
-                    onClick={() => {
-                      clearFilters();
-                      setShowMobileFilters(false);
-                    }}
-                    className="w-full py-3 text-red-600 border border-red-200 rounded-lg"
-                  >
-                    Clear All
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Products Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Products Grid */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg p-4 animate-pulse">
-                <div className="h-32 bg-gray-200 rounded-lg mb-3"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-lg p-3 animate-pulse">
+                <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-1"></div>
+                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
               </div>
             ))}
           </div>
         ) : error ? (
           <div className="text-center py-12">
-            <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            <p className="text-red-600">Error loading products: {error}</p>
+            <p className="text-red-600 dark:text-red-400">Error loading products: {error}</p>
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12">
             <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">No products found</h3>
-            <p className="text-gray-500">Try adjusting your filters</p>
+            <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No products found</h3>
+            <p className="text-gray-500 dark:text-gray-400">Try adjusting your filters</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {products.map((product) => {
               const priceInfo = getPriceForRole(product);
-              
-              // Skip rendering if product has invalid price
-              if (priceInfo.invalid || priceInfo.price <= 0) {
-                return null;
-              }
+              if (priceInfo.invalid || priceInfo.price <= 0) return null;
               
               return (
-                <motion.div
+                <ProductCard
                   key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow overflow-hidden cursor-pointer"
-                  onClick={() => handleOrderClick(product, { stopPropagation: () => {} })}
-                >
-                  <div className="relative h-32 bg-gray-100">
-                    {product.image_url ? (
-                      <img 
-                        src={product.image_url} 
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'https://via.placeholder.com/128?text=No+Image';
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                        <Package className="w-8 h-8 text-gray-400" />
-                      </div>
-                    )}
-                    
-                    {product.quantity <= 3 && (
-                      <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                        Only {product.quantity} left
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-3">
-                    <div className="mb-2">
-                      <h3 className="font-semibold text-gray-900 text-sm line-clamp-1">
-                        {product.name}
-                      </h3>
-                      <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                        <MapPin className="w-3 h-3" />
-                        <span>{product.location || 'Location?'}</span>
-                        {product.condition && (
-                          <span className="px-1.5 py-0.5 bg-gray-100 rounded text-xs">
-                            {product.condition === 'new' ? 'New' : 
-                             product.condition === 'opened_like_new' ? 'Like New' : 
-                             product.condition}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between text-xs mb-2">
-                      <span className="text-gray-500">{product.category || 'Uncategorized'}</span>
-                      <span className="text-gray-600 truncate max-w-[100px]">
-                        {product.profiles?.company || product.profiles?.full_name || 'Seller'}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-                      <div>
-                        <p className="text-xs text-gray-500">{priceInfo.label}</p>
-                        <p className="text-lg font-bold text-blue-600">
-                          {formatPrice(priceInfo.price)}
-                        </p>
-                      </div>
-                      <button
-                        onClick={(e) => handleOrderClick(product, e)}
-                        className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition"
-                      >
-                        Order
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
+                  product={product}
+                  priceInfo={priceInfo}
+                  formatPrice={formatPrice}
+                  onViewDetails={(e) => handleOrderClick(product, e)}
+                  onAddToCart={addToCart}
+                />
               );
             })}
           </div>
@@ -493,19 +285,34 @@ const MarketplacePage = () => {
       </div>
 
       {/* Product Detail Modal */}
-      {selectedProduct && (
-        <ProductDetailModal
-          isOpen={showDetailModal}
-          onClose={() => setShowDetailModal(false)}
-          product={selectedProduct}
-          dropshipperId={user?.id}
-          userRole={userRole}
-          onOrderSuccess={(order) => {
-            console.log('Order placed:', order);
-            setShowDetailModal(false);
-            refetch();
-          }}
-        />
+      {selectedProduct && showDetailModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowDetailModal(false)}>
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-2xl font-bold mb-4">{selectedProduct.name}</h2>
+            {selectedProduct.image_url && (
+              <img src={selectedProduct.image_url} alt={selectedProduct.name} className="w-full h-64 object-contain mb-4" />
+            )}
+            <p className="text-gray-600 mb-4">{selectedProduct.description}</p>
+            <p className="text-xl font-bold text-blue-600 mb-4">
+              {formatPrice(selectedProduct.sale_price || selectedProduct.price)}
+            </p>
+            <button 
+              onClick={() => {
+                addToCart(selectedProduct, selectedProduct.sale_price || selectedProduct.price);
+                setShowDetailModal(false);
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 mr-2"
+            >
+              Add to Cart
+            </button>
+            <button 
+              onClick={() => setShowDetailModal(false)}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
