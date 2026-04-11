@@ -7,7 +7,7 @@ import AdminDashboard from "./admin/AdminDashboard";
 import SellerDashboard from "./seller/SellerDashboard";
 import DropshipperDashboard from "./dropshipper/DropshipperDashboard";
 import DeliveryDashboard from "./delivery/DeliveryDashboard";
-import WarehouseDashboard from "./warehouse/WarehouseDashboard";
+import WarehouseDashboard from "./Warehouse/WarehouseDashboard";
 import DashboardSkeleton from "./DashboardSkeleton";
 
 const Dashboard = () => {
