@@ -143,67 +143,67 @@
 
 /* 5. Fix table cells alternating background */
 .bg-gray-50 {
-    background-color: #f9f9f9 !;
+    background-color: #f9f9f9 ;
 }
 
 .bg-white {
-    background-color: #ffffff !;
+    background-color: #ffffff ;
 }
 
 /* 6. Fix table borders */
 .border-white\/20,
 .border-white\/10 {
-    border-color: #e0e0e0 !;
+    border-color: #e0e0e0 ;
 }
 
 .border-gray-100,
 .border-gray-200 {
-    border-color: #dee2e6 !;
+    border-color: #dee2e6 ;
 }
 
 /* 7. Fix hover states */
 .hover\:bg-white\/20,
 .hover\:bg-gray-50 {
-    background-color: #f0f0f0 !;
+    background-color: #f0f0f0 ;
 }
 
 /* 8. Fix "Add New" button - make it visible on light background */
 .text-sm.bg-white\/10 {
-    background-color: #3498db !; /* Blue background */
-    color: white !;
-    border: none !;
+    background-color: #3498db ; /* Blue background */
+    color: white ;
+    border: none ;
 }
 
 .text-sm.bg-white\/10:hover {
-    background-color: #2980b9 !;
+    background-color: #2980b9 ;
 }
 
 /* 9. Fix icon backgrounds in metrics cards */
 .bg-gradient-to-br {
-    background: linear-gradient(135deg, #e0e0e0, #f0f0f0) !;
+    background: linear-gradient(135deg, #e0e0e0, #f0f0f0) ;
 }
 
 /* Specific color fixes for metric icons */
 .from-blue-500.to-cyan-500 {
-    background: linear-gradient(135deg, #e3f2fd, #bbdefb) !;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb) ;
 }
 
 .from-orange-500.to-amber-500 {
-    background: linear-gradient(135deg, #ffe0b2, #ffcc80) !;
+    background: linear-gradient(135deg, #ffe0b2, #ffcc80) ;
 }
 
 .from-red-500.to-pink-500 {
-    background: linear-gradient(135deg, #ffcdd2, #f8bbd0) !;
+    background: linear-gradient(135deg, #ffcdd2, #f8bbd0) ;
 }
 
 .from-teal-500.to-cyan-500 {
-    background: linear-gradient(135deg, #db7f8d, #d13049) !; /* Euro sign */
+    background: linear-gradient(135deg, #db7f8d, #d13049) ; /* Euro sign */
 
 }
 
 /* 10. Fix SVG icons inside metrics */
 .w-6.h-6.text-white {
-    color: #666666 !; /* Dark gray icons */
+    color: #666666 ; /* Dark gray icons */
 }
 
 /* 11. Keep colored buttons as they are (don't change) */
@@ -216,15 +216,15 @@
 
 /* 12. Status badges - keep colors but adjust text for contrast */
 .bg-green-100 {
-    background-color: #d4edda !;
+    background-color: #d4edda ;
 }
 
 .text-green-800 {
-    color: #155724 !;
+    color: #155724 ;
 }
 
 .border-green-200 {
-    border-color: #c3e6cb !;
+    border-color: #c3e6cb ;
 }
 
 /* 13. Price colors - keep for visibility */
@@ -244,25 +244,25 @@
 
 /* 15. Fix the welcome message line space */
 .mb-8 {
-    background-color: transparent !;
+    background-color: transparent ;
     padding: 20px;
     border-radius: 8px;
-    margin-bottom: 30px !;
+    margin-bottom: 30px ;
 }
 
 /* 16. Ensure "Your product" table is clearly visible */
 .rounded-lg.shadow-lg,
 .rounded-lg.shadow-sm {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !;
-    border: 1px solid #e0e0e0 !;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) ;
+    border: 1px solid #e0e0e0 ;
 }
 
 /* 17. Fix transparency in Cards and tables */
 [class*="bg-white\/"],
 [style*="background: rgba"],
 [style*="opacity"] {
-    opacity: 1 !;
-    background-color: #ffffff !;
+    opacity: 1 ;
+    background-color: #ffffff ;
 }
 /* === ADD PRODUCT FORM FIXES === */
 
