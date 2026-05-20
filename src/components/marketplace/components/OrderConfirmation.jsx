@@ -17,6 +17,186 @@ const generateOrderNumber = (index) => {
   return `ORD-${timestamp}${random}${index}`;
 };
 
+// ============================================
+// DELIVERY FEE CALCULATION HELPERS
+// ============================================
+
+// Helper to check if city is in zone
+const isCityInZone = (city, zone) => {
+  const zoneMappings = {
+    'rabat-sale-kenitra': ['rabat', 'sale', 'temara', 'kenitra', 'skhirat', 'tiflet'],
+    'casablanca-settat': ['casablanca', 'mohammedia', 'settat', 'berrechid', 'bouskoura', 'nouaceur', 'mediouna'],
+    'marrakech-safi': ['marrakech', 'safi', 'essaouira', 'chichaoua', 'yelmane', 'ben guerir'],
+    'tanger-tetouan': ['tanger', 'tetouan', 'chefchaouen', 'larache', 'asilah', 'martil', 'fnideq'],
+    'fes-meknes': ['fes', 'meknes', 'taza', 'sefrou', 'boulemane', 'el hajeb', 'ifrane'],
+    'agadir': ['agadir', 'inzegan', 'ait melloul', 'tiznit', 'taroudant', 'ouarzazate'],
+    'oriental': ['oujda', 'nador', 'berkan', 'taourirt', 'jerada', 'saidia'],
+    'beni-mellal': ['beni mellal', 'khouribga', 'khenifra', 'azilal', 'fquih ben salah']
+  };
+  
+  const normalizedCity = city?.toLowerCase().trim() || '';
+  const normalizedZone = zone?.toLowerCase().trim() || '';
+  const citiesInZone = zoneMappings[normalizedZone] || [];
+  return citiesInZone.some(c => normalizedCity.includes(c) || c.includes(normalizedCity));
+};
+
+// IMPROVED: Find the best matching rule based on city, weight, and priority
+const findBestMatchingRule = (rules, toCity, weight) => {
+  const normalizedTo = toCity?.toLowerCase().trim() || '';
+  
+  if (!rules || rules.length === 0) return null;
+  
+  // First, filter to only rules that match the city exactly
+  const exactCityMatches = rules.filter(rule => 
+    rule.to_city && rule.to_city.toLowerCase() === normalizedTo
+  );
+  
+  // If we have exact city matches, pick the one with HIGHEST PRIORITY
+  if (exactCityMatches.length > 0) {
+    // Sort by priority (higher is better), then by base_fee (lower is better for customer)
+    exactCityMatches.sort((a, b) => {
+      // First compare by priority (higher number = higher priority)
+      if (a.priority !== b.priority) {
+        return (b.priority || 0) - (a.priority || 0);
+      }
+      // If same priority, lower fee is better for customer
+      return (a.base_fee || 0) - (b.base_fee || 0);
+    });
+    
+    console.log(`✅ Found ${exactCityMatches.length} exact matches for ${toCity}, selected: ${exactCityMatches[0].base_fee} MAD (priority ${exactCityMatches[0].priority})`);
+    return exactCityMatches[0];
+  }
+  
+  // If no exact match, check zone matches
+  const zoneMatches = rules.filter(rule => 
+    rule.zone_to && isCityInZone(normalizedTo, rule.zone_to)
+  );
+  
+  if (zoneMatches.length > 0) {
+    zoneMatches.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+    console.log(`🌍 Found ${zoneMatches.length} zone matches for ${toCity}, selected: ${zoneMatches[0].base_fee} MAD`);
+    return zoneMatches[0];
+  }
+  
+  // Finally, check fallback rules (no city specified)
+  const fallbackRules = rules.filter(rule => 
+    !rule.to_city && !rule.zone_to
+  );
+  
+  if (fallbackRules.length > 0) {
+    fallbackRules.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+    console.log(`🔄 Using fallback rule: ${fallbackRules[0].base_fee} MAD`);
+    return fallbackRules[0];
+  }
+  
+  console.log(`⚠️ No matching rule found for ${toCity}`);
+  return null;
+};
+
+// Calculate delivery fee based on rules table
+const calculateDeliveryFeeFromRules = async (deliveryCompanyId, toCity, weight = 1) => {
+  try {
+    // Build query for delivery_fee_rules table
+    let query = supabase
+      .from('delivery_fee_rules')
+      .select('*')
+      .eq('is_active', true);
+
+    // Filter by delivery company if specified
+    if (deliveryCompanyId) {
+      query = query.eq('delivery_company_id', deliveryCompanyId);
+    }
+
+    const { data: rules, error } = await query;
+
+    if (error) {
+      console.error('Error fetching delivery rules:', error);
+      return 30;
+    }
+
+    if (!rules || rules.length === 0) {
+      console.log('No delivery rules found');
+      return 30;
+    }
+
+    // Find best matching rule using improved function
+    const bestRule = findBestMatchingRule(rules, toCity, weight);
+
+    if (bestRule) {
+      let fee = parseFloat(bestRule.base_fee) || 0;
+      
+      // Add per-kg fee for weight above minimum
+      if (bestRule.per_kg_fee && weight > (bestRule.weight_min || 0)) {
+        const extraKg = weight - (bestRule.weight_min || 0);
+        fee += extraKg * parseFloat(bestRule.per_kg_fee);
+      }
+      
+      return fee;
+    }
+
+    // No matching rule found - default fallback
+    console.log(`No matching delivery rule for city: ${toCity}`);
+    return 30;
+    
+  } catch (error) {
+    console.error('Error calculating delivery fee:', error);
+    return 30;
+  }
+};
+
+// DEBUG: Function to see what rules exist for a city
+const debugDeliveryRules = async (city) => {
+  console.log(`🔍 === DEBUGGING DELIVERY FOR "${city}" ===`);
+  
+  const { data: allRules, error } = await supabase
+    .from('delivery_fee_rules')
+    .select('*')
+    .eq('is_active', true);
+  
+  if (error) {
+    console.error('Error fetching rules:', error);
+    return;
+  }
+  
+  // Find exact matches for this city
+  const exactMatches = allRules.filter(r => 
+    r.to_city && r.to_city.toLowerCase() === city.toLowerCase()
+  );
+  
+  console.log(`📋 Exact matches for "${city}": ${exactMatches.length}`);
+  exactMatches.forEach(rule => {
+    console.log(`   - Fee: ${rule.base_fee} MAD, Priority: ${rule.priority}, per_kg: ${rule.per_kg_fee || 0}`);
+  });
+  
+  // Sort by priority to see best
+  const sorted = [...exactMatches].sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  
+  if (sorted.length > 0) {
+    console.log(`🏆 BEST RULE: Fee ${sorted[0].base_fee} MAD (Priority ${sorted[0].priority})`);
+  } else {
+    console.log(`⚠️ No exact match found for "${city}"`);
+    
+    // Check zone matches
+    const zoneMatches = allRules.filter(r => 
+      r.zone_to && isCityInZone(city, r.zone_to)
+    );
+    console.log(`🌍 Zone matches: ${zoneMatches.length}`);
+    zoneMatches.forEach(rule => {
+      console.log(`   - Zone: ${rule.zone_to}, Fee: ${rule.base_fee} MAD`);
+    });
+  }
+  
+  // Check fallback rules
+  const fallbacks = allRules.filter(r => !r.to_city && !r.zone_to);
+  console.log(`🔄 Fallback rules: ${fallbacks.length}`);
+  fallbacks.forEach(rule => {
+    console.log(`   - Fee: ${rule.base_fee} MAD, Priority: ${rule.priority || 0}`);
+  });
+};
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
 export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess }) {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
@@ -24,6 +204,10 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
   const [deliveryCompanies, setDeliveryCompanies] = useState([]);
   const [selectedDeliveryCompany, setSelectedDeliveryCompany] = useState(null);
   const [dropshipperMarkupPercentage, setDropshipperMarkupPercentage] = useState(0);
+  const [deliveryFee, setDeliveryFee] = useState(0);
+  const [calculatingFee, setCalculatingFee] = useState(false);
+  const [availableCities, setAvailableCities] = useState([]);
+  const [loadingCities, setLoadingCities] = useState(true);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -36,6 +220,45 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
 
   const isDropshipper = profile?.role === 'dropshipper';
   const isGuest = !user;
+
+  // Fetch available cities from delivery_fee_rules
+  useEffect(() => {
+    const fetchAvailableCities = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('delivery_fee_rules')
+          .select('to_city, zone_to')
+          .eq('is_active', true);
+
+        if (error) throw error;
+
+        // Extract unique cities from to_city
+        const citiesSet = new Set();
+        
+        data.forEach(rule => {
+          if (rule.to_city && rule.to_city.trim()) {
+            citiesSet.add(rule.to_city);
+          }
+        });
+
+        const sortedCities = Array.from(citiesSet).sort();
+        setAvailableCities(sortedCities);
+        
+        // Pre-fill city for authenticated users if their city is available
+        if (profile?.city && sortedCities.includes(profile.city)) {
+          setFormData(prev => ({ ...prev, city: profile.city }));
+        }
+        
+        setLoadingCities(false);
+      } catch (error) {
+        console.error('Error fetching available cities:', error);
+        setAvailableCities(['Casablanca', 'Rabat', 'Marrakech', 'Fes', 'Tanger', 'Agadir']);
+        setLoadingCities(false);
+      }
+    };
+
+    fetchAvailableCities();
+  }, [profile]);
 
   // Load delivery companies
   useEffect(() => {
@@ -51,11 +274,49 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
         email: user.email || '',
         phone: profile.phone || '',
         address: profile.address || '',
-        city: profile.city || '',
         postalCode: profile.postal_code || ''
       }));
     }
   }, [user, profile]);
+
+  // Recalculate delivery fee when city or delivery company changes
+  useEffect(() => {
+    const calculateFee = async () => {
+      if (!formData.city || formData.city.length < 2) {
+        setDeliveryFee(0);
+        return;
+      }
+      
+      if (!selectedDeliveryCompany) {
+        setDeliveryFee(30);
+        return;
+      }
+      
+      setCalculatingFee(true);
+      
+      // Debug: See what rules exist for this city
+      await debugDeliveryRules(formData.city);
+      
+      // Calculate total weight from cart items (default 0.5kg per item if weight not specified)
+      const totalWeight = cartItems.reduce((sum, item) => {
+        const itemWeight = item.weight || 0.5;
+        return sum + (itemWeight * item.quantity);
+      }, 0);
+      
+      const fee = await calculateDeliveryFeeFromRules(
+        selectedDeliveryCompany.id,
+        formData.city,
+        totalWeight
+      );
+      
+      console.log(`💰 Final delivery fee for ${formData.city}: ${fee} MAD`);
+      
+      setDeliveryFee(fee);
+      setCalculatingFee(false);
+    };
+    
+    calculateFee();
+  }, [formData.city, selectedDeliveryCompany, cartItems]);
 
   const fetchDeliveryCompanies = async () => {
     try {
@@ -90,7 +351,7 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
     return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   };
 
-  // ✅ FIXED: Calculate markup per item individually
+  // Calculate markup per item individually
   const calculateMarkupPerItem = (item) => {
     if (!isDropshipper) return 0;
     const itemTotal = item.price * item.quantity;
@@ -108,7 +369,7 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
   };
 
   const calculateShipping = () => {
-    return selectedDeliveryCompany?.base_fee || 30;
+    return deliveryFee;
   };
 
   const calculateTotal = () => {
@@ -123,6 +384,11 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCityChange = (e) => {
+    const city = e.target.value;
+    setFormData(prev => ({ ...prev, city }));
   };
 
   const handleSubmitOrder = async (e) => {
@@ -147,6 +413,7 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
       console.log('Is dropshipper:', isDropshipper);
       console.log('Markup percentage:', dropshipperMarkupPercentage);
       console.log('Cart items:', cartItems.length);
+      console.log('Delivery fee:', shippingFee);
       console.log('==================');
 
       const orders = [];
@@ -155,10 +422,8 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
       for (let i = 0; i < cartItems.length; i++) {
         const item = cartItems[i];
         
-        // Generate UNIQUE order number for EACH product
         const orderNumber = generateOrderNumber(i);
         
-        // Get seller_id from product if not already in cart
         let sellerId = item.seller_id;
         
         if (!sellerId) {
@@ -177,7 +442,6 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
           sellerId = product.user_id;
         }
 
-        // ✅ FIXED: Calculate per-item values correctly
         const itemSubtotal = item.price * item.quantity;
         const itemMarkup = calculateMarkupPerItem(item);
         const itemShipping = shippingFee / cartItems.length;
@@ -185,7 +449,6 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
 
         console.log(`Item ${i + 1}: ${item.name} - Subtotal: ${itemSubtotal}, Markup: ${itemMarkup}, Final: ${itemFinalPrice}`);
 
-        // Prepare order data
         const orderData = {
           product_id: item.id,
           seller_id: sellerId,
@@ -211,7 +474,6 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
           }
         };
 
-        // Add dropshipper fields if applicable
         if (isDropshipper && user) {
           orderData.dropshipper_id = user.id;
           orderData.dropshipper_markup = itemMarkup;
@@ -219,12 +481,9 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
           orderData.dropshipper_commission_amount = itemMarkup;
         }
 
-        // Add customer_id if logged in
         if (user) {
           orderData.customer_id = user.id;
         }
-
-        console.log(`Inserting order ${i + 1}/${cartItems.length} for:`, item.name, orderNumber);
 
         const { data: order, error: orderError } = await supabase
           .from('orders')
@@ -242,7 +501,6 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
       }
 
       if (errors.length > 0) {
-        console.error('Some orders failed:', errors);
         toast.error(`${errors.length} item(s) failed to order.`);
       }
 
@@ -250,7 +508,6 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
         throw new Error('No orders were created');
       }
 
-      // Clear cart after successful orders
       localStorage.removeItem('cart');
       localStorage.removeItem('cart_guest');
       sessionStorage.removeItem('checkoutCart');
@@ -263,7 +520,6 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
       
       if (onClose) onClose();
       
-      // Redirect based on user role
       if (isDropshipper) {
         navigate('/dropshipper/orders');
       } else {
@@ -416,14 +672,24 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           City *
                         </label>
-                        <input
-                          type="text"
-                          name="city"
-                          value={formData.city}
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                          required
-                        />
+                        {loadingCities ? (
+                          <div className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-gray-100">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span className="text-sm text-gray-500">Loading cities...</span>
+                          </div>
+                        ) : (
+                          <select
+                            value={formData.city}
+                            onChange={handleCityChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                            required
+                          >
+                            <option value="">Select your city</option>
+                            {availableCities.map(city => (
+                              <option key={city} value={city}>{city}</option>
+                            ))}
+                          </select>
+                        )}
                       </div>
                       
                       <div>
@@ -450,6 +716,7 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
                         onChange={handleInputChange}
                         rows="2"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="e.g., Building name, floor number, landmark..."
                       />
                     </div>
                   </div>
@@ -483,16 +750,27 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
                           <div>
                             <p className="font-medium text-gray-900 dark:text-white">{company.name}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {company.service_type} delivery
+                              {company.service_type || 'Standard'} delivery
                             </p>
                           </div>
                         </div>
                         <p className="font-semibold text-gray-900 dark:text-white">
-                          {formatPrice(company.base_fee)}
+                          {calculatingFee ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            formatPrice(deliveryFee)
+                          )}
                         </p>
                       </label>
                     ))}
                   </div>
+                  
+                  {formData.city && deliveryFee === 0 && !calculatingFee && (
+                    <p className="text-xs text-yellow-600 mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      Delivery fee will be calculated based on your selected city
+                    </p>
+                  )}
                 </div>
               </form>
             </div>
@@ -588,7 +866,11 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
                   
                   <div className="flex justify-between text-sm">
                     <span>Delivery Fee:</span>
-                    <span>{formatPrice(shippingFee)}</span>
+                    {calculatingFee ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <span>{formatPrice(shippingFee)}</span>
+                    )}
                   </div>
                   
                   <div className="flex justify-between text-lg font-bold pt-2 border-t">
@@ -599,8 +881,8 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
                 
                 <button
                   onClick={handleSubmitOrder}
-                  disabled={loading}
-                  className="w-full mt-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center gap-2 disabled:opacity-50"
+                  disabled={loading || calculatingFee || !formData.city}
+                  className="w-full mt-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>

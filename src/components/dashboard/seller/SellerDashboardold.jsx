@@ -559,60 +559,55 @@ const SellerDashboard = () => {
 
       if (productsError) throw productsError;
 
-      // Determine seller tier once (not per product)
-      const isPremium = profile?.subscription_tier === 'premium' || false;
-      const appliesTo = isPremium ? 'Pro_Seller' : 'Seller';
-
-      // Collect unique categories from all products for a targeted fetch
-      const uniqueCategories = [...new Set(
-        (productsData || []).map(p => p.category || 'Other')
-      )];
-
-      // QUERY 1 of 2: Fetch all category-specific rules in one shot
-      const { data: allRules } = await supabase
-        .from('commission_rules')
-        .select('percentage, min_amount, max_amount, category, is_default')
-        .eq('applies_to', appliesTo)
-        .eq('is_active', true)
-        .in('category', uniqueCategories);
-
-      // QUERY 2 of 2: Fetch the single default fallback rule
-      const { data: defaultRule } = await supabase
-        .from('commission_rules')
-        .select('percentage')
-        .eq('applies_to', appliesTo)
-        .eq('is_active', true)
-        .eq('is_default', true)
-        .maybeSingle();
-
-      const defaultRate = defaultRule?.percentage || 0;
-
-      // Match each product to its rule in memory — zero extra queries
-      const productsWithCommission = (productsData || []).map((product) => {
-        const price = product.purchase_price || 0;
-        const category = product.category || 'Other';
-
-        // Find the most specific rule: same category + price within range
-        const matchedRule = (allRules || []).find(
-          r => r.category === category &&
-               !r.is_default &&
-               (r.min_amount == null || price >= r.min_amount) &&
-               (r.max_amount == null || price <= r.max_amount)
-        );
-
-        const commissionRate = matchedRule?.percentage ?? defaultRate;
-        const commissionAmount = price * (commissionRate / 100);
-
-        return {
-          ...product,
-          commission_rate: commissionRate,
-          commission: commissionAmount,
-          net_amount: price - commissionAmount,
-          is_premium: isPremium,
-          commission_min_amount: matchedRule?.min_amount ?? null,
-          commission_max_amount: matchedRule?.max_amount ?? null,
-        };
-      });
+      // Fetch commission rates for each product
+      const productsWithCommission = await Promise.all(
+        (productsData || []).map(async (product) => {
+          // Determine which applies_to to use based on seller type
+          const isPremium = profile?.subscription_tier === 'premium' || false;
+          const appliesTo = isPremium ? 'Pro_Seller' : 'Seller';
+          
+          // Get commission rule for seller based on category and price
+          const { data: commissionRule } = await supabase
+            .from('commission_rules')
+            .select('percentage, min_amount, max_amount')
+            .eq('applies_to', appliesTo)
+            .eq('is_active', true)
+            .eq('category', product.category || 'Other')
+            .lte('min_amount', product.purchase_price || 0)
+            .gte('max_amount', product.purchase_price || 0)
+            .maybeSingle();
+          
+          let commissionRate = commissionRule?.percentage || 0;
+          let commissionMinAmount = commissionRule?.min_amount;
+          let commissionMaxAmount = commissionRule?.max_amount;
+          
+          // If no specific rule, get default for that applies_to
+          if (commissionRate === 0) {
+            const { data: defaultRule } = await supabase
+              .from('commission_rules')
+              .select('percentage')
+              .eq('applies_to', appliesTo)
+              .eq('is_active', true)
+              .eq('is_default', true)
+              .maybeSingle();
+            commissionRate = defaultRule?.percentage || 0;
+          }
+          
+          // Calculate commission amount and net amount
+          const commissionAmount = (product.purchase_price || 0) * (commissionRate / 100);
+          const netAmount = (product.purchase_price || 0) - commissionAmount;
+          
+          return {
+            ...product,
+            commission_rate: commissionRate,
+            commission: commissionAmount,
+            net_amount: netAmount,
+            is_premium: isPremium,
+            commission_min_amount: commissionMinAmount,
+            commission_max_amount: commissionMaxAmount
+          };
+        })
+      );
 
       setProducts(productsWithCommission || []);
 

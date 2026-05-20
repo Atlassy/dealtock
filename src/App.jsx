@@ -23,7 +23,7 @@ import DropshipperCustomersPage from "./components/dashboard/dropshipper/Dropshi
 import DropshipperEarningsPage from "./components/dashboard/dropshipper/DropshipperEarningsPage";
 
 export default function App() {
-  const { user, loading, profile } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -40,8 +40,8 @@ export default function App() {
       {/* Unified Navbar - Shows for all users */}
       <Navbar />
 
-      {/* Main content with proper padding for navbar */}
-      <div className={`pt-16 ${user ? 'pl-16' : ''}`}>
+      {/* Main content - NO pt-16 needed since navbar is not fixed */}
+      <div className={user ? 'pl-16' : ''}>
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<MarketplacePage />} />

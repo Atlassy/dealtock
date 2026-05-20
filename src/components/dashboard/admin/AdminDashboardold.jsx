@@ -9,8 +9,7 @@ import {
   Eye, 
   Percent,
   RefreshCw,
-  FileText,
-  Package
+  FileText  // Add this import for the invoices icon
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,17 +23,13 @@ import CommissionRulesManager from './components/CommissionRulesManager';
 // Import invoice components
 import InvoicesList from './invoices/InvoicesList';
 
-// Import returned products components
-import ReturnedProductsSection from './returned-products/ReturnedProductsSection';
-
 const TABS = {
-  OVERVIEW:  'overview',
-  DELIVERY:  'delivery',
-  ESCROW:    'escrow',
-  ORDERS:    'orders',
+  OVERVIEW: 'overview',
+  DELIVERY: 'delivery',
+  ESCROW: 'escrow',
+  ORDERS: 'orders',
   COMMISSIONS: 'commissions',
-  INVOICES:  'invoices',
-  RETURNED:  'returned',
+  INVOICES: 'invoices'  // Add new tab
 };
 
 const AdminDashboard = () => {
@@ -61,8 +56,7 @@ const AdminDashboard = () => {
     totalInvoices: 0,
     pendingInvoices: 0,
     paidInvoices: 0,
-    overdueInvoices: 0,
-    pendingReturnedProducts: 0,
+    overdueInvoices: 0
   });
   
   const [deliveryCompanies, setDeliveryCompanies] = useState([]);
@@ -80,14 +74,14 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
+      // Parallel data fetching with error handling
       const [
         deliveryResult, 
         escrowResult, 
         ordersResult, 
         activityResult,
         profilesResult,
-        invoicesResult,
-        returnedResult,
+        invoicesResult  // Add invoices fetch
       ] = await Promise.allSettled([
         supabase.from('delivery_companies').select('*').order('created_at', { ascending: false }),
         supabase.from('escrow_holdings')
@@ -113,11 +107,7 @@ const AdminDashboard = () => {
           .select('role')
           .in('role', ['seller', 'dropshipper']),
         supabase.from('invoices')
-          .select('status'),
-        supabase.from('products')
-          .select('id', { count: 'exact', head: true })
-          .eq('source_type', 'returned')
-          .eq('listing_status', 'pending_review'),
+          .select('status')
       ]);
 
       // Process delivery companies
@@ -176,10 +166,7 @@ const AdminDashboard = () => {
             totalInvoices,
             pendingInvoices,
             paidInvoices,
-            overdueInvoices,
-            pendingReturnedProducts: returnedResult.status === 'fulfilled'
-              ? (returnedResult.value.count || 0)
-              : 0,
+            overdueInvoices
           });
         }
       }
@@ -255,13 +242,12 @@ const AdminDashboard = () => {
   };
 
   const tabs = [
-    { key: TABS.OVERVIEW,     label: 'Overview',           icon: TrendingUp },
-    { key: TABS.ORDERS,       label: 'Order Oversight',    icon: Eye },
-    { key: TABS.RETURNED,     label: 'Returned Products',  icon: Package },
-    { key: TABS.INVOICES,     label: 'Invoices',           icon: FileText },
-    { key: TABS.ESCROW,       label: 'Escrow Management',  icon: Shield },
-    { key: TABS.DELIVERY,     label: 'Delivery Companies', icon: Truck },
-    { key: TABS.COMMISSIONS,  label: 'Commissions',        icon: Percent },
+    { key: TABS.OVERVIEW, label: 'Overview', icon: TrendingUp },
+    { key: TABS.ORDERS, label: 'Order Oversight', icon: Eye },
+    { key: TABS.INVOICES, label: 'Invoices', icon: FileText },  // Add invoices tab
+    { key: TABS.ESCROW, label: 'Escrow Management', icon: Shield },
+    { key: TABS.DELIVERY, label: 'Delivery Companies', icon: Truck },
+    { key: TABS.COMMISSIONS, label: 'Commissions', icon: Percent }
   ];
 
   if (loading) {
@@ -318,11 +304,6 @@ const AdminDashboard = () => {
                   {stats.pendingInvoices}
                 </span>
               )}
-              {tab.key === TABS.RETURNED && stats.pendingReturnedProducts > 0 && (
-                <span className="ml-2 px-2 py-0.5 text-xs bg-orange-500 text-white rounded-full font-bold">
-                  {stats.pendingReturnedProducts}
-                </span>
-              )}
             </button>
           ))}
         </div>
@@ -348,12 +329,6 @@ const AdminDashboard = () => {
             />
           )}
           
-          {activeTab === TABS.RETURNED && (
-            <ReturnedProductsSection
-              deliveryCompanies={deliveryCompanies}
-            />
-          )}
-
           {activeTab === TABS.INVOICES && (
             <InvoicesList />
           )}
