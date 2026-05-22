@@ -59,9 +59,19 @@ function validateRow(row) {
 }
 
 // ── Download template CSV ─────────────────────────────────────────
+// BOM (﻿) tells Excel this is UTF-8 — prevents re-encoding on save.
+// Only quotes fields that contain commas, quotes, or newlines.
 function downloadTemplate() {
+  function escapeCell(val) {
+    const s = String(val);
+    if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }
   const rows = [TEMPLATE_HEADERS, ...TEMPLATE_EXAMPLE];
-  const csv = rows.map(r => r.map(c => `"${c}"`).join(",")).join("\n");
+  const bom  = "\uFEFF";
+  const csv  = bom + rows.map(r => r.map(escapeCell).join(",")).join("\r\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement("a");
@@ -71,36 +81,68 @@ function downloadTemplate() {
   URL.revokeObjectURL(url);
 }
 
-// ── Parse raw CSV text → array of row objects ──────────────────────
-function parseCSV(text) {
-  const lines = text.trim().split(/\r?\n/);
-  if (lines.length < 2) return { headers: [], rows: [] };
+// ── Parse a single CSV line ───────────────────────────────────────
+// Handles two formats that Excel/LibreOffice produce:
+//   Format A (standard RFC4180):   field1,"field 2","field,3"
+//   Format B (Excel outer-quoted): "field1,\"\"field2\"\",\"\"field3\"\"" 
+//     → entire line wrapped in quotes, inner fields double-quoted,
+//       first field unquoted, rest end with trailing ""
+function parseSingleLine(line) {
+  const t = line.trim();
+  if (!t) return [];
 
-  // Handle quoted fields with commas inside
-  function parseLine(line) {
-    const result = [];
-    let current  = "";
-    let inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"' && line[i + 1] === '"') { current += '"'; i++; }
-      else if (ch === '"') { inQuotes = !inQuotes; }
-      else if (ch === ',' && !inQuotes) { result.push(current.trim()); current = ""; }
-      else { current += ch; }
-    }
-    result.push(current.trim());
-    return result;
+  // ── Format B detection: Excel outer-quoted ──
+  // Signature: starts with ", ends with ", contains ,""
+  if (t.startsWith('"') && t.endsWith('"') && t.includes(',""')) {
+    const inner = t.slice(1, -1); // strip outer quotes
+    const parts = inner.split(',""');
+    return parts.map((part, i) => {
+      if (i === 0) return part.trim(); // first field: plain text
+      // Subsequent fields: strip trailing closing "" or "
+      let clean = part;
+      if (clean.endsWith('""')) clean = clean.slice(0, -2);
+      else if (clean.endsWith('"')) clean = clean.slice(0, -1);
+      return clean.trim();
+    });
   }
 
-  const headers = parseLine(lines[0]);
-  const rows    = lines.slice(1)
-    .filter(l => l.trim())
-    .map((line, i) => {
-      const values = parseLine(line);
-      const obj    = { _rowIndex: i + 2 }; // 1-based, +1 for header
-      headers.forEach((h, j) => { obj[h] = values[j] ?? ""; });
-      return obj;
-    });
+  // ── Format A: standard RFC4180 ──
+  const result = [];
+  let i = 0;
+  while (i < t.length) {
+    if (t[i] === '"') {
+      i++;
+      let field = "";
+      while (i < t.length) {
+        if (t[i] === '"' && t[i + 1] === '"') { field += '"'; i += 2; }
+        else if (t[i] === '"') { i++; break; }
+        else { field += t[i++]; }
+      }
+      result.push(field.trim());
+      if (t[i] === ",") i++;
+    } else {
+      const start = i;
+      while (i < t.length && t[i] !== ",") i++;
+      result.push(t.slice(start, i).trim());
+      if (i < t.length) i++;
+    }
+  }
+  return result;
+}
+
+// ── Parse full CSV → { headers, rows } ───────────────────────────
+function parseCSV(text) {
+  const clean = text.replace(/^\uFEFF/, "").trim();
+  const lines = clean.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) return { headers: [], rows: [] };
+
+  const headers = parseSingleLine(lines[0]);
+  const rows = lines.slice(1).map((line, i) => {
+    const values = parseSingleLine(line);
+    const obj    = { _rowIndex: i + 2 };
+    headers.forEach((h, j) => { obj[h] = values[j] ?? ""; });
+    return obj;
+  });
 
   return { headers, rows };
 }
@@ -140,8 +182,26 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
       return;
     }
     const reader = new FileReader();
+    // Try UTF-8 first, fall back to ISO-8859 (common for Excel on Windows/French locale)
     reader.onload = (e) => {
-      const parsed = parseCSV(e.target.result);
+      let text = e.target.result;
+      // Detect garbled encoding: if common French chars look wrong, retry as latin-1
+      // We detect this by checking for replacement character or common ISO-8859 artifacts
+      if (text.includes("\uFFFD") || (text.includes("Ã") && !text.includes("ã"))) {
+        const reader2 = new FileReader();
+        reader2.onload = (e2) => {
+          const parsed = parseCSV(e2.target.result);
+          if (!parsed.headers.length) { toast.error("CSV appears empty or unreadable"); return; }
+          const initialMapping = {};
+          parsed.headers.forEach(h => { initialMapping[h] = autoMap(h); });
+          setCsvData(parsed);
+          setMapping(initialMapping);
+          setStep("map");
+        };
+        reader2.readAsText(file, "ISO-8859-1");
+        return;
+      }
+      const parsed = parseCSV(text);
       if (!parsed.headers.length) {
         toast.error("CSV appears empty or unreadable");
         return;
