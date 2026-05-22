@@ -92,7 +92,7 @@ const StatCard = ({ title, value, icon: Icon, color = "blue", trend, trendValue,
 const SalesTrendChart = ({ data }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="glass-effect border-white/20 rounded-xl p-6">
+      <div className="glass-effect border-white/20 rounded-xl p-3 sm:p-5">
         <h3 className="text-lg font-semibold text-white mb-4">📈 Sales Trend (Last 30 Days)</h3>
         <div className="h-40 flex items-center justify-center">
           <p className="text-gray-400">No sales data available</p>
@@ -104,7 +104,7 @@ const SalesTrendChart = ({ data }) => {
   const maxSales = Math.max(...data.map(d => d.sales), 1);
   
   return (
-    <div className="glass-effect border-white/20 rounded-xl p-6">
+    <div className="glass-effect border-white/20 rounded-xl p-3 sm:p-5">
       <h3 className="text-lg font-semibold text-white mb-4">📈 Sales Trend (Last 30 Days)</h3>
       <div className="h-40 flex items-end gap-1">
         {data.map((day, i) => (
@@ -162,7 +162,7 @@ const DeviceBreakdown = ({ mobile, desktop }) => {
   const desktopPercent = total > 0 ? Math.round((desktop / total) * 100) : 0;
 
   return (
-    <div className="glass-effect border-white/20 rounded-xl p-6">
+    <div className="glass-effect border-white/20 rounded-xl p-3 sm:p-5">
       <h3 className="text-lg font-semibold text-white mb-4">📱 Device Breakdown</h3>
       <div className="space-y-4">
         <div className="flex items-center gap-4">
@@ -366,7 +366,7 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
 
       {/* Escrow Orders Table */}
       <div className="bg-white/5 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-white/10">
+        <div className="px-3 py-3 border-b border-white/10">
           <h3 className="text-lg font-semibold text-white">Orders in Escrow</h3>
         </div>
         
@@ -421,7 +421,7 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
       {/* Payout History */}
       {payoutHistory.length > 0 && (
         <div className="bg-white/5 rounded-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-white/10">
+          <div className="px-3 py-3 border-b border-white/10">
             <h3 className="text-lg font-semibold text-white">Recent Payouts</h3>
           </div>
           
@@ -955,10 +955,10 @@ const SellerDashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
       {/* Tab Navigation - Simplified, no duplicate header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <div className="flex gap-4 flex-wrap">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all whitespace-nowrap text-sm ${
               activeTab === 'dashboard'
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
                 : 'text-gray-400 hover:text-white hover:bg-white/10'
@@ -970,7 +970,7 @@ const SellerDashboard = () => {
           
           <button
             onClick={() => setActiveTab('products')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all whitespace-nowrap text-sm ${
               activeTab === 'products'
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
                 : 'text-gray-400 hover:text-white hover:bg-white/10'
@@ -982,7 +982,7 @@ const SellerDashboard = () => {
           
           <button
             onClick={() => setActiveTab('escrow')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all relative ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all relative whitespace-nowrap text-sm ${
               activeTab === 'escrow'
                 ? 'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg'
                 : 'text-gray-400 hover:text-white hover:bg-white/10'
@@ -999,7 +999,7 @@ const SellerDashboard = () => {
           
           <button
             onClick={() => setActiveTab('orders')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all relative ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all relative whitespace-nowrap text-sm ${
               activeTab === 'orders'
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
                 : 'text-gray-400 hover:text-white hover:bg-white/10'
@@ -1017,7 +1017,7 @@ const SellerDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {activeTab === 'dashboard' ? (
           <>
             {/* Key Metrics Row */}
@@ -1025,7 +1025,7 @@ const SellerDashboard = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8"
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-4"
             >
               <StatCard 
                 title="Active Products" 
