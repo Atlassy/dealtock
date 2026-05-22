@@ -287,50 +287,64 @@ const Navbar = () => {
     <>
       <div className="bg-[#FEDEB8] dark:bg-[#1a1a2e] transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between h-14">
-            <div className="flex items-center gap-3">
+          {/* Mobile-optimised top bar: 3 zones — menu+logo | (spacer) | actions */}
+          <div className="flex items-center justify-between h-14 gap-2">
+
+            {/* LEFT: hamburger + logo */}
+            <div className="flex items-center gap-2 flex-shrink-0">
               {user && (
-                <button 
+                <button
                   ref={menuButtonRef}
-                  onClick={() => setSidebarOpen(!sidebarOpen)} 
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
                   className="p-1.5 hover:bg-[#5C3A21] dark:hover:bg-[#febd69] hover:text-white dark:hover:text-gray-900 rounded-lg transition text-[#5C3A21] dark:text-gray-200"
                 >
                   <Menu className="w-5 h-5" />
                 </button>
               )}
-              <Link to="/" className="flex items-center">
-                <img src={LOGO_URL} alt="Dealtock" className="h-9 w-auto object-contain" />
+              <Link to="/" className="flex items-center flex-shrink-0">
+                <img src={LOGO_URL} alt="Dealtock" className="h-8 w-auto object-contain" />
               </Link>
-              <div className="hidden lg:flex items-center gap-1 ml-2 px-2 py-1 hover:bg-[#5C3A21] dark:hover:bg-[#febd69] hover:text-white dark:hover:text-gray-900 rounded-lg transition cursor-pointer group">
+              {/* Deliver-to: desktop only */}
+              <div className="hidden lg:flex items-center gap-1 ml-1 px-2 py-1 hover:bg-[#5C3A21] dark:hover:bg-[#febd69] hover:text-white dark:hover:text-gray-900 rounded-lg transition cursor-pointer group">
                 <MapPin className="w-4 h-4 text-[#5C3A21] dark:text-gray-300 group-hover:text-white dark:group-hover:text-gray-900" />
                 <div className="text-[#5C3A21] dark:text-gray-200 group-hover:text-white dark:group-hover:text-gray-900 text-xs">
-                  <p className="text-[10px] text-[#8B6B4A] dark:text-gray-400 group-hover:text-white/80 dark:group-hover:text-gray-600">Deliver to</p>
+                  <p className="text-[10px] text-[#8B6B4A] dark:text-gray-400 group-hover:text-white/80">Deliver to</p>
                   <p className="font-medium text-sm">Morocco</p>
                 </div>
               </div>
             </div>
 
-            <div className="hidden md:flex items-center gap-4">
+            {/* CENTRE: social links — hidden on mobile */}
+            <div className="hidden md:flex items-center gap-3">
               <a href="#" className="text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] transition"><Facebook className="w-4 h-4" /></a>
               <a href="#" className="text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] transition"><Twitter className="w-4 h-4" /></a>
               <a href="#" className="text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] transition"><Instagram className="w-4 h-4" /></a>
               <a href="#" className="text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] transition"><Youtube className="w-4 h-4" /></a>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="hidden lg:flex items-center gap-3 text-xs">
-                <div className="flex items-center gap-1 text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] transition"><Phone className="w-3 h-3" /><span>+212 5XX XXX XXX</span></div>
-                <div className="flex items-center gap-1 text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] transition"><Mail className="w-3 h-3" /><span>support@dealtock.ma</span></div>
+            {/* RIGHT: compact action icons */}
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+
+              {/* Contact info — desktop only */}
+              <div className="hidden lg:flex items-center gap-3 text-xs mr-1">
+                <div className="flex items-center gap-1 text-[#5C3A21] dark:text-gray-300"><Phone className="w-3 h-3" /><span>+212 5XX XXX XXX</span></div>
+                <div className="flex items-center gap-1 text-[#5C3A21] dark:text-gray-300"><Mail className="w-3 h-3" /><span>support@dealtock.ma</span></div>
               </div>
 
+              {/* Language picker */}
               <div className="relative" ref={languageMenuRef}>
-                <button onClick={() => setShowLanguageMenu(!showLanguageMenu)} className="flex items-center gap-1 px-2 py-1 text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] transition text-sm">
-                  <Globe className="w-4 h-4" /><span>{languages.find(l => l.code === language)?.flag}</span><ChevronDown className="w-3 h-3" />
+                <button
+                  onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+                  className="flex items-center gap-0.5 p-1.5 text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] transition text-sm rounded-lg"
+                >
+                  <Globe className="w-4 h-4" />
+                  <span className="hidden sm:inline text-xs">{languages.find(l => l.code === language)?.flag}</span>
                 </button>
                 {showLanguageMenu && (
                   <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 z-50">
                     {languages.map((lang) => (
-                      <button key={lang.code} onClick={() => changeLanguage(lang.code)} className={`w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 ${language === lang.code ? 'bg-gray-100 dark:bg-gray-700 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200'}`}>
+                      <button key={lang.code} onClick={() => changeLanguage(lang.code)}
+                        className={`w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 ${language === lang.code ? 'bg-gray-100 dark:bg-gray-700 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200'}`}>
                         <span>{lang.flag}</span><span>{lang.name}</span>
                       </button>
                     ))}
@@ -338,34 +352,52 @@ const Navbar = () => {
                 )}
               </div>
 
-              <button onClick={() => setDarkMode(!darkMode)} className="p-1 text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] transition">
+              {/* Dark mode */}
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className="p-1.5 text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] transition rounded-lg"
+              >
                 {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
 
+              {/* Cart */}
               <Link to="/cart" className="relative p-1.5 text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] rounded-lg transition">
                 <ShoppingCart className="w-5 h-5" />
-                {cartCount > 0 && <span className="absolute -top-1 -right-1 bg-[#5C3A21] dark:bg-[#febd69] text-[#FEDEB8] dark:text-gray-900 text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">{cartCount > 9 ? '9+' : cartCount}</span>}
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#5C3A21] dark:bg-[#febd69] text-[#FEDEB8] dark:text-gray-900 text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                    {cartCount > 9 ? '9+' : cartCount}
+                  </span>
+                )}
               </Link>
 
+              {/* User menu */}
               {user ? (
                 <div className="relative" ref={userMenuRef}>
-                  <button onClick={() => setShowUserMenu(!showUserMenu)} className="flex items-center gap-1 px-2 py-1 text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] transition text-sm">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center gap-1 p-1.5 text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] transition rounded-lg text-sm"
+                  >
                     <UserCircle className="w-5 h-5" />
-                    <span className="hidden md:inline truncate max-w-[80px]">{profile?.full_name?.split(' ')[0] || user.email?.split('@')[0]}</span>
-                    <ChevronDown className="w-3 h-3" />
+                    <span className="hidden md:inline truncate max-w-[70px] text-xs font-medium">
+                      {profile?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
+                    </span>
+                    <ChevronDown className="w-3 h-3 hidden sm:block" />
                   </button>
                   {showUserMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 z-50">
-                      <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700"><p className="text-sm font-medium text-gray-900 dark:text-white">{profile?.full_name || 'User'}</p><p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p></div>
-                      <Link to="/dashboard" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"><LayoutDashboard className="w-4 h-4" /> Dashboard</Link>
-                      <Link to="/profile" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"><User className="w-4 h-4" /> Profile</Link>
-                      <button onClick={() => { signOut(); setShowUserMenu(false); }} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"><LogOut className="w-4 h-4" /> Sign Out</button>
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl py-1 z-50 border border-gray-100 dark:border-gray-700">
+                      <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{profile?.full_name || 'User'}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+                      </div>
+                      <Link to="/dashboard" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"><LayoutDashboard className="w-4 h-4" /> Dashboard</Link>
+                      <Link to="/profile" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"><User className="w-4 h-4" /> Profile</Link>
+                      <button onClick={() => { signOut(); setShowUserMenu(false); }} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700"><LogOut className="w-4 h-4" /> Sign Out</button>
                     </div>
                   )}
                 </div>
               ) : (
-                <Link to="/login" className="flex items-center gap-1 px-3 py-1.5 bg-[#5C3A21] dark:bg-[#febd69] hover:bg-[#3D2515] dark:hover:bg-[#f3a847] text-[#FEDEB8] dark:text-gray-900 rounded-lg transition text-sm font-medium">
-                  <LogIn className="w-4 h-4" /><span className="hidden sm:inline">Sign In</span>
+                <Link to="/login" className="flex items-center gap-1 px-2.5 py-1.5 bg-[#5C3A21] dark:bg-[#febd69] hover:bg-[#3D2515] dark:hover:bg-[#f3a847] text-[#FEDEB8] dark:text-gray-900 rounded-lg transition text-xs font-semibold">
+                  <LogIn className="w-4 h-4" /><span>Sign In</span>
                 </Link>
               )}
             </div>
