@@ -282,7 +282,7 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-6 flex flex-wrap gap-4 justify-between items-center">
+        <div className="mb-4 flex flex-wrap gap-3 justify-between items-center">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
             <p className="text-sm md:text-base text-gray-600 mt-1">
@@ -300,11 +300,11 @@ const AdminDashboard = () => {
         </div>
 
         {/* Tabs Navigation */}
-        <div className="flex border-b mb-6 overflow-x-auto pb-1 bg-white rounded-t-lg px-2">
+        <div className="flex border-b mb-4 overflow-x-auto pb-0 bg-white rounded-t-lg px-1 -mx-1 scrollbar-hide">
           {tabs.map(tab => (
             <button
               key={tab.key}
-              className={`px-4 py-3 font-medium whitespace-nowrap flex items-center gap-2 text-sm transition-all ${
+              className={`px-3 py-2.5 font-medium whitespace-nowrap flex items-center gap-2 text-xs sm:text-sm transition-all ${
                 activeTab === tab.key 
                   ? 'border-b-2 border-blue-500 text-blue-600 -mb-px' 
                   : 'text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300'
@@ -328,7 +328,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-sm p-3 sm:p-6">
           {activeTab === TABS.OVERVIEW && (
             <OverviewSection 
               stats={stats}
