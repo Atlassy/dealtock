@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/SupabaseAuthContext";
 export default function Login() {
   const navigate = useNavigate();
   const { signIn, loading } = useAuth();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPwd, setShowPwd] = useState(false);
@@ -15,307 +14,118 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg("");
-
-    const { data, error } = await signIn(email, password);
-
-    if (error) {
-      setErrorMsg(error.message);
-      return;
-    }
-
+    const { error } = await signIn(email, password);
+    if (error) { setErrorMsg(error.message); return; }
     navigate("/dashboard");
   };
 
   return (
-    <div style={{ 
-      minHeight: "100vh", 
-      display: "flex", 
-      alignItems: "center", 
-      justifyContent: "center", 
-      backgroundColor: "#f8fafc",
-      padding: "1rem"
-    }}>
-      <div style={{
-        width: "100%",
-        maxWidth: "28rem",
-        backgroundColor: "white",
-        padding: "2rem",
-        borderRadius: "0.5rem",
-        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
-      }}>
-        {/* Dealtock Logo Section */}
-        <div style={{ 
-          textAlign: "center", 
-          marginBottom: "1.5rem",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center"
-        }}>
-          {/* Logo Image */}
-          <div style={{
-            width: "80px",
-            height: "80px",
-            marginBottom: "0.75rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-          }}>
-            <img src="https://i.ibb.co/PGkjFhwv/Dealtock.png"
-              alt="Dealtock Logo" 
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain"
-              }}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
+      <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg p-6">
+
+        {/* Logo + brand */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-16 h-16 mb-3 flex items-center justify-center">
+            <img
+              src="https://i.ibb.co/PGkjFhwv/Dealtock.png"
+              alt="Dealtock"
+              className="w-full h-full object-contain"
               onError={(e) => {
-                // Fallback if image fails to load
-                e.target.style.display = 'none';
-                const parent = e.target.parentElement;
-                parent.innerHTML = `
-                  <div style="
-                    width: 100%;
-                    height: 100%;
-                    border-radius: 12px;
-                    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
-                  ">
-                    <span style="
-                      color: white;
-                      font-weight: bold;
-                      font-size: 1.5rem;
-                    ">D</span>
-                  </div>
-                `;
+                e.target.style.display = "none";
+                e.target.parentElement.innerHTML =
+                  `<div class="w-full h-full rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center"><span class="text-white font-bold text-2xl">D</span></div>`;
               }}
             />
           </div>
-          
-          {/* Brand Name */}
-          <h1 style={{
-            fontSize: "1.875rem",
-            fontWeight: "bold",
-            background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            color: "transparent",
-            marginBottom: "0.25rem"
-          }}>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent">
             Dealtock
           </h1>
-          
-          {/* Tagline */}
-          <p style={{
-            color: "#6b7280",
-            fontSize: "0.875rem",
-            fontWeight: "500"
-          }}>
-Version 1.0          </p>
+          <p className="text-xs text-gray-400 mt-0.5">Version 1.0</p>
         </div>
 
-        <h2 style={{
-          fontSize: "1.25rem",
-          fontWeight: "600",
-          marginBottom: "1.5rem",
-          textAlign: "center",
-          color: "#1f2937"
-        }}>
+        <h2 className="text-lg font-semibold text-gray-800 text-center mb-5">
           Welcome Back
         </h2>
 
         {errorMsg && (
-          <div style={{
-            backgroundColor: "#fee2e2",
-            color: "#dc2626",
-            padding: "0.75rem",
-            borderRadius: "0.375rem",
-            marginBottom: "1rem",
-            fontSize: "0.875rem",
-            textAlign: "center",
-            border: "1px solid #fca5a5"
-          }}>
+          <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-4 text-center">
             {errorMsg}
           </div>
         )}
 
-        <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <form onSubmit={handleLogin} className="space-y-4">
+          {/* Email */}
           <div>
-            <label style={{
-              display: "block",
-              fontSize: "0.875rem",
-              fontWeight: "500",
-              color: "#374151",
-              marginBottom: "0.5rem"
-            }}>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Email Address
             </label>
             <input
               type="email"
               placeholder="you@example.com"
-              style={{
-                width: "100%",
-                padding: "0.75rem",
-                border: "1px solid #d1d5db",
-                borderRadius: "0.375rem",
-                fontSize: "0.875rem"
-              }}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
             />
           </div>
 
+          {/* Password */}
           <div>
-            <div style={{ 
-              display: "flex", 
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "0.5rem"
-            }}>
-              <label style={{
-                display: "block",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                color: "#374151"
-              }}>
-                Password
-              </label>
-              <Link 
-                to="/forgot-password" 
-                style={{ 
-                  fontSize: "0.75rem",
-                  color: "#2563eb", 
-                  textDecoration: "none"
-                }}
-              >
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-sm font-medium text-gray-700">Password</label>
+              <Link to="/forgot-password" className="text-xs text-blue-600 hover:underline">
                 Forgot password?
               </Link>
             </div>
-            <div style={{ position: "relative" }}>
+            {/* Container: relative + overflow-hidden prevents icon from overflowing */}
+            <div className="relative">
               <input
                 type={showPwd ? "text" : "password"}
                 placeholder="••••••••"
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  paddingRight: "0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.375rem",
-                  fontSize: "0.875rem"
-                }}
+                className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="current-password"
               />
               <button
                 type="button"
-                style={{
-                  position: "absolute",
-                  right: "0.75rem",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "#4b5563",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0.25rem"
-                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition p-1 flex items-center justify-center"
                 onClick={() => setShowPwd(!showPwd)}
+                tabIndex={-1}
               >
-                {showPwd ? "👁️" : "👁️‍🗨️"}
+                {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
 
+          {/* Submit */}
           <button
             type="submit"
-            style={{
-              width: "100%",
-              backgroundColor: loading ? "#9ca3af" : "#3b82f6",
-              color: "white",
-              fontWeight: "600",
-              padding: "0.75rem",
-              borderRadius: "0.375rem",
-              border: "none",
-              cursor: loading ? "not-allowed" : "pointer",
-              fontSize: "0.875rem",
-              transition: "background-color 0.2s",
-              marginTop: "0.5rem"
-            }}
             disabled={loading}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                e.target.style.backgroundColor = "#2563eb";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) {
-                e.target.style.backgroundColor = "#3b82f6";
-              }
-            }}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm transition mt-1 flex items-center justify-center gap-2"
           >
             {loading ? (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
-                <div style={{
-                  width: "1rem",
-                  height: "1rem",
-                  border: "2px solid white",
-                  borderTopColor: "transparent",
-                  borderRadius: "50%",
-                  animation: "spin 1s linear infinite"
-                }} />
+              <>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 Signing in...
-              </div>
+              </>
             ) : "Sign In"}
           </button>
         </form>
 
-        <div style={{ 
-          marginTop: "1.5rem", 
-          textAlign: "center", 
-          color: "#6b7280",
-          fontSize: "0.875rem",
-          paddingTop: "1.5rem",
-          borderTop: "1px solid #e5e7eb"
-        }}>
+        <div className="mt-5 pt-5 border-t border-gray-100 text-center text-sm text-gray-500">
           Don't have an account?{" "}
-          <Link 
-            to="/signup" 
-            style={{ 
-              color: "#2563eb", 
-              textDecoration: "none",
-              fontWeight: "500"
-            }}
-            onMouseEnter={(e) => e.target.style.textDecoration = "underline"}
-            onMouseLeave={(e) => e.target.style.textDecoration = "none"}
-          >
+          <Link to="/signup" className="text-blue-600 font-medium hover:underline">
             Create account
           </Link>
         </div>
 
-        {/* Footer */}
-        <div style={{ 
-          marginTop: "2rem", 
-          textAlign: "center", 
-          color: "#9ca3af",
-          fontSize: "0.75rem"
-        }}>
-          <p>© {new Date().getFullYear()} Dealtock. All rights reserved.</p>
-        </div>
+        <p className="mt-4 text-center text-xs text-gray-400">
+          © {new Date().getFullYear()} Dealtock. All rights reserved.
+        </p>
       </div>
-
-      {/* Add CSS for spinner animation */}
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }
