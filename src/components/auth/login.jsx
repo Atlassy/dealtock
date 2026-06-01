@@ -82,7 +82,7 @@ export default function Login() {
               <input
                 type={showPwd ? "text" : "password"}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+                className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -90,7 +90,7 @@ export default function Login() {
               />
               <button
                 type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md active:bg-gray-100 touch-manipulation"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition p-1 flex items-center justify-center rounded-md active:bg-gray-100 touch-manipulation"
                 onClick={() => setShowPwd(!showPwd)}
                 tabIndex={-1}
                 aria-label={showPwd ? "Hide password" : "Show password"}
