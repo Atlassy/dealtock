@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail]     = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -14,18 +14,19 @@ export default function ForgotPassword() {
     setErrorMsg("");
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      // Supabase redirects here after user clicks link in email
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
     if (error) { setErrorMsg(error.message); return; }
-    navigate("/check-email");
+    // Pass email to CheckEmail page so it can show it + allow resend
+    navigate("/check-email", { state: { email } });
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg p-6">
 
-        {/* Icon */}
         <div className="flex justify-center mb-5">
           <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center">
             <Mail className="w-7 h-7 text-blue-600" />
@@ -36,7 +37,7 @@ export default function ForgotPassword() {
           Reset your password
         </h2>
         <p className="text-sm text-gray-500 text-center mb-6">
-          Enter your email and we'll send you a reset link.
+          Enter your Dealtock email and we'll send you a secure reset link.
         </p>
 
         {errorMsg && (

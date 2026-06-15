@@ -23,9 +23,9 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg p-6">
 
-        {/* Logo + brand */}
+        {/* Logo */}
         <div className="flex flex-col items-center mb-6">
-          <div className="w-16 h-16 mb-3 flex items-center justify-center">
+          <div className="w-16 h-16 mb-3">
             <img
               src="https://i.ibb.co/PGkjFhwv/Dealtock.png"
               alt="Dealtock"
@@ -33,7 +33,7 @@ export default function Login() {
               onError={(e) => {
                 e.target.style.display = "none";
                 e.target.parentElement.innerHTML =
-                  `<div class="w-full h-full rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center"><span class="text-white font-bold text-2xl">D</span></div>`;
+                  `<div style="width:100%;height:100%;borderRadius:12px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;alignItems:center;justifyContent:center"><span style="color:white;fontWeight:bold;fontSize:24px">D</span></div>`;
               }}
             />
           </div>
@@ -62,7 +62,7 @@ export default function Login() {
             <input
               type="email"
               placeholder="you@example.com"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -70,7 +70,7 @@ export default function Login() {
             />
           </div>
 
-          {/* Password */}
+          {/* Password — flexbox row, NO absolute positioning */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-sm font-medium text-gray-700">Password</label>
@@ -78,11 +78,14 @@ export default function Login() {
                 Forgot password?
               </Link>
             </div>
-            <div className="relative">
+            {/* KEY FIX: flex row instead of relative/absolute */}
+            <div
+              className="flex items-center border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-400 focus-within:border-transparent"
+            >
               <input
                 type={showPwd ? "text" : "password"}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+                className="flex-1 px-4 py-3 text-sm outline-none border-none bg-transparent"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -90,7 +93,7 @@ export default function Login() {
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition p-1 flex items-center justify-center rounded-md active:bg-gray-100 touch-manipulation"
+                className="px-3 py-3 text-gray-400 hover:text-gray-600 flex items-center justify-center flex-shrink-0"
                 onClick={() => setShowPwd(!showPwd)}
                 tabIndex={-1}
                 aria-label={showPwd ? "Hide password" : "Show password"}
@@ -104,7 +107,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm transition mt-1 flex items-center justify-center gap-2"
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 mt-1"
           >
             {loading ? (
               <>

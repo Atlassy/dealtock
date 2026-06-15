@@ -30,13 +30,17 @@ import {
   Wallet,
   CreditCard,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  X,
+  Plus
 } from "lucide-react";
 import { toast } from "sonner";
 
 // Import components
 import SellerOrders from './SellerOrders';
 import ProductTable from '../ProductTable';
+import AddProductForm from '../AddProductForm';
+import EditProductForm from '../EditProductForm';
 
 // ============================================
 // DASHBOARD SKELETON
@@ -475,6 +479,7 @@ const SellerDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
   const [editingProduct, setEditingProduct] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [dashboardData, setDashboardData] = useState({
@@ -529,7 +534,7 @@ const SellerDashboard = () => {
       if (user) {
         const { data } = await supabase
           .from('profiles')
-          .select('full_name, company, avatar_url, city, address, phone, subscription_tier')
+          .select('full_name, company, avatar_url, city, address, phone')
           .eq('id', user.id)
           .single();
         if (data) setProfile(data);
@@ -560,7 +565,7 @@ const SellerDashboard = () => {
       if (productsError) throw productsError;
 
       // Determine seller tier once (not per product)
-      const isPremium = profile?.subscription_tier === 'premium' || false;
+      const isPremium = false; // Pro tier determined by role, not subscription_tier
       const appliesTo = isPremium ? 'Pro_Seller' : 'Seller';
 
       // Collect unique categories from all products for a targeted fetch
@@ -913,6 +918,49 @@ const SellerDashboard = () => {
     });
     
     setProducts(sorted);
+  };
+
+  const handleAddProduct = async (productData) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .insert([{
+          ...productData,
+          user_id: user.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }])
+        .select()
+        .single();
+      if (error) throw error;
+      await fetchProducts();
+      setShowAddForm(false);
+      toast.success('Product added successfully!');
+      return { success: true };
+    } catch (err) {
+      console.error('Add product error:', err);
+      toast.error(err.message || 'Failed to add product');
+      return { success: false };
+    }
+  };
+
+  const handleUpdateProduct = async (id, updates) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+      if (error) throw error;
+      await fetchProducts();
+      setEditingProduct(null);
+      toast.success('Product updated successfully!');
+    } catch (err) {
+      console.error('Update product error:', err);
+      toast.error(err.message || 'Failed to update product');
+    }
   };
 
   const handleDeleteProduct = async (id) => {
@@ -1306,18 +1354,18 @@ const SellerDashboard = () => {
         ) : activeTab === 'products' ? (
           /* PRODUCTS SECTION */
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <div className="px-4 py-4 border-b border-gray-200 bg-gray-50">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold text-gray-900">Your Products</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Your Products</h2>
                 <button
-                  onClick={() => {}} // Add product modal trigger
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  onClick={() => setShowAddForm(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2 text-sm font-medium"
                 >
-                  + Add Product
+                  <span className="text-lg leading-none">+</span> Add Product
                 </button>
               </div>
             </div>
-            <ProductTable 
+            <ProductTable
               products={products}
               onEdit={setEditingProduct}
               onDelete={handleDeleteProduct}
@@ -1335,6 +1383,54 @@ const SellerDashboard = () => {
           <SellerOrders sellerId={user.id} />
         )}
       </div>
+
+      {/* ── Add Product Modal ───────────────────────────────── */}
+      {showAddForm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-800">Add New Product</h2>
+              <button
+                onClick={() => setShowAddForm(false)}
+                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              <AddProductForm
+                onSubmit={handleAddProduct}
+                onCancel={() => setShowAddForm(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Edit Product Modal ──────────────────────────────── */}
+      {editingProduct && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-800">Edit Product</h2>
+              <button
+                onClick={() => setEditingProduct(null)}
+                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              <EditProductForm
+                product={editingProduct}
+                onSubmit={(updates) => handleUpdateProduct(editingProduct.id, updates)}
+                onCancel={() => setEditingProduct(null)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
