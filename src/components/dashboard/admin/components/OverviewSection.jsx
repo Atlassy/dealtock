@@ -56,7 +56,7 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
       title: "Order Status",
       value: `${stats.deliveredOrders}/${stats.shippedOrders}/${stats.pendingOrders}`,
       icon: TrendingUp,
-      color: "bg-orange-500",
+      color: "bg-kraft-500",
       description: "Delivered/In Transit/Pending"
     },
     {
@@ -89,8 +89,8 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
     {
       label: "Order Oversight",
       icon: Eye,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      color: "text-kraft-600",
+      bgColor: "bg-kraft-50",
       tab: "orders",
       description: "View all orders"
     },

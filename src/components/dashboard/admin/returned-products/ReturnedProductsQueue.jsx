@@ -122,7 +122,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Eye className="w-6 h-6 text-orange-500" />
+            <Eye className="w-6 h-6 text-kraft-500" />
             Returned Products Queue
           </h2>
           <p className="text-sm text-gray-500 mt-1">
@@ -133,7 +133,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
           <button onClick={fetchProducts} className="flex items-center gap-1.5 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
             <RefreshCw className="w-4 h-4" /> Refresh
           </button>
-          <button onClick={onSwitchToImport} className="flex items-center gap-1.5 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium">
+          <button onClick={onSwitchToImport} className="flex items-center gap-1.5 px-3 py-2 bg-kraft-500 hover:bg-kraft-600 text-white rounded-lg text-sm font-medium">
             <Package className="w-4 h-4" /> Import CSV
           </button>
         </div>
@@ -168,7 +168,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
           placeholder="Search by product, city, category, or delivery company…"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
+          className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-kraft-400 focus:border-kraft-400"
         />
       </div>
 
@@ -206,7 +206,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                   }
 
                   {/* Source badge */}
-                  <span className="absolute top-2 left-2 px-2 py-0.5 bg-orange-500 text-white text-xs font-semibold rounded-full flex items-center gap-1">
+                  <span className="absolute top-2 left-2 px-2 py-0.5 bg-kraft-500 text-white text-xs font-semibold rounded-full flex items-center gap-1">
                     <Package className="w-3 h-3" /> Returned
                   </span>
 

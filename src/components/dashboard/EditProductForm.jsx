@@ -424,7 +424,7 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
       {/* Location & Shipping */}
       <div className="bg-gray-50 rounded-lg p-5">
         <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <MapPin className="w-5 h-5 text-orange-500" />
+          <MapPin className="w-5 h-5 text-kraft-500" />
           Location & Shipping
         </h3>
         

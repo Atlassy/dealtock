@@ -653,7 +653,7 @@ export default function ProductDetailModal({
                       <span>Tracked Delivery</span>
                     </div>
                     <div className="text-center">
-                      <Clock className="w-4 h-4 text-orange-500 mx-auto mb-1" />
+                      <Clock className="w-4 h-4 text-kraft-500 mx-auto mb-1" />
                       <span>3-Day Hold</span>
                     </div>
                   </div>

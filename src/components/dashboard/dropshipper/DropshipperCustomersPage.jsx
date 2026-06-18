@@ -134,7 +134,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
@@ -144,8 +144,8 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Customers</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your customers and their orders</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Customers</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage your customers and their orders</p>
         </div>
         <button
           onClick={() => setShowAddCustomer(true)}
@@ -158,22 +158,22 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
         <input
           type="text"
           placeholder="Search customers by name, email or phone..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          className="w-full pl-9 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       {/* Customers Grid */}
       {filteredCustomers.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-          <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No customers yet</h3>
-          <p className="text-gray-500 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <Users className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No customers yet</h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">
             {searchTerm ? 'No customers match your search' : 'Start adding customers to place orders for them'}
           </p>
           {!searchTerm && (
@@ -191,42 +191,42 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
           {filteredCustomers.map((customer) => (
             <div
               key={customer.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition cursor-pointer"
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition cursor-pointer"
               onClick={() => setSelectedCustomer(customer)}
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{customer.full_name || 'Unnamed'}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{customer.full_name || 'Unnamed'}</h3>
                   <div className="space-y-1 mt-2">
                     {customer.email && (
-                      <p className="text-sm text-gray-600 flex items-center">
-                        <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                      <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center">
+                        <Mail className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
                         {customer.email}
                       </p>
                     )}
                     {customer.phone && (
-                      <p className="text-sm text-gray-600 flex items-center">
-                        <Phone className="w-4 h-4 mr-2 text-gray-400" />
+                      <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center">
+                        <Phone className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
                         {customer.phone}
                       </p>
                     )}
                     {customer.city && (
-                      <p className="text-sm text-gray-600 flex items-center">
-                        <MapPin className="w-4 h-4 mr-2 text-gray-400" />
+                      <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center">
+                        <MapPin className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
                         {customer.city}
                       </p>
                     )}
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                  <span className="inline-flex items-center px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full text-sm">
                     <Package className="w-4 h-4 mr-1" />
                     {customer.totalOrders} {customer.totalOrders === 1 ? 'order' : 'orders'}
                   </span>
                 </div>
               </div>
               {customer.lastOrder && (
-                <p className="text-xs text-gray-400 mt-3">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
                   Last order: {new Date(customer.lastOrder).toLocaleDateString()}
                 </p>
               )}
@@ -238,60 +238,60 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
       {/* Add Customer Modal */}
       {showAddCustomer && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full">
-            <div className="p-6 border-b">
-              <h3 className="text-xl font-bold">Add New Customer</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Add New Customer</h3>
             </div>
             <form onSubmit={handleAddCustomer} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Full Name *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name *</label>
                 <input
                   type="text"
                   required
                   value={newCustomer.fullName}
                   onChange={(e) => setNewCustomer({...newCustomer, fullName: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="John Doe"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Phone Number *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number *</label>
                 <input
                   type="tel"
                   required
                   value={newCustomer.phone}
                   onChange={(e) => setNewCustomer({...newCustomer, phone: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="+212 6XX XXX XXX"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Email Address</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
                 <input
                   type="email"
                   value={newCustomer.email}
                   onChange={(e) => setNewCustomer({...newCustomer, email: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="customer@example.com"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">City</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
                 <input
                   type="text"
                   value={newCustomer.city}
                   onChange={(e) => setNewCustomer({...newCustomer, city: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="Casablanca"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Address</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
                 <textarea
                   value={newCustomer.address}
                   onChange={(e) => setNewCustomer({...newCustomer, address: e.target.value})}
                   rows="2"
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="123 Main St, Apt 4B"
                 />
               </div>
@@ -299,7 +299,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
                 <button
                   type="button"
                   onClick={() => setShowAddCustomer(false)}
-                  className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </button>
@@ -318,25 +318,25 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
       {/* Customer Details Modal */}
       {selectedCustomer && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-lg w-full">
-            <div className="p-6 border-b">
-              <h3 className="text-xl font-bold">Customer Details</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-lg w-full">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Customer Details</h3>
             </div>
-            <div className="p-6 space-y-3">
-              <p><span className="font-medium">Name:</span> {selectedCustomer.full_name || 'N/A'}</p>
-              <p><span className="font-medium">Email:</span> {selectedCustomer.email || 'N/A'}</p>
-              <p><span className="font-medium">Phone:</span> {selectedCustomer.phone || 'N/A'}</p>
-              <p><span className="font-medium">City:</span> {selectedCustomer.city || 'N/A'}</p>
-              <p><span className="font-medium">Address:</span> {selectedCustomer.address || 'N/A'}</p>
-              <p><span className="font-medium">Total Orders:</span> {selectedCustomer.totalOrders}</p>
+            <div className="p-6 space-y-3 text-gray-900 dark:text-gray-100">
+              <p><span className="font-medium text-gray-700 dark:text-gray-300">Name:</span> {selectedCustomer.full_name || 'N/A'}</p>
+              <p><span className="font-medium text-gray-700 dark:text-gray-300">Email:</span> {selectedCustomer.email || 'N/A'}</p>
+              <p><span className="font-medium text-gray-700 dark:text-gray-300">Phone:</span> {selectedCustomer.phone || 'N/A'}</p>
+              <p><span className="font-medium text-gray-700 dark:text-gray-300">City:</span> {selectedCustomer.city || 'N/A'}</p>
+              <p><span className="font-medium text-gray-700 dark:text-gray-300">Address:</span> {selectedCustomer.address || 'N/A'}</p>
+              <p><span className="font-medium text-gray-700 dark:text-gray-300">Total Orders:</span> {selectedCustomer.totalOrders}</p>
               {selectedCustomer.lastOrder && (
-                <p><span className="font-medium">Last Order:</span> {new Date(selectedCustomer.lastOrder).toLocaleDateString()}</p>
+                <p><span className="font-medium text-gray-700 dark:text-gray-300">Last Order:</span> {new Date(selectedCustomer.lastOrder).toLocaleDateString()}</p>
               )}
             </div>
-            <div className="p-6 border-t flex justify-end gap-3">
+            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
               <button
                 onClick={() => setSelectedCustomer(null)}
-                className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Close
               </button>

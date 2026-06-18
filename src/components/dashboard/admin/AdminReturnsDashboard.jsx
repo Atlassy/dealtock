@@ -44,7 +44,7 @@ export default function AdminReturnsDashboard() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading returns...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading returns...</p>
         </div>
       </div>
     );
@@ -52,28 +52,28 @@ export default function AdminReturnsDashboard() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Returns Management</h1>
-      
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Returns Management</h1>
+
       {returns.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500">No disputed returns found</p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
+          <p className="text-gray-500 dark:text-gray-400">No disputed returns found</p>
         </div>
       ) : (
         <div className="space-y-4">
           {returns.map((returnItem) => (
-            <div key={returnItem.id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+            <div key={returnItem.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="font-medium text-gray-900">Return ID: {returnItem.id}</p>
-                  <p className="text-sm text-gray-600 mt-1">Reason: {returnItem.reason}</p>
-                  <p className="text-sm text-gray-600">Condition: {returnItem.condition_on_return}</p>
-                  <p className="text-sm text-gray-600">Order Total: ${returnItem.orders?.total_amount}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">Return ID: {returnItem.id}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Reason: {returnItem.reason}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Condition: {returnItem.condition_on_return}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Order Total: ${returnItem.orders?.total_amount}</p>
                 </div>
                 <div className="text-right">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400">
                     {returnItem.decision}
                   </span>
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
                     {new Date(returnItem.created_at).toLocaleDateString()}
                   </p>
                 </div>

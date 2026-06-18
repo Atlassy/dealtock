@@ -83,7 +83,7 @@ export default function ResetPassword() {
               <input
                 type={showPwd ? "text" : "password"}
                 placeholder="Min. 8 characters"
-                className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+                className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required disabled={loading}
@@ -105,7 +105,7 @@ export default function ResetPassword() {
               <input
                 type={showConfirm ? "text" : "password"}
                 placeholder="Repeat your password"
-                className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+                className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 required disabled={loading}

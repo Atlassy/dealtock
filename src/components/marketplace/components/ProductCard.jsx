@@ -24,7 +24,7 @@ export default function ProductCard({ product, onClick, canOrder }) {
           </div>
         )}
         {product.quantity <= 5 && (
-          <span className="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+          <span className="absolute top-2 right-2 bg-kraft-500 text-white text-xs px-2 py-1 rounded-full">
             Only {product.quantity} left
           </span>
         )}

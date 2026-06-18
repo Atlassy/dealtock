@@ -19,13 +19,14 @@ import {
   Truck, Tag, Sparkles, Shield, X, ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { StampBadge } from '../ui/stamp-badge';
 
 const CATEGORIES = [
   { name: 'Electronics', icon: '📱', color: 'bg-blue-100 text-blue-600' },
   { name: 'Fashion',     icon: '👕', color: 'bg-pink-100 text-pink-600' },
   { name: 'Home',        icon: '🏠', color: 'bg-green-100 text-green-600' },
   { name: 'Beauty',      icon: '💄', color: 'bg-purple-100 text-purple-600' },
-  { name: 'Sports',      icon: '⚽', color: 'bg-orange-100 text-orange-600' },
+  { name: 'Sports',      icon: '⚽', color: 'bg-kraft-100 text-kraft-600' },
   { name: 'Books',       icon: '📚', color: 'bg-yellow-100 text-yellow-600' },
   { name: 'Promotions',  icon: '🎉', color: 'bg-red-100 text-red-600', isPromo: true },
 ];
@@ -54,7 +55,7 @@ const CityDealsBanner = ({ city, count, onFilter }) => (
   <motion.div
     initial={{ opacity: 0, y: -12 }}
     animate={{ opacity: 1, y: 0 }}
-    className="mb-4 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl p-4 flex items-center justify-between shadow-md"
+    className="mb-4 bg-kraft-700 rounded-xl p-4 flex items-center justify-between shadow-md"
   >
     <div className="flex items-center gap-3">
       <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
@@ -64,14 +65,14 @@ const CityDealsBanner = ({ city, count, onFilter }) => (
         <p className="text-white font-bold text-sm">
           🔥 {count} local deal{count > 1 ? 's' : ''} near you in {city}!
         </p>
-        <p className="text-orange-100 text-xs mt-0.5">
+        <p className="text-kraft-100 text-xs mt-0.5">
           Sealed returned parcels · Instant local delivery · Big discounts
         </p>
       </div>
     </div>
     <button
       onClick={onFilter}
-      className="flex items-center gap-1 bg-white text-orange-600 font-semibold text-xs px-3 py-2 rounded-lg hover:bg-orange-50 transition flex-shrink-0 ml-3"
+      className="flex items-center gap-1 bg-white text-kraft-600 font-semibold text-xs px-3 py-2 rounded-lg hover:bg-kraft-50 transition flex-shrink-0 ml-3"
     >
       See deals <ChevronRight className="w-3 h-3" />
     </button>
@@ -105,7 +106,7 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
         onMouseLeave={() => setIsHovered(false)}
         className={`bg-white dark:bg-gray-800 rounded-xl border transition-all duration-300 overflow-hidden cursor-pointer group ${
           isReturned
-            ? 'border-orange-200 dark:border-orange-800 hover:shadow-xl hover:shadow-orange-100'
+            ? 'border-kraft-200 dark:border-kraft-800 hover:shadow-xl hover:shadow-kraft-100'
             : 'border-gray-200 dark:border-gray-700 hover:shadow-xl'
         }`}
       >
@@ -137,13 +138,12 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
           {/* Returned product badge — top left */}
           {isReturned && (
             <div className="absolute top-2 left-2 flex flex-col gap-1">
-              <span className="flex items-center gap-1 px-2 py-0.5 bg-orange-500 text-white text-xs font-bold rounded-full shadow">
+              <StampBadge variant="kraft" className="shadow">
                 <Sparkles className="w-3 h-3" /> Dealtock Deal
-              </span>
-              {/* Sealed condition badge */}
-              <span className="flex items-center gap-1 px-2 py-0.5 bg-green-500 text-white text-xs font-semibold rounded-full shadow">
-                <Shield className="w-3 h-3" /> Sealed ✓
-              </span>
+              </StampBadge>
+              <StampBadge variant="verified" className="shadow">
+                <Shield className="w-3 h-3" /> Sealed
+              </StampBadge>
             </div>
           )}
 
@@ -173,7 +173,7 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
             <span className="truncate">
               {product.city || 'Morocco'}
               {product.city_locked && (
-                <span className="ml-1 text-orange-500 font-medium">· Local pickup</span>
+                <span className="ml-1 text-kraft-500 font-medium">· Local pickup</span>
               )}
             </span>
           </div>
@@ -182,7 +182,7 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400">{priceInfo.label}</p>
-              <p className={`text-lg font-bold ${isReturned ? 'text-orange-600' : 'text-blue-600 dark:text-blue-400'}`}>
+              <p className={`text-lg font-bold ${isReturned ? 'text-kraft-600' : 'text-blue-600 dark:text-blue-400'}`}>
                 {formatPrice(priceInfo.price)}
               </p>
             </div>
@@ -199,7 +199,7 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
                 disabled={addingToCart}
                 className={`p-1.5 rounded-lg transition disabled:opacity-50 ${
                   isReturned
-                    ? 'bg-orange-500 hover:bg-orange-600'
+                    ? 'bg-kraft-500 hover:bg-kraft-600'
                     : 'bg-blue-600 hover:bg-blue-700'
                 }`}
                 title="Add to Cart"
@@ -367,7 +367,7 @@ const MarketplacePage = () => {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                 activeSource === tab.key
                   ? tab.key === 'returned'
-                    ? 'bg-orange-500 text-white shadow-md shadow-orange-200'
+                    ? 'bg-kraft-500 text-white shadow-md shadow-kraft-200'
                     : 'bg-blue-600 text-white shadow-md'
                   : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-blue-300'
               }`}
@@ -376,7 +376,7 @@ const MarketplacePage = () => {
               {tab.label}
               {tab.key === 'returned' && cityLockedCount > 0 && buyerCity && (
                 <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs font-bold ${
-                  activeSource === 'returned' ? 'bg-white/30 text-white' : 'bg-orange-500 text-white'
+                  activeSource === 'returned' ? 'bg-white/30 text-white' : 'bg-kraft-500 text-white'
                 }`}>
                   {cityLockedCount}
                 </span>
@@ -408,14 +408,14 @@ const MarketplacePage = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mb-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4 flex items-start gap-3"
+            className="mb-4 bg-kraft-50 dark:bg-kraft-900/20 border border-kraft-200 dark:border-kraft-800 rounded-xl p-4 flex items-start gap-3"
           >
-            <Sparkles className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
+            <Sparkles className="w-5 h-5 text-kraft-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-orange-800 dark:text-orange-300">
+              <p className="text-sm font-semibold text-kraft-800 dark:text-kraft-300">
                 Dealtock Deals — Returned & Sealed Products
               </p>
-              <p className="text-xs text-orange-600 dark:text-orange-400 mt-0.5">
+              <p className="text-xs text-kraft-600 dark:text-kraft-400 mt-0.5">
                 These are sealed, unopened parcels that couldn't be delivered to their original recipient.
                 Products are verified by Dealtock and delivered by the same company that holds the stock —
                 meaning faster delivery and bigger discounts.
@@ -487,15 +487,15 @@ const MarketplacePage = () => {
         >
           <div
             className={`bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl ${
-              selectedProduct.source_type === 'returned' ? 'border-2 border-orange-300' : ''
+              selectedProduct.source_type === 'returned' ? 'border-2 border-kraft-300' : ''
             }`}
             onClick={e => e.stopPropagation()}
           >
             {/* Returned deal header strip */}
             {selectedProduct.source_type === 'returned' && (
-              <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-200">
-                <Sparkles className="w-4 h-4 text-orange-500" />
-                <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">
+              <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-kraft-50 dark:bg-kraft-900/20 rounded-xl border border-kraft-200">
+                <Sparkles className="w-4 h-4 text-kraft-500" />
+                <span className="text-sm font-semibold text-kraft-700 dark:text-kraft-300">
                   Dealtock Deal — Sealed & Verified
                 </span>
                 <Shield className="w-4 h-4 text-green-500 ml-auto" />
@@ -524,7 +524,7 @@ const MarketplacePage = () => {
               <p className="text-sm text-gray-500 dark:text-gray-400">{selectedProductPriceInfo.label}</p>
               <p className={`text-2xl font-bold ${
                 selectedProduct.source_type === 'returned'
-                  ? 'text-orange-600' : 'text-blue-600 dark:text-blue-400'
+                  ? 'text-kraft-600' : 'text-blue-600 dark:text-blue-400'
               }`}>
                 {formatPrice(selectedProductPriceInfo.price)}
               </p>
@@ -535,7 +535,7 @@ const MarketplacePage = () => {
               {selectedProduct.source_type === 'returned' && (
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500 dark:text-gray-400">Type:</span>
-                  <span className="text-orange-600 font-semibold">🔥 Returned & Sealed</span>
+                  <span className="text-kraft-600 font-semibold">🔥 Returned & Sealed</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
@@ -570,7 +570,7 @@ const MarketplacePage = () => {
                 disabled={selectedProduct.quantity <= 0}
                 className={`flex-1 px-4 py-2.5 text-white rounded-xl font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed ${
                   selectedProduct.source_type === 'returned'
-                    ? 'bg-orange-500 hover:bg-orange-600'
+                    ? 'bg-kraft-500 hover:bg-kraft-600'
                     : 'bg-blue-600 hover:bg-blue-700'
                 }`}
               >

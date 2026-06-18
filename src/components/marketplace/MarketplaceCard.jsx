@@ -23,7 +23,7 @@ const CATEGORIES = [
   { name: 'Fashion', icon: '👕', color: 'bg-pink-100 text-pink-600' },
   { name: 'Home', icon: '🏠', color: 'bg-green-100 text-green-600' },
   { name: 'Beauty', icon: '💄', color: 'bg-purple-100 text-purple-600' },
-  { name: 'Sports', icon: '⚽', color: 'bg-orange-100 text-orange-600' },
+  { name: 'Sports', icon: '⚽', color: 'bg-kraft-100 text-kraft-600' },
   { name: 'Books', icon: '📚', color: 'bg-yellow-100 text-yellow-600' },
   { name: 'Promotions', icon: '🎉', color: 'bg-red-100 text-red-600', isPromo: true }
 ];

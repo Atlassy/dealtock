@@ -989,11 +989,11 @@ const SellerDashboard = () => {
 
   if (!user) {
     return (
-      <div className="h-screen flex items-center justify-center text-gray-600">
+      <div className="h-screen flex items-center justify-center text-gray-600 dark:text-gray-300 bg-white dark:bg-slate-900">
         <div className="text-center">
-          <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Please Log In</h2>
-          <p className="text-gray-500">You need to be authenticated to access your seller dashboard.</p>
+          <Package className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2 dark:text-white">Please Log In</h2>
+          <p className="text-gray-500 dark:text-gray-400">You need to be authenticated to access your seller dashboard.</p>
         </div>
       </div>
     );
@@ -1353,13 +1353,13 @@ const SellerDashboard = () => {
           </>
         ) : activeTab === 'products' ? (
           /* PRODUCTS SECTION */
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="px-4 py-4 border-b border-gray-200 bg-gray-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+            <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Your Products</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Your Products</h2>
                 <button
                   onClick={() => setShowAddForm(true)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2 text-sm font-medium"
+                  className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition flex items-center gap-2 text-sm font-medium"
                 >
                   <span className="text-lg leading-none">+</span> Add Product
                 </button>
@@ -1387,12 +1387,12 @@ const SellerDashboard = () => {
       {/* ── Add Product Modal ───────────────────────────────── */}
       {showAddForm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-800">Add New Product</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white">Add New Product</h2>
               <button
                 onClick={() => setShowAddForm(false)}
-                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1410,12 +1410,12 @@ const SellerDashboard = () => {
       {/* ── Edit Product Modal ──────────────────────────────── */}
       {editingProduct && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-800">Edit Product</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white">Edit Product</h2>
               <button
                 onClick={() => setEditingProduct(null)}
-                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition"
               >
                 <X className="w-5 h-5" />
               </button>

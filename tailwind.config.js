@@ -65,15 +65,26 @@ module.exports = {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))'
         },
-        // Amazon-style colors
-        amazon: {
-          navy: '#131921',
-          dark: '#232f3e',
-          orange: '#febd69',
-          orangeDark: '#f3a847',
-          light: '#ffffff',
-          gray: '#eaeded'
-        }
+        // Kraft — Dealtock brand ramp (bordereau/tampon identity)
+        kraft: {
+          50: '#FAF6F0',
+          100: '#F2E9DC',
+          200: '#E3CFB2',
+          300: '#D2B488',
+          400: '#BC9C6C',
+          500: '#AA8350',
+          600: '#8F6B3F',
+          700: '#735531',
+          800: '#574025',
+          900: '#3B2B18'
+        },
+        'stamp-red': 'hsl(var(--stamp-red))',
+        'stamp-green': 'hsl(var(--stamp-green))'
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        display: ['"Archivo Black"', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'monospace']
       },
       borderRadius: {
         lg: 'var(--radius)',

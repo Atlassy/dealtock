@@ -267,9 +267,9 @@ const DropshipperOrders = ({ dropshipperId, onUpdate }) => {
                     +{formatCurrency(order.dropshipper_markup)}
                   </p>
                 </div>
-                <div className="bg-orange-50 p-3 rounded-lg">
+                <div className="bg-kraft-50 p-3 rounded-lg">
                   <p className="text-xs text-gray-600 mb-1">Dealtock Fee</p>
-                  <p className="text-lg font-bold text-orange-600">
+                  <p className="text-lg font-bold text-kraft-600">
                     -{formatCurrency(order.dropshipper_commission_amount)}
                   </p>
                   <p className="text-xs text-gray-500">
@@ -400,7 +400,7 @@ const DropshipperOrders = ({ dropshipperId, onUpdate }) => {
                     <span>Your Markup:</span>
                     <span>+{formatCurrency(selectedOrder.dropshipper_markup)}</span>
                   </div>
-                  <div className="flex justify-between text-sm text-orange-600">
+                  <div className="flex justify-between text-sm text-kraft-600">
                     <span>Dealtock Fee ({selectedOrder.dropshipper_commission_rate}%):</span>
                     <span>-{formatCurrency(selectedOrder.dropshipper_commission_amount)}</span>
                   </div>

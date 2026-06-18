@@ -188,8 +188,8 @@ export function InvoiceDetailModal({
                 </tr>
                 {financialSummary.dropshipper_commission > 0 && (
                   <tr>
-                    <td className="py-2 text-orange-600">Dropshipper Commission</td>
-                    <td className="py-2 text-right text-orange-600">-{formatCurrency(financialSummary.dropshipper_commission)}</td>
+                    <td className="py-2 text-kraft-600">Dropshipper Commission</td>
+                    <td className="py-2 text-right text-kraft-600">-{formatCurrency(financialSummary.dropshipper_commission)}</td>
                   </tr>
                 )}
                 <tr className="font-bold text-lg border-t-2">

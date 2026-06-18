@@ -324,12 +324,12 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Package className="w-6 h-6 text-orange-500" />
+            <Package className="w-6 h-6 text-kraft-500" />
             Import Returned Products
           </h2>
           <p className="text-sm text-gray-500 mt-1">
             Upload a CSV from a delivery company to list returned parcels on the marketplace.
-            All listings go to <span className="font-medium text-orange-600">pending review</span> before going live.
+            All listings go to <span className="font-medium text-kraft-600">pending review</span> before going live.
           </p>
         </div>
         <button
@@ -351,10 +351,10 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
           return (
             <React.Fragment key={s}>
               <div className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
-                isCurrent ? "text-orange-600" : isDone ? "text-green-600" : "text-gray-400"
+                isCurrent ? "text-kraft-600" : isDone ? "text-green-600" : "text-gray-400"
               }`}>
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                  isCurrent ? "bg-orange-500 text-white" :
+                  isCurrent ? "bg-kraft-500 text-white" :
                   isDone    ? "bg-green-500 text-white" :
                               "bg-gray-200 text-gray-500"
                 }`}>
@@ -380,7 +380,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
             <select
               value={selectedDC}
               onChange={e => setSelectedDC(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-kraft-400 focus:border-kraft-400"
             >
               <option value="">— Choose delivery company —</option>
               {deliveryCompanies.map(dc => (
@@ -397,11 +397,11 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
             onClick={() => fileRef.current?.click()}
             className={`cursor-pointer rounded-xl border-2 border-dashed p-12 text-center transition-all ${
               dragging
-                ? "border-orange-400 bg-orange-50"
-                : "border-gray-300 hover:border-orange-300 hover:bg-orange-50/40"
+                ? "border-kraft-400 bg-kraft-50"
+                : "border-gray-300 hover:border-kraft-300 hover:bg-kraft-50/40"
             }`}
           >
-            <Upload className={`w-10 h-10 mx-auto mb-3 transition-colors ${dragging ? "text-orange-500" : "text-gray-400"}`} />
+            <Upload className={`w-10 h-10 mx-auto mb-3 transition-colors ${dragging ? "text-kraft-500" : "text-gray-400"}`} />
             <p className="text-base font-semibold text-gray-700">Drop your CSV here or click to browse</p>
             <p className="text-sm text-gray-400 mt-1">Accepts .csv files — any column format</p>
             <input ref={fileRef} type="file" accept=".csv" className="hidden"
@@ -430,7 +430,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
         <div className="space-y-4">
           {/* DC selector (shown again if not filled) */}
           {!selectedDC && (
-            <div className="bg-white rounded-xl border border-orange-200 p-5">
+            <div className="bg-white rounded-xl border border-kraft-200 p-5">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 <Truck className="inline w-4 h-4 mr-1 text-gray-400" />
                 Select Delivery Company *
@@ -438,7 +438,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
               <select
                 value={selectedDC}
                 onChange={e => setSelectedDC(e.target.value)}
-                className="w-full px-3 py-2 border border-orange-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400"
+                className="w-full px-3 py-2 border border-kraft-300 rounded-lg text-sm focus:ring-2 focus:ring-kraft-400"
               >
                 <option value="">— Choose delivery company —</option>
                 {deliveryCompanies.map(dc => (
@@ -487,7 +487,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
                       <select
                         value={mapping[header] || "ignore"}
                         onChange={e => setMapping(prev => ({ ...prev, [header]: e.target.value }))}
-                        className={`w-full px-3 py-2 border rounded-lg text-sm appearance-none pr-8 focus:ring-2 focus:ring-orange-400 ${
+                        className={`w-full px-3 py-2 border rounded-lg text-sm appearance-none pr-8 focus:ring-2 focus:ring-kraft-400 ${
                           isIgnored     ? "border-gray-200 text-gray-400" :
                           isRequired    ? "border-green-300 text-green-800 bg-green-50" :
                                           "border-gray-300"
@@ -530,7 +530,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
               ← Back
             </button>
             <button onClick={buildPreview}
-              className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+              className="px-6 py-2 bg-kraft-500 hover:bg-kraft-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
               Preview Rows
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -547,7 +547,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
               { label: "Total rows",    value: preview.length,                                     color: "text-gray-800" },
               { label: "Valid",         value: preview.filter(r => r._errors.length === 0).length, color: "text-green-600" },
               { label: "Has errors",    value: preview.filter(r => r._errors.length > 0).length,   color: "text-red-500" },
-              { label: "Selected",      value: Object.values(rowChecked).filter(Boolean).length,    color: "text-orange-600" },
+              { label: "Selected",      value: Object.values(rowChecked).filter(Boolean).length,    color: "text-kraft-600" },
             ].map(s => (
               <div key={s.label} className="bg-white rounded-xl border border-gray-200 p-4 text-center">
                 <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
@@ -596,7 +596,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
                     </th>
                     <th className="text-left p-3 text-xs font-semibold text-gray-500">
                       <Clock className="inline w-3 h-3 mr-0.5" />
-                      Days Stored <span className="text-orange-500">(admin)</span>
+                      Days Stored <span className="text-kraft-500">(admin)</span>
                     </th>
                     <th className="text-left p-3 text-xs font-semibold text-gray-500">Status</th>
                   </tr>
@@ -608,7 +608,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
                     return (
                       <tr key={row._rowIndex} className={`border-t transition-colors ${
                         hasErrors ? "bg-red-50/60" :
-                        checked   ? "bg-orange-50/40" :
+                        checked   ? "bg-kraft-50/40" :
                                     "hover:bg-gray-50"
                       }`}>
                         <td className="p-3 text-xs text-gray-400">{row._rowIndex}</td>
@@ -618,7 +618,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
                             checked={!hasErrors && checked}
                             disabled={hasErrors}
                             onChange={e => setRowChecked(prev => ({ ...prev, [row._rowIndex]: e.target.checked }))}
-                            className="rounded accent-orange-500 disabled:opacity-30"
+                            className="rounded accent-kraft-500 disabled:opacity-30"
                           />
                         </td>
                         <td className="p-3 font-medium text-gray-800 max-w-[200px] truncate">{row.name || "—"}</td>
@@ -667,7 +667,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
             <button
               onClick={handleImport}
               disabled={importing || !Object.values(rowChecked).some(Boolean)}
-              className="px-6 py-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              className="px-6 py-2 bg-kraft-500 hover:bg-kraft-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
             >
               {importing
                 ? <><RefreshCw className="w-4 h-4 animate-spin" />Importing…</>
@@ -726,7 +726,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
                 Import another file
               </button>
               <button onClick={() => onImportComplete?.()}
-                className="flex items-center gap-2 px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium">
+                className="flex items-center gap-2 px-5 py-2 bg-kraft-500 hover:bg-kraft-600 text-white rounded-lg text-sm font-medium">
                 <Eye className="w-4 h-4" />
                 Go to review queue
               </button>

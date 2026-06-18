@@ -103,7 +103,7 @@ export default function SignUpForm() {
 
           <input
             type="email"
-            className="w-full p-3 border rounded"
+            className="w-full p-3 border rounded bg-white text-gray-900"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -114,7 +114,7 @@ export default function SignUpForm() {
             <input
               type={showPwd ? "text" : "password"}
               placeholder="Password"
-              className="w-full p-3 border rounded pr-10"
+              className="w-full p-3 border rounded pr-10 bg-white text-gray-900"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -134,7 +134,7 @@ export default function SignUpForm() {
             <input
               type={showConfirmPwd ? "text" : "password"}
               placeholder="Confirm Password"
-              className="w-full p-3 border rounded pr-10"
+              className="w-full p-3 border rounded pr-10 bg-white text-gray-900"
               value={confirmPwd}
               onChange={(e) => setConfirmPwd(e.target.value)}
               required
@@ -149,7 +149,7 @@ export default function SignUpForm() {
           </div>
 
           <select
-            className="w-full p-3 border rounded"
+            className="w-full p-3 border rounded bg-white text-gray-900"
             value={city}
             onChange={(e) => setCity(e.target.value)}
           >

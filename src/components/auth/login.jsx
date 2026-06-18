@@ -62,7 +62,7 @@ export default function Login() {
             <input
               type="email"
               placeholder="you@example.com"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -85,7 +85,7 @@ export default function Login() {
               <input
                 type={showPwd ? "text" : "password"}
                 placeholder="••••••••"
-                className="flex-1 px-4 py-3 text-sm outline-none border-none bg-transparent"
+                className="flex-1 px-4 py-3 text-sm outline-none border-none bg-transparent text-gray-900"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

@@ -120,14 +120,14 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
     if (escrow.released_at) {
       return {
         label: 'Released',
-        color: 'bg-green-100 text-green-800',
+        color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
         icon: CheckCircle
       };
     }
     
     return {
       label: 'Pending',
-      color: 'bg-yellow-100 text-yellow-800',
+      color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
       icon: AlertCircle
     };
   };
@@ -261,25 +261,25 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
       {/* Header */}
       <div className="flex flex-wrap gap-4 justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Shield className="w-6 h-6" />
             Escrow Management
           </h2>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
             Manage COD funds held for delivery partners
           </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={handleExport}
-            className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center gap-2 text-sm"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 flex items-center gap-2 text-sm"
           >
             <Download className="w-4 h-4" />
             Export
           </button>
           <button
             onClick={onRefresh}
-            className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center gap-2 text-sm"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 flex items-center gap-2 text-sm"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -298,48 +298,48 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg border">
-          <p className="text-sm text-gray-600">Total Escrows</p>
-          <p className="text-2xl font-bold">{stats.total}</p>
-          <p className="text-xs text-gray-500 mt-1">{formatCurrency(stats.totalAmount)}</p>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+          <p className="text-sm text-gray-600 dark:text-gray-400">Total Escrows</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatCurrency(stats.totalAmount)}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg border">
-          <p className="text-sm text-gray-600">Pending Release</p>
-          <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
-          <p className="text-xs text-gray-500 mt-1">{formatCurrency(stats.pendingAmount)}</p>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+          <p className="text-sm text-gray-600 dark:text-gray-400">Pending Release</p>
+          <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.pending}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatCurrency(stats.pendingAmount)}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg border">
-          <p className="text-sm text-gray-600">Released</p>
-          <p className="text-2xl font-bold text-green-600">{stats.released}</p>
-          <p className="text-xs text-gray-500 mt-1">{formatCurrency(stats.releasedAmount)}</p>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+          <p className="text-sm text-gray-600 dark:text-gray-400">Released</p>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.released}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatCurrency(stats.releasedAmount)}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg border">
-          <p className="text-sm text-gray-600">Total Value</p>
-          <p className="text-2xl font-bold text-blue-600">{formatCurrency(stats.totalAmount)}</p>
-          <p className="text-xs text-gray-500 mt-1">All escrows combined</p>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+          <p className="text-sm text-gray-600 dark:text-gray-400">Total Value</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{formatCurrency(stats.totalAmount)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">All escrows combined</p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-lg border flex flex-wrap gap-4">
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 flex flex-wrap gap-4">
         <div className="flex-1 min-w-[200px]">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
               placeholder="Search by order number or company..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border rounded-lg w-full text-sm"
+              className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg w-full text-sm"
             />
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-gray-400" />
+          <Filter className="w-4 h-4 text-gray-400 dark:text-gray-500" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border rounded-lg min-w-[150px] text-sm"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg min-w-[150px] text-sm"
           >
             <option value="pending">Pending Only</option>
             <option value="released">Released</option>

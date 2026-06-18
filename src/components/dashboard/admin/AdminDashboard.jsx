@@ -266,12 +266,12 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-20">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto"></div>
-            <h2 className="mt-6 text-xl font-semibold text-gray-900">Loading Dashboard</h2>
-            <p className="mt-2 text-gray-600">Preparing your admin overview...</p>
+            <h2 className="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Loading Dashboard</h2>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">Preparing your admin overview...</p>
           </div>
         </div>
       </div>
@@ -279,20 +279,20 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-4 flex flex-wrap gap-3 justify-between items-center">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p className="text-sm md:text-base text-gray-600 mt-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">
               Welcome back, {user?.user_metadata?.full_name || user?.email}
             </p>
           </div>
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50 flex items-center gap-2 text-sm shadow-sm disabled:opacity-50"
+            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-sm shadow-sm disabled:opacity-50 text-gray-700 dark:text-gray-300"
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? 'Refreshing...' : 'Refresh All Data'}
@@ -300,26 +300,26 @@ const AdminDashboard = () => {
         </div>
 
         {/* Tabs Navigation */}
-        <div className="flex border-b mb-4 overflow-x-auto pb-0 bg-white rounded-t-lg px-1 -mx-1 scrollbar-hide">
+        <div className="flex border-b dark:border-gray-700 mb-4 overflow-x-auto pb-0 bg-white dark:bg-gray-800 rounded-t-lg px-1 -mx-1 scrollbar-hide">
           {tabs.map(tab => (
             <button
               key={tab.key}
               className={`px-3 py-2.5 font-medium whitespace-nowrap flex items-center gap-2 text-xs sm:text-sm transition-all ${
-                activeTab === tab.key 
-                  ? 'border-b-2 border-blue-500 text-blue-600 -mb-px' 
-                  : 'text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300'
+                activeTab === tab.key
+                  ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400 -mb-px'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-b-2 hover:border-gray-300 dark:hover:border-gray-600'
               }`}
               onClick={() => setActiveTab(tab.key)}
             >
               <tab.icon className="w-4 h-4" />
               {tab.label}
               {tab.key === TABS.INVOICES && stats.pendingInvoices > 0 && (
-                <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 rounded-full">
                   {stats.pendingInvoices}
                 </span>
               )}
               {tab.key === TABS.RETURNED && stats.pendingReturnedProducts > 0 && (
-                <span className="ml-2 px-2 py-0.5 text-xs bg-orange-500 text-white rounded-full font-bold">
+                <span className="ml-2 px-2 py-0.5 text-xs bg-kraft-500 dark:bg-kraft-600 text-white rounded-full font-bold">
                   {stats.pendingReturnedProducts}
                 </span>
               )}
@@ -328,7 +328,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow-sm p-3 sm:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 sm:p-6">
           {activeTab === TABS.OVERVIEW && (
             <OverviewSection 
               stats={stats}

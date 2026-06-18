@@ -224,7 +224,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 px-6 py-4 border-b border-amber-100 sticky top-0">
+        <div className="bg-gradient-to-r from-amber-50 to-kraft-50 px-6 py-4 border-b border-amber-100 sticky top-0">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-gray-800">Place B2B Order</h2>
             <button onClick={onClose} className="p-1 hover:bg-amber-100 rounded-lg">
@@ -297,7 +297,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
                   <span>Your Markup Amount:</span>
                   <span className="font-bold text-green-600">+{prices.markupAmount.toFixed(2)} MAD</span>
                 </div>
-                <div className="flex justify-between text-sm text-orange-600 border-t pt-2">
+                <div className="flex justify-between text-sm text-kraft-600 border-t pt-2">
                   <span>Dealtock Fee ({prices.commissionRate}%):</span>
                   <span className="font-bold">-{prices.commissionAmount.toFixed(2)} MAD</span>
                 </div>
@@ -334,7 +334,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
             type="button"
             onClick={handleSubmit}
             disabled={loading || loadingCommission || markupPercent <= 0}
-            className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white py-3 rounded-lg font-medium hover:from-amber-700 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-r from-amber-600 to-kraft-600 text-white py-3 rounded-lg font-medium hover:from-amber-700 hover:to-kraft-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               <>

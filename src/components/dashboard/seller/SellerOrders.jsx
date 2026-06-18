@@ -141,54 +141,54 @@ const handleMarkReady = async (orderId) => {
 };
   const getStatusBadge = (status) => {
     const badges = {
-      'ordered': { 
-        color: 'bg-yellow-100 text-yellow-800', 
-        icon: Clock, 
+      'ordered': {
+        color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400',
+        icon: Clock,
         label: 'Pending Approval'
       },
-      'approved': { 
-        color: 'bg-blue-100 text-blue-800', 
-        icon: CheckCircle, 
+      'approved': {
+        color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400',
+        icon: CheckCircle,
         label: 'Approved'
       },
-      'ready': { 
-        color: 'bg-green-100 text-green-800', 
-        icon: Package, 
+      'ready': {
+        color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400',
+        icon: Package,
         label: 'Ready for Pickup'
       },
-      'ready_for_pickup': { 
-        color: 'bg-green-100 text-green-800', 
-        icon: Package, 
+      'ready_for_pickup': {
+        color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400',
+        icon: Package,
         label: 'Ready for Pickup'
       },
-      'picked_up': { 
-        color: 'bg-indigo-100 text-indigo-800', 
-        icon: Truck, 
+      'picked_up': {
+        color: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400',
+        icon: Truck,
         label: 'Picked Up'
       },
-      'with_delivery_partner': { 
-        color: 'bg-indigo-100 text-indigo-800', 
-        icon: Truck, 
+      'with_delivery_partner': {
+        color: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400',
+        icon: Truck,
         label: 'With Delivery Partner'
       },
-      'in_transit': { 
-        color: 'bg-indigo-100 text-indigo-800', 
-        icon: Truck, 
+      'in_transit': {
+        color: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400',
+        icon: Truck,
         label: 'In Transit'
       },
-      'out_for_delivery': { 
-        color: 'bg-blue-100 text-blue-800', 
-        icon: Truck, 
+      'out_for_delivery': {
+        color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400',
+        icon: Truck,
         label: 'Out for Delivery'
       },
-      'delivered': { 
-        color: 'bg-green-100 text-green-800', 
-        icon: CheckCircle, 
+      'delivered': {
+        color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400',
+        icon: CheckCircle,
         label: 'Delivered'
       },
-      'cancelled': { 
-        color: 'bg-gray-100 text-gray-800', 
-        icon: AlertCircle, 
+      'cancelled': {
+        color: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300',
+        icon: AlertCircle,
         label: 'Cancelled'
       }
     };
@@ -208,12 +208,12 @@ const handleMarkReady = async (orderId) => {
     const isProcessing = processingId === order.id;
 
     return (
-      <div className="flex gap-2 border-t pt-3">
+      <div className="flex gap-2 border-t border-gray-200 dark:border-gray-700 pt-3">
         {order.status === 'ordered' && (
           <button
             onClick={() => handleApproveOrder(order.id)}
             disabled={isProcessing}
-            className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 text-sm font-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isProcessing ? (
               <RefreshCw className="w-4 h-4 animate-spin" />
@@ -223,12 +223,12 @@ const handleMarkReady = async (orderId) => {
             Approve Order
           </button>
         )}
-        
+
         {order.status === 'approved' && (
           <button
             onClick={() => handleMarkReady(order.id)}
             disabled={isProcessing}
-            className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 text-sm font-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isProcessing ? (
               <RefreshCw className="w-4 h-4 animate-spin" />
@@ -238,23 +238,23 @@ const handleMarkReady = async (orderId) => {
             Mark Ready for Pickup
           </button>
         )}
-        
+
         {/* Tracking link for orders with delivery partner */}
         {order.delivery_tracking_number && (
           <a
             href={`https://partners.olivraison.com/tracking/${order.delivery_tracking_number}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium transition flex items-center gap-2"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium transition flex items-center gap-2 text-gray-700 dark:text-gray-200"
           >
             <ExternalLink className="w-4 h-4" />
             Track
           </a>
         )}
-        
+
         <button
           onClick={() => setSelectedOrder(order)}
-          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium transition"
+          className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium transition text-gray-700 dark:text-gray-200"
         >
           <Eye className="w-4 h-4" />
         </button>
@@ -265,8 +265,8 @@ const handleMarkReady = async (orderId) => {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading orders...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+        <p className="mt-4 text-gray-600 dark:text-gray-400">Loading orders...</p>
       </div>
     );
   }
@@ -274,57 +274,57 @@ const handleMarkReady = async (orderId) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-900">Orders to Fulfill</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Orders to Fulfill</h2>
         <button
           onClick={fetchOrders}
-          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
+          className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition"
           title="Refresh"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
-      
+
       {orders.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">No orders yet</p>
-          <p className="text-sm text-gray-400 mt-1">
+        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <Package className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">No orders yet</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
             When dropshippers order your products, they'll appear here
           </p>
         </div>
       ) : (
         <div className="grid gap-4">
           {orders.map((order) => (
-            <div key={order.id} className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition">
+            <div key={order.id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition">
               {/* Order Header */}
               <div className="flex flex-wrap gap-4 justify-between items-start mb-3">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm text-gray-500">Order #{order.order_number || order.id.substring(0, 8)}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Order #{order.order_number || order.id.substring(0, 8)}</span>
                     {getStatusBadge(order.status)}
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                     {new Date(order.created_at).toLocaleDateString()} at {new Date(order.created_at).toLocaleTimeString()}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-lg text-green-600">{order.final_customer_price?.toFixed(2)} MAD</p>
-                  <p className="text-xs text-gray-500">Total amount</p>
+                  <p className="font-bold text-lg text-green-600 dark:text-green-400">{order.final_customer_price?.toFixed(2)} MAD</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Total amount</p>
                 </div>
               </div>
 
               {/* Product Info */}
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg mb-3">
-                <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg mb-3">
+                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
                   {order.products?.image_url ? (
                     <img src={order.products.image_url} alt={order.products.name} className="w-full h-full object-cover" />
                   ) : (
-                    <Package className="w-full h-full p-2 text-gray-400" />
+                    <Package className="w-full h-full p-2 text-gray-400 dark:text-gray-500" />
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900">{order.products?.name}</p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
+                  <p className="font-medium text-gray-900 dark:text-white">{order.products?.name}</p>
+                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mt-1">
                     <span>Quantity: {order.ordered_quantity || 1}</span>
                     <span className="flex items-center gap-1">
                       <MapPin className="w-3 h-3" />
@@ -337,27 +337,27 @@ const handleMarkReady = async (orderId) => {
               {/* Customer & Delivery Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 <div className="text-sm">
-                  <p className="font-medium text-gray-700 mb-1 flex items-center gap-1">
+                  <p className="font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
                     <User className="w-4 h-4" />
                     Customer
                   </p>
-                  <p className="text-gray-600">{order.shipping_address?.name || order.dropshipper?.full_name || 'N/A'}</p>
-                  <p className="text-gray-500 text-xs flex items-center gap-1 mt-1">
+                  <p className="text-gray-600 dark:text-gray-400">{order.shipping_address?.name || order.dropshipper?.full_name || 'N/A'}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs flex items-center gap-1 mt-1">
                     <Phone className="w-3 h-3" />
                     {order.shipping_address?.phone || order.dropshipper?.phone || 'N/A'}
                   </p>
                 </div>
                 <div className="text-sm">
-                  <p className="font-medium text-gray-700 mb-1 flex items-center gap-1">
+                  <p className="font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
                     <Truck className="w-4 h-4" />
                     Delivery
                   </p>
-                  <p className="text-gray-600">{order.delivery_company?.name || 'Not assigned'}</p>
-                  <p className="text-gray-500 text-xs mt-1">
+                  <p className="text-gray-600 dark:text-gray-400">{order.delivery_company?.name || 'Not assigned'}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
                     To: {order.shipping_address?.city || order.city || 'N/A'}
                   </p>
                   {order.delivery_tracking_number && (
-                    <p className="text-xs text-blue-600 mt-1">
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                       Tracking: {order.delivery_tracking_number}
                     </p>
                   )}
@@ -374,94 +374,94 @@ const handleMarkReady = async (orderId) => {
       {/* Order Details Modal */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={() => setSelectedOrder(null)}>
-          <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
-              <h3 className="text-xl font-bold">Order Details</h3>
-              <button 
-                onClick={() => setSelectedOrder(null)} 
-                className="p-2 hover:bg-gray-100 rounded-lg"
+          <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Order Details</h3>
+              <button
+                onClick={() => setSelectedOrder(null)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            
+
             <div className="p-6 space-y-6">
               {/* Order Information */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Order Number</p>
-                  <p className="font-medium">{selectedOrder.order_number || selectedOrder.id.substring(0, 8)}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Order Number</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.order_number || selectedOrder.id.substring(0, 8)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Order Date</p>
-                  <p className="font-medium">{new Date(selectedOrder.created_at).toLocaleDateString()}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Order Date</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{new Date(selectedOrder.created_at).toLocaleDateString()}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Status</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
                   <div className="mt-1">{getStatusBadge(selectedOrder.status)}</div>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Payment Method</p>
-                  <p className="font-medium">{selectedOrder.payment_method || 'COD'}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Payment Method</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.payment_method || 'COD'}</p>
                 </div>
               </div>
 
               {/* Customer Information */}
-              <div className="border-t pt-4">
-                <h4 className="font-semibold mb-3 flex items-center gap-2">
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <h4 className="font-semibold mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
                   <User className="w-4 h-4" />
                   Customer Information
                 </h4>
-                <div className="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-lg">
+                <div className="grid grid-cols-2 gap-3 bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">
                   <div>
-                    <p className="text-xs text-gray-500">Name</p>
-                    <p className="text-sm font-medium">{selectedOrder.shipping_address?.name || selectedOrder.dropshipper?.full_name || 'N/A'}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Name</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedOrder.shipping_address?.name || selectedOrder.dropshipper?.full_name || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Phone</p>
-                    <p className="text-sm font-medium">{selectedOrder.shipping_address?.phone || selectedOrder.dropshipper?.phone || 'N/A'}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedOrder.shipping_address?.phone || selectedOrder.dropshipper?.phone || 'N/A'}</p>
                   </div>
                   <div className="col-span-2">
-                    <p className="text-xs text-gray-500">Address</p>
-                    <p className="text-sm font-medium">{selectedOrder.shipping_address?.address || 'N/A'}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Address</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedOrder.shipping_address?.address || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">City</p>
-                    <p className="text-sm font-medium">{selectedOrder.shipping_address?.city || selectedOrder.city || 'N/A'}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">City</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedOrder.shipping_address?.city || selectedOrder.city || 'N/A'}</p>
                   </div>
                 </div>
               </div>
 
               {/* Product Information */}
-              <div className="border-t pt-4">
-                <h4 className="font-semibold mb-3 flex items-center gap-2">
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <h4 className="font-semibold mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
                   <Package className="w-4 h-4" />
                   Product Information
                 </h4>
-                <div className="bg-gray-50 p-3 rounded-lg flex gap-3">
-                  <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg flex gap-3">
+                  <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
                     {selectedOrder.products?.image_url ? (
                       <img src={selectedOrder.products.image_url} alt={selectedOrder.products.name} className="w-full h-full object-cover" />
                     ) : (
-                      <Package className="w-full h-full p-3 text-gray-400" />
+                      <Package className="w-full h-full p-3 text-gray-400 dark:text-gray-500" />
                     )}
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium">{selectedOrder.products?.name}</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.products?.name}</p>
                     <div className="grid grid-cols-3 gap-2 mt-2 text-sm">
                       <div>
-                        <p className="text-xs text-gray-500">Quantity</p>
-                        <p className="font-medium">{selectedOrder.ordered_quantity || 1}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Quantity</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.ordered_quantity || 1}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Unit Price</p>
-                        <p className="font-medium">{selectedOrder.product_price?.toFixed(2)} MAD</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Unit Price</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.product_price?.toFixed(2)} MAD</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Total</p>
-                        <p className="font-medium text-green-600">{selectedOrder.final_customer_price?.toFixed(2)} MAD</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Total</p>
+                        <p className="font-medium text-green-600 dark:text-green-400">{selectedOrder.final_customer_price?.toFixed(2)} MAD</p>
                       </div>
                     </div>
                   </div>
@@ -469,28 +469,28 @@ const handleMarkReady = async (orderId) => {
               </div>
 
               {/* Delivery Information */}
-              <div className="border-t pt-4">
-                <h4 className="font-semibold mb-3 flex items-center gap-2">
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <h4 className="font-semibold mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
                   <Truck className="w-4 h-4" />
                   Delivery Information
                 </h4>
-                <div className="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-lg">
+                <div className="grid grid-cols-2 gap-3 bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">
                   <div>
-                    <p className="text-xs text-gray-500">Delivery Company</p>
-                    <p className="text-sm font-medium">{selectedOrder.delivery_company?.name || 'Not assigned'}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Delivery Company</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedOrder.delivery_company?.name || 'Not assigned'}</p>
                   </div>
                   {selectedOrder.delivery_tracking_number && (
                     <>
                       <div>
-                        <p className="text-xs text-gray-500">Tracking Number</p>
-                        <p className="text-sm font-medium">{selectedOrder.delivery_tracking_number}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Tracking Number</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedOrder.delivery_tracking_number}</p>
                       </div>
                       <div className="col-span-2">
                         <a
                           href={`https://partners.olivraison.com/tracking/${selectedOrder.delivery_tracking_number}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm flex items-center gap-1"
                         >
                           <ExternalLink className="w-3 h-3" />
                           Track Package
@@ -502,28 +502,28 @@ const handleMarkReady = async (orderId) => {
               </div>
 
               {/* Order Timeline */}
-              <div className="border-t pt-4">
-                <h4 className="font-semibold mb-3">Order Timeline</h4>
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">Order Timeline</h4>
                 <div className="space-y-2">
-                  <div className="flex gap-2 text-sm">
-                    <span className="text-gray-500 w-24">Created:</span>
+                  <div className="flex gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <span className="text-gray-500 dark:text-gray-400 w-24">Created:</span>
                     <span>{new Date(selectedOrder.created_at).toLocaleString()}</span>
                   </div>
                   {selectedOrder.approved_at && (
-                    <div className="flex gap-2 text-sm">
-                      <span className="text-gray-500 w-24">Approved:</span>
+                    <div className="flex gap-2 text-sm text-gray-700 dark:text-gray-300">
+                      <span className="text-gray-500 dark:text-gray-400 w-24">Approved:</span>
                       <span>{new Date(selectedOrder.approved_at).toLocaleString()}</span>
                     </div>
                   )}
                   {selectedOrder.ready_at && (
-                    <div className="flex gap-2 text-sm">
-                      <span className="text-gray-500 w-24">Ready:</span>
+                    <div className="flex gap-2 text-sm text-gray-700 dark:text-gray-300">
+                      <span className="text-gray-500 dark:text-gray-400 w-24">Ready:</span>
                       <span>{new Date(selectedOrder.ready_at).toLocaleString()}</span>
                     </div>
                   )}
                   {selectedOrder.delivered_at && (
-                    <div className="flex gap-2 text-sm">
-                      <span className="text-gray-500 w-24">Delivered:</span>
+                    <div className="flex gap-2 text-sm text-gray-700 dark:text-gray-300">
+                      <span className="text-gray-500 dark:text-gray-400 w-24">Delivered:</span>
                       <span>{new Date(selectedOrder.delivered_at).toLocaleString()}</span>
                     </div>
                   )}

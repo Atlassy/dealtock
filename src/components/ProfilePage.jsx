@@ -283,8 +283,8 @@ export default function ProfilePage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading profile...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600 dark:text-blue-400 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Loading profile...</p>
         </div>
       </div>
     );
@@ -294,8 +294,8 @@ export default function ProfilePage() {
     <div className="max-w-6xl mx-auto p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-        <p className="text-gray-600 mt-1">Manage your personal information and account settings</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Profile</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your personal information and account settings</p>
       </div>
 
       {/* Profile Header with Avatar */}
@@ -314,8 +314,8 @@ export default function ProfilePage() {
                 <User className="w-12 h-12 text-white" />
               )}
             </div>
-            <label className="absolute bottom-0 right-0 p-1 bg-white rounded-full cursor-pointer shadow-lg hover:bg-gray-100 transition">
-              <Camera className="w-4 h-4 text-gray-600" />
+            <label className="absolute bottom-0 right-0 p-1 bg-white dark:bg-gray-800 rounded-full cursor-pointer shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+              <Camera className="w-4 h-4 text-gray-600 dark:text-gray-300" />
               <input
                 type="file"
                 className="hidden"
@@ -358,13 +358,13 @@ export default function ProfilePage() {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex border-b mb-6 overflow-x-auto">
+      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6 overflow-x-auto">
         <button
           onClick={() => setActiveTab('profile')}
           className={`px-4 py-2 font-medium transition flex items-center gap-2 ${
             activeTab === 'profile'
-              ? 'border-b-2 border-blue-500 text-blue-600'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
           }`}
         >
           <User className="w-4 h-4" />
@@ -374,8 +374,8 @@ export default function ProfilePage() {
           onClick={() => setActiveTab('business')}
           className={`px-4 py-2 font-medium transition flex items-center gap-2 ${
             activeTab === 'business'
-              ? 'border-b-2 border-blue-500 text-blue-600'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
           }`}
         >
           <Building className="w-4 h-4" />
@@ -385,8 +385,8 @@ export default function ProfilePage() {
           onClick={() => setActiveTab('security')}
           className={`px-4 py-2 font-medium transition flex items-center gap-2 ${
             activeTab === 'security'
-              ? 'border-b-2 border-blue-500 text-blue-600'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
           }`}
         >
           <Shield className="w-4 h-4" />
@@ -398,58 +398,58 @@ export default function ProfilePage() {
       <div>
         {/* Profile Tab */}
         {activeTab === 'profile' && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-6 space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Mail className="w-4 h-4 inline mr-1" />
                   Email Address
                 </label>
                 <input
                   disabled
                   value={profile.email || user?.email || ""}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                  className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400 cursor-not-allowed"
                 />
-                <p className="text-xs text-gray-400 mt-1">Go to Security tab to change email</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Go to Security tab to change email</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <User className="w-4 h-4 inline mr-1" />
                   Full Name
                 </label>
                 <input
                   disabled
                   value={profile.full_name || ""}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                  className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400 cursor-not-allowed"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Phone className="w-4 h-4 inline mr-1" />
                   Phone Number
                 </label>
                 <input
                   value={profile.phone || ""}
                   onChange={(e) => handleChange("phone", e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                    editedFields.phone ? "border-blue-400 bg-blue-50" : "border-gray-200"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white ${
+                    editedFields.phone ? "border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-700"
                   }`}
                   placeholder="+212 6XX XX XX XX"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <MapPin className="w-4 h-4 inline mr-1" />
                   City
                 </label>
                 <select
                   value={profile.city || ""}
                   onChange={(e) => handleChange("city", e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                    editedFields.city ? "border-blue-400 bg-blue-50" : "border-gray-200"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white ${
+                    editedFields.city ? "border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-700"
                   }`}
                 >
                   <option value="">Select your city</option>
@@ -460,7 +460,7 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Home className="w-4 h-4 inline mr-1" />
                   Address
                 </label>
@@ -468,8 +468,8 @@ export default function ProfilePage() {
                   value={profile.address || ""}
                   onChange={(e) => handleChange("address", e.target.value)}
                   rows="2"
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                    editedFields.address ? "border-blue-400 bg-blue-50" : "border-gray-200"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white ${
+                    editedFields.address ? "border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-700"
                   }`}
                   placeholder="Your street address"
                 />
@@ -480,7 +480,7 @@ export default function ProfilePage() {
                 disabled={saving || Object.keys(editedFields).length === 0}
                 className={`w-full py-3 px-4 rounded-lg font-medium transition flex items-center justify-center gap-2 ${
                   Object.keys(editedFields).length === 0
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                     : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800"
                 }`}
               >
@@ -502,65 +502,65 @@ export default function ProfilePage() {
 
         {/* Business Info Tab */}
         {activeTab === 'business' && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-6 space-y-5">
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Business Details</h3>
-                <p className="text-sm text-gray-500">Information about your business or store</p>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Business Details</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Information about your business or store</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Building className="w-4 h-4 inline mr-1" />
                   Company Name
                 </label>
                 <input
                   value={profile.company || ""}
                   onChange={(e) => handleChange("company", e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                    editedFields.company ? "border-blue-400 bg-blue-50" : "border-gray-200"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white ${
+                    editedFields.company ? "border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-700"
                   }`}
                   placeholder="Your company name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Store className="w-4 h-4 inline mr-1" />
                   Business Name
                 </label>
                 <input
                   value={profile.business_name || ""}
                   onChange={(e) => handleChange("business_name", e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                    editedFields.business_name ? "border-blue-400 bg-blue-50" : "border-gray-200"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white ${
+                    editedFields.business_name ? "border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-700"
                   }`}
                   placeholder="Your business name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <CreditCard className="w-4 h-4 inline mr-1" />
                   Tax ID / VAT Number
                 </label>
                 <input
                   value={profile.tax_id || ""}
                   onChange={(e) => handleChange("tax_id", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                   placeholder="Your tax identification number"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Globe className="w-4 h-4 inline mr-1" />
                   Website
                 </label>
                 <input
                   value={profile.website || ""}
                   onChange={(e) => handleChange("website", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                   placeholder="https://your-store.com"
                 />
               </div>
@@ -570,7 +570,7 @@ export default function ProfilePage() {
                 disabled={saving || Object.keys(editedFields).length === 0}
                 className={`w-full py-3 px-4 rounded-lg font-medium transition flex items-center justify-center gap-2 ${
                   Object.keys(editedFields).length === 0
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                     : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800"
                 }`}
               >
@@ -583,50 +583,50 @@ export default function ProfilePage() {
 
         {/* Security Tab */}
         {activeTab === 'security' && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-6 space-y-5">
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Security Settings</h3>
-                <p className="text-sm text-gray-500">Manage your account security</p>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Security Settings</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Manage your account security</p>
               </div>
 
               {/* Change Email Section */}
-              <div className="border border-gray-200 rounded-lg p-4">
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <MailIcon className="w-5 h-5 text-gray-500" />
+                    <MailIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     <div>
-                      <p className="font-medium text-gray-900">Email Address</p>
-                      <p className="text-sm text-gray-500">Current: {user?.email}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">Email Address</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Current: {user?.email}</p>
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setShowEmailForm(!showEmailForm)}
-                    className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                    className="px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
                   >
                     {showEmailForm ? "Cancel" : "Change Email"}
                   </button>
                 </div>
-                
+
                 {showEmailForm && (
-                  <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
+                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">New Email Address</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Email Address</label>
                       <input
                         type="email"
                         value={emailData.newEmail}
                         onChange={(e) => setEmailData({...emailData, newEmail: e.target.value})}
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                         placeholder="newemail@example.com"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Email</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm New Email</label>
                       <input
                         type="email"
                         value={emailData.confirmEmail}
                         onChange={(e) => setEmailData({...emailData, confirmEmail: e.target.value})}
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg"
+                        className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                         placeholder="Confirm new email"
                       />
                     </div>
@@ -643,70 +643,70 @@ export default function ProfilePage() {
               </div>
 
               {/* Change Password Section */}
-              <div className="border border-gray-200 rounded-lg p-4">
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <Lock className="w-5 h-5 text-gray-500" />
+                    <Lock className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     <div>
-                      <p className="font-medium text-gray-900">Password</p>
-                      <p className="text-sm text-gray-500">Change your password</p>
+                      <p className="font-medium text-gray-900 dark:text-white">Password</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Change your password</p>
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setShowPasswordForm(!showPasswordForm)}
-                    className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                    className="px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
                   >
                     {showPasswordForm ? "Cancel" : "Change Password"}
                   </button>
                 </div>
-                
+
                 {showPasswordForm && (
-                  <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
+                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
                       <div className="relative">
                         <input
                           type={showCurrentPassword ? "text" : "password"}
                           value={passwordData.currentPassword}
                           onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 pr-10"
+                          className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 pr-10 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                           placeholder="Enter current password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                         >
                           {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
                       <div className="relative">
                         <input
                           type={showNewPassword ? "text" : "password"}
                           value={passwordData.newPassword}
                           onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 pr-10"
+                          className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 pr-10 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                           placeholder="At least 6 characters"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                         >
                           {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm New Password</label>
                       <input
                         type="password"
                         value={passwordData.confirmPassword}
                         onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg"
+                        className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                         placeholder="Confirm new password"
                       />
                     </div>
@@ -728,7 +728,7 @@ export default function ProfilePage() {
 
       {/* Premium Status Banner */}
       {profile.subscription_tier === 'premium' && (
-        <div className="mt-6 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-4 text-white">
+        <div className="mt-6 bg-kraft-700 rounded-xl p-4 text-white">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <Award className="w-6 h-6" />
@@ -737,7 +737,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-white/80">Enjoy exclusive benefits and lower commission rates</p>
               </div>
             </div>
-            <button className="px-4 py-2 bg-white text-orange-600 rounded-lg font-medium hover:bg-white/90 transition">
+            <button className="px-4 py-2 bg-white text-kraft-600 rounded-lg font-medium hover:bg-white/90 transition">
               View Benefits
             </button>
           </div>

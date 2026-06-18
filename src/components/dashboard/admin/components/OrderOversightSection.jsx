@@ -316,7 +316,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
         </div>
         <div className="bg-white p-4 rounded-lg border">
           <p className="text-sm text-gray-600">Returns/Failed</p>
-          <p className="text-2xl font-bold text-orange-600">
+          <p className="text-2xl font-bold text-kraft-600">
             {orderStats.byStatus.returned + orderStats.byStatus.failed}
           </p>
           <p className="text-xs text-gray-500 mt-1">Issues to resolve</p>

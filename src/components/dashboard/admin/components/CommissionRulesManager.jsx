@@ -263,17 +263,17 @@ const CommissionRulesManager = () => {
   const getAppliesToColor = (appliesTo) => {
     switch (appliesTo) {
       case 'B2C':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
       case 'Seller':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
       case 'dropshipper':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
       case 'Pro_Seller':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
       case 'Pro_dropshipper':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-kraft-100 text-kraft-800 dark:bg-kraft-900/30 dark:text-kraft-400';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
     }
   };
 
@@ -282,18 +282,18 @@ const CommissionRulesManager = () => {
       {/* Header */}
       <div className="flex flex-wrap gap-4 justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Percent className="w-6 h-6" />
             Commission Rules Management
           </h2>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
             Configure platform fees for B2C, Sellers, Dropshippers, and Premium users
           </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={loadCommissionData}
-            className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center gap-2 text-sm"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 flex items-center gap-2 text-sm"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -313,29 +313,29 @@ const CommissionRulesManager = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600">Total Rules</p>
-          <p className="text-2xl font-bold">{stats.total}</p>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+          <p className="text-sm text-gray-600 dark:text-gray-400">Total Rules</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600">Active Rules</p>
-          <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+          <p className="text-sm text-gray-600 dark:text-gray-400">Active Rules</p>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.active}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600">B2C Rules</p>
-          <p className="text-2xl font-bold text-green-600">{stats.b2c}</p>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+          <p className="text-sm text-gray-600 dark:text-gray-400">B2C Rules</p>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.b2c}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600">Seller Rules</p>
-          <p className="text-2xl font-bold text-blue-600">{stats.seller}</p>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+          <p className="text-sm text-gray-600 dark:text-gray-400">Seller Rules</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.seller}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600">Dropshipper Rules</p>
-          <p className="text-2xl font-bold text-purple-600">{stats.dropshipper}</p>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+          <p className="text-sm text-gray-600 dark:text-gray-400">Dropshipper Rules</p>
+          <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.dropshipper}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600">Premium Rules</p>
-          <p className="text-2xl font-bold text-yellow-600">{stats.proSeller + stats.proDropshipper}</p>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+          <p className="text-sm text-gray-600 dark:text-gray-400">Premium Rules</p>
+          <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.proSeller + stats.proDropshipper}</p>
         </div>
       </div>
 
@@ -343,26 +343,26 @@ const CommissionRulesManager = () => {
       {loading ? (
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading commission rules...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading commission rules...</p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
-                  <th className="text-left p-4 font-medium text-sm">Applies To</th>
-                  <th className="text-left p-4 font-medium text-sm">Category</th>
-                  <th className="text-left p-4 font-medium text-sm">Commission %</th>
-                  <th className="text-left p-4 font-medium text-sm">Order Range (MAD)</th>
-                  <th className="text-left p-4 font-medium text-sm">Valid Period</th>
-                  <th className="text-left p-4 font-medium text-sm">Status</th>
-                  <th className="text-left p-4 font-medium text-sm">Actions</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Applies To</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Category</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Commission %</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Order Range (MAD)</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Valid Period</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Status</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {rules.map((rule) => (
-                  <tr key={rule.id} className="border-t hover:bg-gray-50">
+                  <tr key={rule.id} className="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="p-4">
                       <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getAppliesToColor(rule.applies_to)}`}>
                         {getAppliesToIcon(rule.applies_to)}
@@ -371,19 +371,19 @@ const CommissionRulesManager = () => {
                          rule.applies_to}
                       </span>
                     </td>
-                    <td className="p-4 text-sm">
+                    <td className="p-4 text-sm text-gray-700 dark:text-gray-300">
                       {getCategoryName(rule)}
                     </td>
                     <td className="p-4 font-medium">
-                      <span className="text-blue-600 font-bold">{rule.percentage}%</span>
+                      <span className="text-blue-600 dark:text-blue-400 font-bold">{rule.percentage}%</span>
                     </td>
-                    <td className="p-4 text-sm text-gray-600">
+                    <td className="p-4 text-sm text-gray-600 dark:text-gray-400">
                       {rule.min_amount !== null ? `${rule.min_amount} MAD` : '0 MAD'} - {rule.max_amount !== null ? `${rule.max_amount} MAD` : '∞'}
                     </td>
-                    <td className="p-4 text-sm">
+                    <td className="p-4 text-sm text-gray-700 dark:text-gray-300">
                       <div>{new Date(rule.valid_from).toLocaleDateString()}</div>
                       {rule.valid_to && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
                           to {new Date(rule.valid_to).toLocaleDateString()}
                         </div>
                       )}
@@ -392,9 +392,9 @@ const CommissionRulesManager = () => {
                       <button
                         onClick={() => handleToggleActive(rule)}
                         className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors ${
-                          rule.is_active 
-                            ? 'bg-green-100 text-green-800 hover:bg-green-200' 
-                            : 'bg-red-100 text-red-800 hover:bg-red-200'
+                          rule.is_active
+                            ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50'
+                            : 'bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50'
                         }`}
                       >
                         {rule.is_active ? 'Active' : 'Inactive'}
@@ -404,14 +404,14 @@ const CommissionRulesManager = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleEditRule(rule)}
-                          className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                          className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors"
                           title="Edit"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteRule(rule.id)}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                          className="p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
                           title="Delete"
                         >
                           <Trash2 className="w-4 h-4" />

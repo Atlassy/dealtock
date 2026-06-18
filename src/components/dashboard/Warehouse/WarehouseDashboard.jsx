@@ -4,12 +4,12 @@ import { useAuth } from "../../../contexts/SupabaseAuthContext";
 
 const WarehouseDashboard = () => {
   const { user } = useAuth();
-  
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <h1 className="text-2xl font-bold mb-4">Warehouse Dashboard</h1>
-      <p className="text-gray-600">Welcome, {user?.email}</p>
-      <p className="text-gray-600 mt-4">Warehouse management features coming soon...</p>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
+      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Warehouse Dashboard</h1>
+      <p className="text-gray-600 dark:text-gray-300">Welcome, {user?.email}</p>
+      <p className="text-gray-600 dark:text-gray-300 mt-4">Warehouse management features coming soon...</p>
     </div>
   );
 };

@@ -236,7 +236,7 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
           <p className="text-sm text-gray-500 mb-1">Dealtock Fees</p>
-          <p className="text-2xl font-bold text-orange-600">{formatCurrency(earnings.dealtockFees)}</p>
+          <p className="text-2xl font-bold text-kraft-600">{formatCurrency(earnings.dealtockFees)}</p>
           <p className="text-xs text-gray-400 mt-2">{earnings.averageCommission.toFixed(1)}% avg commission</p>
         </div>
 
@@ -271,7 +271,7 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Dealtock Fees:</span>
-              <span className="text-orange-600">-{formatCurrency(earnings.pendingGross - earnings.pendingNet)}</span>
+              <span className="text-kraft-600">-{formatCurrency(earnings.pendingGross - earnings.pendingNet)}</span>
             </div>
             <div className="flex justify-between font-bold pt-2 border-t">
               <span>Your Net:</span>
@@ -289,7 +289,7 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Dealtock Fees:</span>
-              <span className="text-orange-600">-{formatCurrency(earnings.paidGross - earnings.paidNet)}</span>
+              <span className="text-kraft-600">-{formatCurrency(earnings.paidGross - earnings.paidNet)}</span>
             </div>
             <div className="flex justify-between font-bold pt-2 border-t">
               <span>Your Net:</span>
@@ -369,7 +369,7 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
                     <p className="text-sm text-gray-600">
                       Gross: <span className="font-medium">{formatCurrency(transaction.dropshipper_markup)}</span>
                     </p>
-                    <p className="text-xs text-orange-600">
+                    <p className="text-xs text-kraft-600">
                       Fee: -{formatCurrency(transaction.dropshipper_commission_amount)}
                     </p>
                     <p className="font-bold text-green-600">

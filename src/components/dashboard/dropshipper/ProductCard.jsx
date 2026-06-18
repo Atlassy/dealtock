@@ -62,7 +62,7 @@ const ProductCard = ({ product, onPlaceOrder }) => {
   const getCommissionColor = () => {
     if (commissionRate <= 5) return 'text-green-600';
     if (commissionRate <= 8) return 'text-yellow-600';
-    if (commissionRate <= 10) return 'text-orange-600';
+    if (commissionRate <= 10) return 'text-kraft-600';
     return 'text-red-600';
   };
 
@@ -182,7 +182,7 @@ const ProductCard = ({ product, onPlaceOrder }) => {
                         {commissionRate}%
                       </span>
                     </span>
-                    <span className="font-medium text-orange-600">
+                    <span className="font-medium text-kraft-600">
                       -{commissionAmount.toFixed(2)} MAD
                     </span>
                   </div>

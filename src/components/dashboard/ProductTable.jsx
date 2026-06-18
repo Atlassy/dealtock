@@ -1,6 +1,6 @@
 // src/components/dashboard/ProductTable.jsx
 import React from 'react';
-import { Info, AlertTriangle , } from 'lucide-react';
+import { Info, AlertTriangle, Pencil, Trash2 } from 'lucide-react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
 
@@ -17,18 +17,18 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
 
   const getStatusColor = (status) => {
     switch(status?.toLowerCase()) {
-      case 'available': 
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'sold': 
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      default: 
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'available':
+        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border-green-200 dark:border-green-800';
+      case 'sold':
+        return 'bg-kraft-100 dark:bg-kraft-900/30 text-kraft-800 dark:text-kraft-400 border-kraft-200 dark:border-kraft-800';
+      default:
+        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-600';
     }
   };
 
   const getStockWarningClass = (quantity) => {
-    if (quantity <= 0) return 'bg-red-50';
-    if (quantity <= 3) return 'bg-yellow-50';
+    if (quantity <= 0) return 'bg-red-50 dark:bg-red-900/20';
+    if (quantity <= 3) return 'bg-yellow-50 dark:bg-yellow-900/20';
     return '';
   };
 
@@ -50,7 +50,7 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
   const renderSortableHeader = (label, column, width = 'auto') => {
     return (
       <th 
-        className={`text-left py-3 px-4 text-sm font-medium text-gray-700 cursor-pointer group hover:text-blue-600 transition-colors ${width}`}
+        className={`text-left py-2 px-2 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer group hover:text-blue-600 dark:hover:text-blue-400 transition-colors ${width}`}
         onClick={() => handleSort(column)}
       >
         <div className="flex items-center gap-1">
@@ -84,26 +84,26 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full bg-white rounded-lg shadow-sm">
+      <table className="w-full table-fixed bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50">
-            {renderSortableHeader('Product', 'name', 'min-w-[220px]')}
-            {renderSortableHeader('Category', 'category', 'min-w-[120px]')}
-            {renderSortableHeader('Location', 'location', 'min-w-[100px]')}
-            {renderSortableHeader('Qty', 'quantity', 'min-w-[80px]')}
-            {renderSortableHeader('Purchase Price', 'purchase_price', 'min-w-[100px]')}
-            {renderSortableHeader('Commission (MAD)', 'commission', 'min-w-[100px]')}
-            {renderSortableHeader('Commission Rate', 'commission_rate', 'min-w-[100px]')}
-            {renderSortableHeader('Est. Net Amount', 'net_amount', 'min-w-[120px]')}
-            {renderSortableHeader('Status', 'status', 'min-w-[100px]')}
-            <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 min-w-[140px]">Actions</th>
+          <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+            {renderSortableHeader('Product', 'name', 'w-[20%]')}
+            {renderSortableHeader('Category', 'category', 'w-[9%]')}
+            {renderSortableHeader('Location', 'location', 'w-[9%]')}
+            {renderSortableHeader('Qty', 'quantity', 'w-[6%]')}
+            {renderSortableHeader('Purchase Price', 'purchase_price', 'w-[10%]')}
+            {renderSortableHeader('Commission (MAD)', 'commission', 'w-[10%]')}
+            {renderSortableHeader('Commission Rate', 'commission_rate', 'w-[9%]')}
+            {renderSortableHeader('Est. Net Amount', 'net_amount', 'w-[10%]')}
+            {renderSortableHeader('Status', 'status', 'w-[9%]')}
+            <th className="text-left py-3 px-2 text-sm font-medium text-gray-700 dark:text-gray-300 w-[8%]">Actions</th>
            </tr>
         </thead>
         <tbody>
           {products.map((product, index) => {
             const stockWarning = product.quantity <= 3 && product.quantity > 0;
             const outOfStock = product.quantity <= 0;
-            const rowClass = `${getStockWarningClass(product.quantity)} ${index % 2 === 0 ? '' : 'bg-gray-50/50'} transition-colors`;
+            const rowClass = `${getStockWarningClass(product.quantity)} ${index % 2 === 0 ? '' : 'bg-gray-50/50 dark:bg-gray-900/40'} transition-colors`;
             
             const priceRangeText = product.commission_min_amount || product.commission_max_amount
               ? formatPriceRange(product.commission_min_amount, product.commission_max_amount)
@@ -118,95 +118,99 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
             return (
               <tr 
                 key={product.id} 
-                className={`border-b border-gray-100 hover:bg-gray-100 transition-colors ${rowClass}`}
+                className={`border-b border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${rowClass}`}
               >
-                <td className="py-3 px-4">
+                <td className="py-2 px-2">
                   <div className="flex items-center gap-3">
                     {product.image_url ? (
                       <img 
                         src={product.image_url} 
                         alt={product.name}
-                        className="w-10 h-10 rounded-lg object-cover border border-gray-200 flex-shrink-0"
+                        className="w-10 h-10 rounded-lg object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0"
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = 'https://via.placeholder.com/40?text=No+Image';
                         }}
                       />
                     ) : (
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200 flex-shrink-0">
-                        <span className="text-gray-400 text-xs">No img</span>
+                      <div className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-700 flex-shrink-0">
+                        <span className="text-gray-400 dark:text-gray-500 text-xs">No img</span>
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-gray-900 truncate">{product.name}</p>
+                      <p className="font-medium text-gray-900 dark:text-white truncate">{product.name}</p>
                       {product.sku && (
-                        <p className="text-xs text-gray-500">SKU: {product.sku}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">SKU: {product.sku}</p>
                       )}
                     </div>
                   </div>
                 </td>
-                <td className="py-3 px-4">
-                  <span className="text-gray-700 text-sm">{product.category || '-'}</span>
+                <td className="py-2 px-2">
+                  <span className="text-gray-700 dark:text-gray-300 text-sm truncate block">{product.category || '-'}</span>
                 </td>
-                <td className="py-3 px-4">
-                  <span className="text-gray-700 text-sm">{product.location || '-'}</span>
+                <td className="py-2 px-2">
+                  <span className="text-gray-700 dark:text-gray-300 text-sm truncate block">{product.location || '-'}</span>
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-2 px-2">
                   <div className="flex items-center gap-1">
-                    <span className={`font-medium text-gray-900 ${stockWarning ? 'text-orange-600' : ''} ${outOfStock ? 'text-red-600' : ''}`}>
+                    <span className={`font-medium text-gray-900 dark:text-white ${stockWarning ? 'text-kraft-600 dark:text-kraft-400' : ''} ${outOfStock ? 'text-red-600 dark:text-red-400' : ''}`}>
                       {product.quantity || product.quantity === 0 ? product.quantity : '-'}
                     </span>
                     {stockWarning && !outOfStock && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 text-xs rounded-full">
                         <AlertTriangle className="w-3 h-3" />
                         Low stock
                       </span>
                     )}
                     {outOfStock && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 text-xs rounded-full">
                         Out of stock
                       </span>
                     )}
                   </div>
                 </td>
-                <td className="py-3 px-4">
-                  <span className="font-medium text-gray-900 text-sm">{formatCurrency(product.purchase_price)}</span>
+                <td className="py-2 px-2">
+                  <span className="font-medium text-gray-900 dark:text-white text-sm">{formatCurrency(product.purchase_price)}</span>
                 </td>
-                <td className="py-3 px-4">
-                  <span className="font-medium text-red-600 text-sm">{formatCurrency(product.commission)}</span>
+                <td className="py-2 px-2">
+                  <span className="font-medium text-red-600 dark:text-red-400 text-sm">{formatCurrency(product.commission)}</span>
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-2 px-2">
                   <div className="flex items-center gap-1">
-                    <span className="font-medium text-blue-600 text-sm">
+                    <span className="font-medium text-blue-600 dark:text-blue-400 text-sm">
                       {product.commission_rate ? `${product.commission_rate}%` : '-'}
                     </span>
                     {product.commission_rate && renderTooltip(commissionTooltip)}
                   </div>
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-2 px-2">
                   <div className="flex items-center gap-1">
-                    <span className="font-medium text-green-600 text-sm">{formatCurrency(product.net_amount)}</span>
+                    <span className="font-medium text-green-600 dark:text-green-400 text-sm">{formatCurrency(product.net_amount)}</span>
                     {renderTooltip(netAmountTooltip)}
                   </div>
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-2 px-2">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(product.status)}`}>
                     {product.status === 'available' ? 'Available' : product.status === 'sold' ? 'Sold' : product.status}
                   </span>
                 </td>
-                <td className="py-3 px-4">
-                  <div className="flex gap-2">
+                <td className="py-2 px-2">
+                  <div className="flex gap-1.5">
                     <button
-                      className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm font-medium shadow-sm hover:shadow"
+                      className="p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow"
                       onClick={() => onEdit(product)}
+                      aria-label="Edit"
+                      title="Edit"
                     >
-                      Edit
+                      <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-sm font-medium shadow-sm hover:shadow"
+                      className="p-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all shadow-sm hover:shadow"
                       onClick={() => onDelete(product.id)}
+                      aria-label="Delete"
+                      title="Delete"
                     >
-                      Delete
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </td>
@@ -217,8 +221,8 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
       </table>
       
       {products.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-lg">
-          <p className="text-gray-500">No products found</p>
+        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg">
+          <p className="text-gray-500 dark:text-gray-400">No products found</p>
         </div>
       )}
     </div>

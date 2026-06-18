@@ -327,64 +327,64 @@ const DeliveryDashboard = () => {
   const getStatusBadge = (status) => {
     const badges = {
       ready: {
-        bg: "bg-blue-100",
-        text: "text-blue-800",
+        bg: "bg-blue-100 dark:bg-blue-900/30",
+        text: "text-blue-800 dark:text-blue-400",
         label: "Ready for Pickup",
         icon: Package
       },
       picked: {
-        bg: "bg-purple-100",
-        text: "text-purple-800",
+        bg: "bg-purple-100 dark:bg-purple-900/30",
+        text: "text-purple-800 dark:text-purple-400",
         label: "Picked Up",
         icon: Package
       },
       shipped: {
-        bg: "bg-indigo-100",
-        text: "text-indigo-800",
+        bg: "bg-indigo-100 dark:bg-indigo-900/30",
+        text: "text-indigo-800 dark:text-indigo-400",
         label: "Shipped",
         icon: Truck
       },
       in_transit: {
-        bg: "bg-yellow-100",
-        text: "text-yellow-800",
+        bg: "bg-yellow-100 dark:bg-yellow-900/30",
+        text: "text-yellow-800 dark:text-yellow-400",
         label: "In Transit",
         icon: Clock
       },
       out_for_delivery: {
-        bg: "bg-orange-100",
-        text: "text-orange-800",
+        bg: "bg-kraft-100 dark:bg-kraft-900/30",
+        text: "text-kraft-800 dark:text-kraft-400",
         label: "Out for Delivery",
         icon: Truck
       },
       delivered: {
-        bg: "bg-green-100",
-        text: "text-green-800",
+        bg: "bg-green-100 dark:bg-green-900/30",
+        text: "text-green-800 dark:text-green-400",
         label: "Delivered",
         icon: CheckCircle
       },
       settled: {
-        bg: "bg-gray-100",
-        text: "text-gray-800",
+        bg: "bg-gray-100 dark:bg-gray-700",
+        text: "text-gray-800 dark:text-gray-300",
         label: "Settled",
         icon: CheckCircle
       },
       returned: {
-        bg: "bg-red-100",
-        text: "text-red-800",
+        bg: "bg-red-100 dark:bg-red-900/30",
+        text: "text-red-800 dark:text-red-400",
         label: "Returned",
         icon: AlertCircle
       },
       cancelled: {
-        bg: "bg-red-100",
-        text: "text-red-800",
+        bg: "bg-red-100 dark:bg-red-900/30",
+        text: "text-red-800 dark:text-red-400",
         label: "Cancelled",
         icon: AlertCircle
       }
     };
-    
+
     const badge = badges[status] || badges.ready;
     const Icon = badge.icon;
-    
+
     return (
       <span className={`${badge.bg} ${badge.text} px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 inline-flex`}>
         <Icon className="w-3.5 h-3.5" />
@@ -411,24 +411,24 @@ const DeliveryDashboard = () => {
   // If no deliveries, show this
   if (!loading && deliveries.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
               <Truck className="w-8 h-8 text-blue-500" />
               Delivery Dashboard
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 dark:text-gray-300 mt-1">
               {user?.email} • No active deliveries
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Package className="w-12 h-12 text-gray-400" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
+            <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Package className="w-12 h-12 text-gray-400 dark:text-gray-500" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">No Deliveries Found</h2>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No Deliveries Found</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md mx-auto">
               There are no orders currently assigned to your delivery company.
             </p>
             <button
@@ -446,16 +446,16 @@ const DeliveryDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-6"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {[1, 2, 3, 4].map(i => (
-                <div key={i} className="h-32 bg-gray-200 rounded"></div>
+                <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
               ))}
             </div>
-            <div className="h-96 bg-gray-200 rounded"></div>
+            <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded"></div>
           </div>
         </div>
       </div>
@@ -463,22 +463,22 @@ const DeliveryDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
               <Truck className="w-8 h-8 text-blue-500" />
               Delivery Dashboard
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 dark:text-gray-300 mt-1">
               {user?.email} • {deliveries.length} active {deliveries.length === 1 ? 'delivery' : 'deliveries'}
             </p>
           </div>
           <button
             onClick={() => fetchDeliveries()}
-            className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm text-gray-900 dark:text-white"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -487,12 +487,12 @@ const DeliveryDashboard = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Deliveries</p>
-                <p className="text-3xl font-bold mt-2 text-gray-900">{stats.totalDeliveries}</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Deliveries</p>
+                <p className="text-3xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalDeliveries}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {stats.pending} ready for pickup
                 </p>
               </div>
@@ -502,12 +502,12 @@ const DeliveryDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">In Transit</p>
-                <p className="text-3xl font-bold mt-2 text-gray-900">{stats.inTransit}</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">In Transit</p>
+                <p className="text-3xl font-bold mt-2 text-gray-900 dark:text-white">{stats.inTransit}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Currently on the road
                 </p>
               </div>
@@ -517,12 +517,12 @@ const DeliveryDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Delivered</p>
-                <p className="text-3xl font-bold mt-2 text-gray-900">{stats.delivered}</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Delivered</p>
+                <p className="text-3xl font-bold mt-2 text-gray-900 dark:text-white">{stats.delivered}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {stats.delivered > 0 ? `${((stats.delivered / stats.totalDeliveries) * 100).toFixed(1)}% success rate` : 'No deliveries yet'}
                 </p>
               </div>
@@ -532,14 +532,14 @@ const DeliveryDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Earnings</p>
-                <p className="text-3xl font-bold mt-2 text-gray-900">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Earnings</p>
+                <p className="text-3xl font-bold mt-2 text-gray-900 dark:text-white">
                   MAD {stats.totalEarnings.toFixed(2)}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   MAD {stats.todayEarnings.toFixed(2)} today
                 </p>
               </div>
@@ -551,54 +551,54 @@ const DeliveryDashboard = () => {
         </div>
 
         {/* Deliveries Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="p-6 border-b flex justify-between items-center">
-            <h2 className="text-xl font-bold flex items-center gap-2 text-gray-900">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h2 className="text-xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
               <Package className="w-5 h-5" />
               Active Deliveries
             </h2>
-            <span className="text-sm bg-gray-100 px-3 py-1 rounded-full">
+            <span className="text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full">
               {deliveries.length} total
             </span>
           </div>
-          
+
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
+            <table className="w-full table-fixed">
+              <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600">Order #</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600">Customer</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600">City</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600">Amount</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600">Status</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600">Actions</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-300 w-[16%]">Order #</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-300 w-[20%]">Customer</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-300 w-[14%]">City</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-300 w-[12%]">Amount</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-300 w-[16%]">Status</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-300 w-[22%]">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {deliveries.map(delivery => (
-                  <tr key={delivery.id} className="border-t hover:bg-gray-50">
+                  <tr key={delivery.id} className="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="p-4">
-                      <div className="font-medium text-gray-900">{delivery.order_number || 'N/A'}</div>
-                      <div className="text-xs text-gray-500">ID: {delivery.id.substring(0, 8)}</div>
+                      <div className="font-medium text-gray-900 dark:text-white truncate">{delivery.order_number || 'N/A'}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">ID: {delivery.id.substring(0, 8)}</div>
                     </td>
                     <td className="p-4">
-                      <div className="font-medium">{delivery.customer_name}</div>
-                      <div className="text-xs text-gray-500">{delivery.customer_phone}</div>
+                      <div className="font-medium text-gray-900 dark:text-white truncate">{delivery.customer_name}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{delivery.customer_phone}</div>
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-gray-400" />
-                        <span>{delivery.city}</span>
+                        <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                        <span className="text-gray-700 dark:text-gray-300 truncate">{delivery.city}</span>
                       </div>
                     </td>
-                    <td className="p-4 font-medium text-green-600">
+                    <td className="p-4 font-medium text-green-600 dark:text-green-400">
                       MAD {delivery.amount.toFixed(2)}
                     </td>
                     <td className="p-4">
                       {getStatusBadge(delivery.status)}
                     </td>
                     <td className="p-4">
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         {delivery.status === 'ready' && (
                           <button
                             onClick={() => updateDeliveryStatus(delivery.id, 'picked')}
@@ -618,7 +618,7 @@ const DeliveryDashboard = () => {
                         {delivery.status === 'in_transit' && (
                           <button
                             onClick={() => updateDeliveryStatus(delivery.id, 'out_for_delivery')}
-                            className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+                            className="px-3 py-1 text-sm bg-kraft-500 text-white rounded hover:bg-kraft-600 transition-colors"
                           >
                             Out for Delivery
                           </button>
@@ -633,7 +633,7 @@ const DeliveryDashboard = () => {
                         )}
                         <button
                           onClick={() => viewOrderDetails(delivery)}
-                          className="px-3 py-1 text-sm border rounded hover:bg-gray-50 transition-colors"
+                          className="px-3 py-1 text-sm border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         >
                           Details
                         </button>

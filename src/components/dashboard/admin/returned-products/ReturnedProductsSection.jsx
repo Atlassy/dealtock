@@ -38,14 +38,14 @@ const ReturnedProductsSection = ({ deliveryCompanies = [] }) => {
           onClick={() => setView(VIEWS.QUEUE)}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             view === VIEWS.QUEUE
-              ? "bg-orange-50 text-orange-700 border border-orange-200"
+              ? "bg-kraft-50 text-kraft-700 border border-kraft-200"
               : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
           }`}
         >
           <Eye className="w-4 h-4" />
           Review Queue
           {pendingCount > 0 && (
-            <span className="px-2 py-0.5 text-xs bg-orange-500 text-white rounded-full font-bold">
+            <span className="px-2 py-0.5 text-xs bg-kraft-500 text-white rounded-full font-bold">
               {pendingCount}
             </span>
           )}
@@ -55,7 +55,7 @@ const ReturnedProductsSection = ({ deliveryCompanies = [] }) => {
           onClick={() => setView(VIEWS.IMPORT)}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             view === VIEWS.IMPORT
-              ? "bg-orange-50 text-orange-700 border border-orange-200"
+              ? "bg-kraft-50 text-kraft-700 border border-kraft-200"
               : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
           }`}
         >
@@ -65,7 +65,7 @@ const ReturnedProductsSection = ({ deliveryCompanies = [] }) => {
 
         {/* Summary pill */}
         <div className="ml-auto flex items-center gap-1.5 text-xs text-gray-400 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5">
-          <Package className="w-3.5 h-3.5 text-orange-400" />
+          <Package className="w-3.5 h-3.5 text-kraft-400" />
           Returned products — sealed parcels only · city-locked · admin-reviewed
         </div>
       </div>
