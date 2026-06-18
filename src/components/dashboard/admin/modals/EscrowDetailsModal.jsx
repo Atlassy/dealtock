@@ -59,40 +59,40 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-auto">
-        <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
-          <h3 className="text-xl font-bold">
+      <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-auto">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
             {company ? 'Edit Delivery Partner' : 'Add New Delivery Partner'}
           </h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg dark:text-gray-300">
             <X className="w-5 h-5" />
           </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             {/* Company Name */}
             <div className="col-span-2">
-              <label className="block text-sm font-medium mb-1">
-                Company Name <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                Company Name <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <input
                 type="text"
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., Sendit Morocco"
               />
             </div>
 
             {/* Service Type */}
             <div className="col-span-2">
-              <label className="block text-sm font-medium mb-1">Service Type</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Service Type</label>
               <select
                 value={formData.service_type}
                 onChange={(e) => setFormData({...formData, service_type: e.target.value})}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
               >
                 <option value="standard">Standard Delivery</option>
                 <option value="express">Express Delivery</option>
@@ -103,14 +103,14 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
 
             {/* Contact Email */}
             <div>
-              <label className="block text-sm font-medium mb-1">Contact Email</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Contact Email</label>
               <div className="relative">
-                <Mail className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Mail className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                 <input
                   type="email"
                   value={formData.contact_email}
                   onChange={(e) => setFormData({...formData, contact_email: e.target.value})}
-                  className="w-full pl-10 pr-3 py-2 border rounded-lg"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   placeholder="contact@company.com"
                 />
               </div>
@@ -118,14 +118,14 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
 
             {/* Contact Phone */}
             <div>
-              <label className="block text-sm font-medium mb-1">Contact Phone</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Contact Phone</label>
               <div className="relative">
-                <Phone className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Phone className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                 <input
                   type="tel"
                   value={formData.contact_phone}
                   onChange={(e) => setFormData({...formData, contact_phone: e.target.value})}
-                  className="w-full pl-10 pr-3 py-2 border rounded-lg"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   placeholder="+212 6XX XXX XXX"
                 />
               </div>
@@ -133,13 +133,13 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
 
             {/* Address */}
             <div className="col-span-2">
-              <label className="block text-sm font-medium mb-1">Address</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Address</label>
               <div className="relative">
-                <MapPin className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+                <MapPin className="w-4 h-4 absolute left-3 top-3 text-gray-400 dark:text-gray-500" />
                 <textarea
                   value={formData.address}
                   onChange={(e) => setFormData({...formData, address: e.target.value})}
-                  className="w-full pl-10 pr-3 py-2 border rounded-lg"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   rows="2"
                   placeholder="123 Main St, Casablanca, Morocco"
                 />
@@ -147,8 +147,8 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
             </div>
 
             {/* API Configuration */}
-            <div className="col-span-2 border-t pt-4 mt-2">
-              <h4 className="font-medium mb-3 flex items-center gap-2">
+            <div className="col-span-2 border-t border-gray-200 dark:border-gray-700 pt-4 mt-2">
+              <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
                 <Key className="w-4 h-4" />
                 API Configuration
               </h4>
@@ -156,14 +156,14 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
 
             {/* API Base URL */}
             <div className="col-span-2">
-              <label className="block text-sm font-medium mb-1">API Base URL</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">API Base URL</label>
               <div className="relative">
-                <Globe className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Globe className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                 <input
                   type="url"
                   value={formData.base_url}
                   onChange={(e) => setFormData({...formData, base_url: e.target.value})}
-                  className="w-full pl-10 pr-3 py-2 border rounded-lg"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   placeholder="https://api.company.com/v1"
                 />
               </div>
@@ -171,22 +171,22 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
 
             {/* API Key */}
             <div className="col-span-2">
-              <label className="block text-sm font-medium mb-1">API Key</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">API Key</label>
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <Key className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Key className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                   <input
                     type="text"
                     value={formData.api_key}
                     onChange={(e) => setFormData({...formData, api_key: e.target.value})}
-                    className="w-full pl-10 pr-3 py-2 border rounded-lg font-mono text-sm"
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg font-mono text-sm"
                     placeholder="dc_xxxxxxxxxxxxxxxx"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => setFormData({...formData, api_key: generateApiKey()})}
-                  className="px-3 py-2 border rounded-lg hover:bg-gray-50 text-sm"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 text-sm"
                 >
                   Regenerate
                 </button>
@@ -195,9 +195,9 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
 
             {/* Commission Rate */}
             <div>
-              <label className="block text-sm font-medium mb-1">Commission Rate (%)</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Commission Rate (%)</label>
               <div className="relative">
-                <Percent className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Percent className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                 <input
                   type="number"
                   step="0.01"
@@ -205,18 +205,18 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
                   max="100"
                   value={formData.commission_rate}
                   onChange={(e) => setFormData({...formData, commission_rate: e.target.value})}
-                  className="w-full pl-10 pr-3 py-2 border rounded-lg"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                 />
               </div>
             </div>
 
             {/* Status */}
             <div>
-              <label className="block text-sm font-medium mb-1">Status</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Status</label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({...formData, status: e.target.value})}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -233,20 +233,20 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
                   onChange={(e) => setFormData({...formData, escrow_enabled: e.target.checked})}
                   className="rounded text-blue-600"
                 />
-                <span className="text-sm font-medium">Enable Escrow for COD orders</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">Enable Escrow for COD orders</span>
               </label>
-              <p className="text-xs text-gray-500 mt-1 ml-6">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-6">
                 When enabled, funds from COD orders will be held in escrow for 3 days
               </p>
             </div>
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t">
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200"
             >
               Cancel
             </button>

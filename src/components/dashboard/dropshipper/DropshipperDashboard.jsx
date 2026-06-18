@@ -200,32 +200,32 @@ const DropshipperDashboard = () => {
 
       {/* Secondary Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Active Customers</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.activeCustomers}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Active Customers</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.activeCustomers}</p>
             </div>
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+              <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Average Markup</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.avgMarkup)}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Average Markup</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(stats.avgMarkup)}</p>
             </div>
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="flex -mb-px space-x-8">
           {tabs.map((tab) => (
             <button
@@ -234,8 +234,8 @@ const DropshipperDashboard = () => {
               className={`
                 flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors
                 ${activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
                 }
               `}
             >

@@ -91,29 +91,29 @@ const ApiKeysModal = ({ isOpen, onClose, company, initialTab = 'api' }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="p-6 border-b">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-xl font-bold flex items-center gap-2">
+              <h3 className="text-xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
                 <Key className="w-5 h-5" />
                 {company.name} Configuration
               </h3>
-              <p className="text-gray-600 text-sm mt-1">Manage API keys and status mappings</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Manage API keys and status mappings</p>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg dark:text-gray-300">
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-4 mt-4 border-b">
+          <div className="flex gap-4 mt-4 border-b border-gray-200 dark:border-gray-700">
             <button
               className={`pb-2 px-1 font-medium text-sm ${
                 activeTab === 'api'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
               onClick={() => setActiveTab('api')}
             >
@@ -123,15 +123,15 @@ const ApiKeysModal = ({ isOpen, onClose, company, initialTab = 'api' }) => {
             <button
               className={`pb-2 px-1 font-medium text-sm ${
                 activeTab === 'mappings'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
               onClick={() => setActiveTab('mappings')}
             >
               <Map className="w-4 h-4 inline mr-1" />
               Status Mappings
               {unknownStatuses.length > 0 && (
-                <span className="ml-2 px-2 py-0.5 text-xs bg-red-100 text-red-800 rounded-full">
+                <span className="ml-2 px-2 py-0.5 text-xs bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 rounded-full">
                   {unknownStatuses.length}
                 </span>
               )}
@@ -145,16 +145,16 @@ const ApiKeysModal = ({ isOpen, onClose, company, initialTab = 'api' }) => {
             /* API Credentials Tab */
             <div className="space-y-6">
               {/* API Key Section */}
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
                 <div className="flex justify-between items-center mb-3">
-                  <h4 className="font-medium flex items-center gap-2">
+                  <h4 className="font-medium flex items-center gap-2 text-gray-900 dark:text-white">
                     <Key className="w-4 h-4" />
                     API Key
                   </h4>
                   <button
                     onClick={handleRegenerateApiKey}
                     disabled={regenerating}
-                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-1"
                   >
                     <RefreshCw className={`w-3 h-3 ${regenerating ? 'animate-spin' : ''}`} />
                     {regenerating ? 'Regenerating...' : 'Regenerate'}
@@ -166,13 +166,13 @@ const ApiKeysModal = ({ isOpen, onClose, company, initialTab = 'api' }) => {
                       type={showApiKey ? "text" : "password"}
                       readOnly
                       value={company.api_key || 'No API key configured'}
-                      className="w-full px-3 py-2 bg-white border rounded-lg font-mono text-sm pr-10"
+                      className="w-full px-3 py-2 bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg font-mono text-sm pr-10"
                     />
                     {company.api_key && (
                       <button
                         type="button"
                         onClick={() => setShowApiKey(!showApiKey)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 text-xs"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-xs"
                       >
                         {showApiKey ? 'Hide' : 'Show'}
                       </button>
@@ -181,11 +181,11 @@ const ApiKeysModal = ({ isOpen, onClose, company, initialTab = 'api' }) => {
                   {company.api_key && (
                     <button
                       onClick={handleCopyApiKey}
-                      className="px-3 py-2 border bg-white rounded-lg hover:bg-gray-50 flex items-center gap-1 text-sm"
+                      className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center gap-1 text-sm"
                     >
                       {copied ? (
                         <>
-                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <CheckCircle className="w-4 h-4 text-green-500 dark:text-green-400" />
                           Copied!
                         </>
                       ) : (
@@ -197,14 +197,14 @@ const ApiKeysModal = ({ isOpen, onClose, company, initialTab = 'api' }) => {
                     </button>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                   Keep this key secret. It provides full access to the delivery API.
                 </p>
               </div>
 
               {/* Webhook URL Section */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium flex items-center gap-2 mb-3">
+              <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                <h4 className="font-medium flex items-center gap-2 mb-3 text-gray-900 dark:text-white">
                   <Globe className="w-4 h-4" />
                   Webhook URL
                 </h4>
@@ -213,38 +213,38 @@ const ApiKeysModal = ({ isOpen, onClose, company, initialTab = 'api' }) => {
                     type="text"
                     readOnly
                     value={`${window.location.origin}/api/webhooks/delivery/${company.id}`}
-                    className="flex-1 px-3 py-2 bg-white border rounded-lg text-sm font-mono"
+                    className="flex-1 px-3 py-2 bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono"
                   />
                   <button
                     onClick={handleCopyWebhookUrl}
-                    className="px-3 py-2 border bg-white rounded-lg hover:bg-gray-50 flex items-center gap-1 text-sm"
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center gap-1 text-sm"
                   >
                     <Copy className="w-4 h-4" />
                     Copy
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                   Configure this URL in your delivery company's system to receive status updates.
                 </p>
               </div>
 
               {/* API Documentation */}
-              <div className="border-t pt-4">
-                <h4 className="font-medium mb-3">API Endpoints</h4>
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <h4 className="font-medium mb-3 text-gray-900 dark:text-white">API Endpoints</h4>
                 <div className="space-y-3">
-                  <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Update Order Status</span>
-                      <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">POST</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">Update Order Status</span>
+                      <span className="text-xs bg-blue-200 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 px-2 py-1 rounded">POST</span>
                     </div>
-                    <code className="text-xs bg-white p-2 rounded block">
+                    <code className="text-xs bg-white dark:bg-gray-800 dark:text-gray-200 p-2 rounded block">
                       {window.location.origin}/api/webhooks/delivery/{company.id}
                     </code>
-                    <p className="text-xs text-gray-600 mt-2">
-                      Headers: <code className="bg-blue-100 px-1">X-API-Key: {company.api_key?.substring(0, 8)}...</code>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                      Headers: <code className="bg-blue-100 dark:bg-blue-900/40 dark:text-blue-300 px-1">X-API-Key: {company.api_key?.substring(0, 8)}...</code>
                     </p>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Body: <code className="bg-blue-100 px-1">{'{ orderId, status, trackingCode, codAmount }'}</code>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      Body: <code className="bg-blue-100 dark:bg-blue-900/40 dark:text-blue-300 px-1">{'{ orderId, status, trackingCode, codAmount }'}</code>
                     </p>
                   </div>
                 </div>
@@ -264,10 +264,10 @@ const ApiKeysModal = ({ isOpen, onClose, company, initialTab = 'api' }) => {
           )}
         </div>
 
-        <div className="p-6 border-t">
+        <div className="p-6 border-t border-gray-200 dark:border-gray-700">
           <button
             onClick={onClose}
-            className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            className="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
           >
             Close
           </button>

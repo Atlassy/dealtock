@@ -111,9 +111,9 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
   );
 
   const statusConfig = {
-    pending_review: { label: "Pending Review", color: "bg-amber-100 text-amber-700", icon: Clock },
-    available:      { label: "Approved",        color: "bg-green-100 text-green-700",  icon: CheckCircle2 },
-    declined:       { label: "Declined",        color: "bg-red-100 text-red-600",      icon: XCircle },
+    pending_review: { label: "Pending Review", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", icon: Clock },
+    available:      { label: "Approved",        color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",  icon: CheckCircle2 },
+    declined:       { label: "Declined",        color: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",      icon: XCircle },
   };
 
   return (
@@ -121,26 +121,26 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Eye className="w-6 h-6 text-kraft-500" />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <Eye className="w-6 h-6 text-kraft-500 dark:text-kraft-400" />
             Returned Products Queue
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Review listings submitted by delivery companies before they go live.
           </p>
         </div>
         <div className="flex gap-2">
-          <button onClick={fetchProducts} className="flex items-center gap-1.5 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+          <button onClick={fetchProducts} className="flex items-center gap-1.5 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
             <RefreshCw className="w-4 h-4" /> Refresh
           </button>
-          <button onClick={onSwitchToImport} className="flex items-center gap-1.5 px-3 py-2 bg-kraft-500 hover:bg-kraft-600 text-white rounded-lg text-sm font-medium">
+          <button onClick={onSwitchToImport} className="flex items-center gap-1.5 px-3 py-2 bg-kraft-500 dark:bg-kraft-600 hover:bg-kraft-600 dark:hover:bg-kraft-700 text-white rounded-lg text-sm font-medium">
             <Package className="w-4 h-4" /> Import CSV
           </button>
         </div>
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
+      <div className="flex gap-1 bg-gray-100 dark:bg-gray-900 rounded-xl p-1 w-fit">
         {Object.entries(statusConfig).map(([key, cfg]) => {
           const Icon = cfg.icon;
           return (
@@ -149,8 +149,8 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
               onClick={() => setFilter(key)}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 filter === key
-                  ? "bg-white shadow text-gray-800"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "bg-white dark:bg-gray-800 shadow text-gray-800 dark:text-gray-100"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -162,28 +162,28 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
 
       {/* Search */}
       <div className="relative">
-        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
         <input
           type="text"
           placeholder="Search by product, city, category, or delivery company…"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-kraft-400 focus:border-kraft-400"
+          className="w-full pl-9 pr-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-kraft-400 focus:border-kraft-400"
         />
       </div>
 
       {/* Product grid */}
       {loading ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="text-center py-16 text-gray-400 dark:text-gray-500">
           <RefreshCw className="w-8 h-8 mx-auto animate-spin mb-3" />
           Loading products…
         </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
-          <Package className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-          <p className="text-gray-500 font-medium">No {statusConfig[filter].label.toLowerCase()} listings</p>
+        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+          <Package className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
+          <p className="text-gray-500 dark:text-gray-400 font-medium">No {statusConfig[filter].label.toLowerCase()} listings</p>
           {filter === "pending_review" && (
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
               Import a CSV from a delivery company to see listings here.
             </p>
           )}
@@ -196,13 +196,13 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
 
             return (
               <div key={product.id}
-                className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
 
                 {/* Product image placeholder */}
-                <div className="h-36 bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center relative">
+                <div className="h-36 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center relative">
                   {product.image_url
                     ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-                    : <Package className="w-12 h-12 text-gray-300" />
+                    : <Package className="w-12 h-12 text-gray-300 dark:text-gray-600" />
                   }
 
                   {/* Source badge */}
@@ -219,13 +219,13 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                 {/* Content */}
                 <div className="p-4 flex flex-col flex-1">
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3 className="font-semibold text-gray-800 text-sm leading-snug line-clamp-2">{product.name}</h3>
+                    <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-sm leading-snug line-clamp-2">{product.name}</h3>
                     <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${statusConfig[product.listing_status]?.color}`}>
                       {statusConfig[product.listing_status]?.label}
                     </span>
                   </div>
 
-                  <div className="space-y-1.5 text-xs text-gray-500 mb-3">
+                  <div className="space-y-1.5 text-xs text-gray-500 dark:text-gray-400 mb-3">
                     {product.category && (
                       <div className="flex items-center gap-1.5">
                         <Tag className="w-3 h-3" />
@@ -243,17 +243,17 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                     {/* days_in_storage: ADMIN ONLY */}
                     {product.days_in_storage != null && (
                       <div className="flex items-center gap-1.5">
-                        <Clock className="w-3 h-3 text-amber-500" />
-                        <span className="text-amber-600 font-medium">
+                        <Clock className="w-3 h-3 text-amber-500 dark:text-amber-400" />
+                        <span className="text-amber-600 dark:text-amber-400 font-medium">
                           {product.days_in_storage} days in storage
-                          <span className="text-gray-400 font-normal ml-1">(admin only)</span>
+                          <span className="text-gray-400 dark:text-gray-500 font-normal ml-1">(admin only)</span>
                         </span>
                       </div>
                     )}
                     {product.decline_reason && (
-                      <div className="flex items-start gap-1.5 mt-1 p-2 bg-red-50 rounded-lg">
-                        <AlertCircle className="w-3 h-3 text-red-400 mt-0.5 shrink-0" />
-                        <span className="text-red-600 text-xs">{product.decline_reason}</span>
+                      <div className="flex items-start gap-1.5 mt-1 p-2 bg-red-50 dark:bg-red-900/30 rounded-lg">
+                        <AlertCircle className="w-3 h-3 text-red-400 dark:text-red-500 mt-0.5 shrink-0" />
+                        <span className="text-red-600 dark:text-red-400 text-xs">{product.decline_reason}</span>
                       </div>
                     )}
                   </div>
@@ -261,12 +261,12 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                   {/* Price */}
                   <div className="mt-auto">
                     <div className="flex items-baseline gap-1 mb-3">
-                      <span className="text-xl font-bold text-gray-900">
+                      <span className="text-xl font-bold text-gray-900 dark:text-white">
                         {product.asking_price ? `${Number(product.asking_price).toFixed(2)}` : "—"}
                       </span>
-                      <span className="text-sm text-gray-400">MAD</span>
-                      <span className="ml-auto text-xs text-gray-400">
-                        Condition: <span className="font-semibold text-green-600">A (Sealed)</span>
+                      <span className="text-sm text-gray-400 dark:text-gray-500">MAD</span>
+                      <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">
+                        Condition: <span className="font-semibold text-green-600 dark:text-green-400">A (Sealed)</span>
                       </span>
                     </div>
 
@@ -276,7 +276,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                         <button
                           onClick={() => handleApprove(product)}
                           disabled={isProcessing}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white rounded-lg text-xs font-semibold transition-colors"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-green-500 dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold transition-colors"
                         >
                           {isProcessing
                             ? <RefreshCw className="w-3 h-3 animate-spin" />
@@ -287,7 +287,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                         <button
                           onClick={() => setSelectedProduct(product)}
                           disabled={isProcessing}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-50 hover:bg-red-100 disabled:opacity-50 text-red-600 border border-red-200 rounded-lg text-xs font-semibold transition-colors"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 disabled:opacity-50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg text-xs font-semibold transition-colors"
                         >
                           <XCircle className="w-3.5 h-3.5" />
                           Decline
@@ -296,7 +296,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                     )}
 
                     {filter === "available" && (
-                      <div className="flex items-center gap-1.5 text-green-600 text-xs font-medium">
+                      <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 text-xs font-medium">
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         Live on marketplace · city-locked to {product.location}
                       </div>
@@ -305,7 +305,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                     {filter === "declined" && (
                       <button
                         onClick={() => handleApprove(product)}
-                        className="w-full py-2 border border-green-300 text-green-600 hover:bg-green-50 rounded-lg text-xs font-semibold transition-colors"
+                        className="w-full py-2 border border-green-300 dark:border-green-700 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg text-xs font-semibold transition-colors"
                       >
                         Re-approve listing
                       </button>
@@ -321,70 +321,70 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
       {/* Decline modal */}
       {selectedProduct && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="p-6 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <XCircle className="w-5 h-5 text-red-500" />
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <XCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
                 Decline Listing
               </h3>
-              <p className="text-sm text-gray-500 mt-1 line-clamp-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
                 "{selectedProduct.name}"
               </p>
             </div>
 
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Reason for declining *
                 </label>
                 <div className="relative">
                   <select
                     value={declineReason}
                     onChange={e => setDeclineReason(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-red-400 focus:border-red-400"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm appearance-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-400 focus:border-red-400"
                   >
                     <option value="">— Select a reason —</option>
                     {DECLINE_REASONS.map(r => (
                       <option key={r} value={r}>{r}</option>
                     ))}
                   </select>
-                  <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" />
+                  <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-500" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Additional notes <span className="font-normal text-gray-400">(optional)</span>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Additional notes <span className="font-normal text-gray-400 dark:text-gray-500">(optional)</span>
                 </label>
                 <textarea
                   value={declineNotes}
                   onChange={e => setDeclineNotes(e.target.value)}
                   rows={3}
                   placeholder="Provide actionable feedback so the delivery company can resubmit correctly…"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-400 focus:border-red-400 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-400 focus:border-red-400 resize-none"
                 />
               </div>
 
-              <div className="flex items-start gap-2 p-3 bg-amber-50 rounded-lg">
-                <Info className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                <p className="text-xs text-amber-700">
+              <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/30 rounded-lg">
+                <Info className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-700 dark:text-amber-400">
                   The decline reason will be visible to the delivery company in their portal
                   so they can correct and resubmit the listing.
                 </p>
               </div>
             </div>
 
-            <div className="p-6 border-t border-gray-100 flex gap-3 justify-end">
+            <div className="p-6 border-t border-gray-100 dark:border-gray-700 flex gap-3 justify-end">
               <button
                 onClick={() => { setSelectedProduct(null); setDeclineReason(""); setDeclineNotes(""); }}
-                className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDecline}
                 disabled={!declineReason || processing === selectedProduct.id}
-                className="px-5 py-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white rounded-lg text-sm font-semibold transition-colors flex items-center gap-2"
+                className="px-5 py-2 bg-red-500 dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700 disabled:opacity-50 text-white rounded-lg text-sm font-semibold transition-colors flex items-center gap-2"
               >
                 {processing === selectedProduct.id
                   ? <RefreshCw className="w-4 h-4 animate-spin" />

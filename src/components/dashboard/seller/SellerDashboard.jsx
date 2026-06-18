@@ -46,17 +46,17 @@ import EditProductForm from '../EditProductForm';
 // DASHBOARD SKELETON
 // ============================================
 const DashboardSkeleton = () => (
-  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 p-8">
+  <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900 p-8">
     <div className="animate-pulse space-y-6">
-      <div className="h-8 bg-gray-700/50 rounded w-1/4"></div>
+      <div className="h-8 bg-gray-200 dark:bg-gray-700/50 rounded w-1/4"></div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[1, 2, 3, 4].map(i => (
-          <div key={i} className="h-32 bg-gray-700/30 rounded-xl"></div>
+          <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700/30 rounded-xl"></div>
         ))}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-64 bg-gray-700/30 rounded-xl"></div>
+          <div key={i} className="h-64 bg-gray-200 dark:bg-gray-700/30 rounded-xl"></div>
         ))}
       </div>
     </div>
@@ -70,16 +70,16 @@ const StatCard = ({ title, value, icon: Icon, color = "blue", trend, trendValue,
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="glass-effect border-white/20 rounded-xl p-5 hover:border-blue-500/50 transition-all duration-300"
+    className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-5 shadow-sm dark:shadow-none hover:border-blue-500/50 transition-all duration-300"
   >
     <div className="flex items-start justify-between">
       <div className="flex-1">
-        <p className="text-sm font-medium text-gray-400">{title}</p>
-        <p className="text-2xl font-bold text-white mt-1">{value}</p>
-        {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
+        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
+        <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
+        {subtext && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{subtext}</p>}
         {trend && (
           <div className={`flex items-center mt-2 text-xs ${
-            trend > 0 ? 'text-green-400' : 'text-red-400'
+            trend > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
           }`}>
             {trend > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
             <span>{Math.abs(trend)}% vs last month</span>
@@ -96,34 +96,34 @@ const StatCard = ({ title, value, icon: Icon, color = "blue", trend, trendValue,
 const SalesTrendChart = ({ data }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="glass-effect border-white/20 rounded-xl p-3 sm:p-5">
-        <h3 className="text-lg font-semibold text-white mb-4">📈 Sales Trend (Last 30 Days)</h3>
+      <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-3 sm:p-5 shadow-sm dark:shadow-none">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📈 Sales Trend (Last 30 Days)</h3>
         <div className="h-40 flex items-center justify-center">
-          <p className="text-gray-400">No sales data available</p>
+          <p className="text-gray-500 dark:text-gray-400">No sales data available</p>
         </div>
       </div>
     );
   }
-  
+
   const maxSales = Math.max(...data.map(d => d.sales), 1);
-  
+
   return (
-    <div className="glass-effect border-white/20 rounded-xl p-3 sm:p-5">
-      <h3 className="text-lg font-semibold text-white mb-4">📈 Sales Trend (Last 30 Days)</h3>
+    <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-3 sm:p-5 shadow-sm dark:shadow-none">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📈 Sales Trend (Last 30 Days)</h3>
       <div className="h-40 flex items-end gap-1">
         {data.map((day, i) => (
           <div key={i} className="flex-1 flex flex-col items-center group">
             <div className="relative w-full">
-              <div 
+              <div
                 className="bg-gradient-to-t from-blue-500 to-blue-400 hover:from-blue-600 hover:to-blue-500 transition cursor-pointer rounded-t"
                 style={{ height: `${Math.max((day.sales / maxSales) * 100, 2)}px` }}
               >
-                <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">
+                <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">
                   {day.date}: {day.sales.toFixed(0)} MAD ({day.orders} orders)
                 </div>
               </div>
             </div>
-            <span className="text-xs text-gray-400 mt-2 hidden md:block">
+            <span className="text-xs text-gray-500 dark:text-gray-400 mt-2 hidden md:block">
               {day.date.slice(-5)}
             </span>
           </div>
@@ -136,11 +136,11 @@ const SalesTrendChart = ({ data }) => {
 const CategoryProgressBar = ({ category, percentage, count, color = "blue" }) => (
   <div className="mb-3">
     <div className="flex justify-between text-sm mb-1">
-      <span className="text-gray-300">{category}</span>
-      <span className="text-gray-400">{count} products</span>
+      <span className="text-gray-700 dark:text-gray-300">{category}</span>
+      <span className="text-gray-500 dark:text-gray-400">{count} products</span>
     </div>
-    <div className="w-full bg-gray-700 rounded-full h-2">
-      <div 
+    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+      <div
         className={`bg-gradient-to-r from-${color}-500 to-${color}-400 h-2 rounded-full`}
         style={{ width: `${percentage}%` }}
       ></div>
@@ -149,14 +149,14 @@ const CategoryProgressBar = ({ category, percentage, count, color = "blue" }) =>
 );
 
 const TopListItem = ({ rank, name, value, unit, color = "blue" }) => (
-  <div className="flex items-center justify-between py-2 border-b border-gray-700 last:border-0">
+  <div className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
     <div className="flex items-center gap-3">
-      <div className={`w-6 h-6 rounded-full bg-${color}-500/20 flex items-center justify-center text-xs font-bold text-${color}-400`}>
+      <div className={`w-6 h-6 rounded-full bg-${color}-500/20 flex items-center justify-center text-xs font-bold text-${color}-600 dark:text-${color}-400`}>
         {rank}
       </div>
-      <span className="text-gray-300">{name}</span>
+      <span className="text-gray-700 dark:text-gray-300">{name}</span>
     </div>
-    <span className="text-white font-medium">{value} {unit}</span>
+    <span className="text-gray-900 dark:text-white font-medium">{value} {unit}</span>
   </div>
 );
 
@@ -166,42 +166,42 @@ const DeviceBreakdown = ({ mobile, desktop }) => {
   const desktopPercent = total > 0 ? Math.round((desktop / total) * 100) : 0;
 
   return (
-    <div className="glass-effect border-white/20 rounded-xl p-3 sm:p-5">
-      <h3 className="text-lg font-semibold text-white mb-4">📱 Device Breakdown</h3>
+    <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-3 sm:p-5 shadow-sm dark:shadow-none">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📱 Device Breakdown</h3>
       <div className="space-y-4">
         <div className="flex items-center gap-4">
           <div className="flex-1">
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-300 flex items-center gap-1">
+              <span className="text-gray-700 dark:text-gray-300 flex items-center gap-1">
                 <Smartphone className="w-4 h-4" /> Mobile
               </span>
-              <span className="text-gray-400">{mobile} orders</span>
+              <span className="text-gray-500 dark:text-gray-400">{mobile} orders</span>
             </div>
-            <div className="w-full bg-gray-700 rounded-full h-2">
-              <div 
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div
                 className="bg-gradient-to-r from-purple-500 to-purple-400 h-2 rounded-full"
                 style={{ width: `${mobilePercent}%` }}
               ></div>
             </div>
           </div>
-          <span className="text-white font-bold">{mobilePercent}%</span>
+          <span className="text-gray-900 dark:text-white font-bold">{mobilePercent}%</span>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex-1">
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-300 flex items-center gap-1">
+              <span className="text-gray-700 dark:text-gray-300 flex items-center gap-1">
                 <Monitor className="w-4 h-4" /> Desktop
               </span>
-              <span className="text-gray-400">{desktop} orders</span>
+              <span className="text-gray-500 dark:text-gray-400">{desktop} orders</span>
             </div>
-            <div className="w-full bg-gray-700 rounded-full h-2">
-              <div 
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div
                 className="bg-gradient-to-r from-blue-500 to-blue-400 h-2 rounded-full"
                 style={{ width: `${desktopPercent}%` }}
               ></div>
             </div>
           </div>
-          <span className="text-white font-bold">{desktopPercent}%</span>
+          <span className="text-gray-900 dark:text-white font-bold">{desktopPercent}%</span>
         </div>
       </div>
     </div>
@@ -337,7 +337,7 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
 
   if (loading) {
     return (
-      <div className="bg-white/5 rounded-xl p-8">
+      <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-8">
         <div className="flex justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         </div>
@@ -349,39 +349,39 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
     <div className="space-y-6">
       {/* Escrow Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="glass-effect border-white/20 rounded-xl p-5">
-          <p className="text-sm text-gray-400 mb-1">Escrow Balance</p>
-          <p className="text-2xl font-bold text-blue-400">{formatCurrency(dashboardData.escrowBalance || 0)}</p>
-          <p className="text-xs text-gray-400 mt-1">{dashboardData.pendingEscrowCount || 0} orders pending</p>
+        <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-5 shadow-sm dark:shadow-none">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Escrow Balance</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{formatCurrency(dashboardData.escrowBalance || 0)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{dashboardData.pendingEscrowCount || 0} orders pending</p>
         </div>
-        
-        <div className="glass-effect border-white/20 rounded-xl p-5">
-          <p className="text-sm text-gray-400 mb-1">Available for Payout</p>
-          <p className="text-2xl font-bold text-green-400">{formatCurrency(dashboardData.availableForPayout || 0)}</p>
-          <p className="text-xs text-gray-400 mt-1">Ready to withdraw</p>
+
+        <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-5 shadow-sm dark:shadow-none">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Available for Payout</p>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(dashboardData.availableForPayout || 0)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Ready to withdraw</p>
         </div>
-        
-        <div className="glass-effect border-white/20 rounded-xl p-5">
-          <p className="text-sm text-gray-400 mb-1">Total Released</p>
-          <p className="text-2xl font-bold text-purple-400">{formatCurrency(dashboardData.totalReleased || 0)}</p>
-          <p className="text-xs text-gray-400 mt-1">Paid to you</p>
+
+        <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-5 shadow-sm dark:shadow-none">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Released</p>
+          <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{formatCurrency(dashboardData.totalReleased || 0)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Paid to you</p>
         </div>
       </div>
 
       {/* Escrow Orders Table */}
-      <div className="bg-white/5 rounded-xl overflow-hidden">
-        <div className="px-3 py-3 border-b border-white/10">
-          <h3 className="text-lg font-semibold text-white">Orders in Escrow</h3>
+      <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-transparent rounded-xl overflow-hidden shadow-sm dark:shadow-none">
+        <div className="px-3 py-3 border-b border-gray-200 dark:border-white/10">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Orders in Escrow</h3>
         </div>
-        
+
         <div className="p-4">
           {escrowOrders.length === 0 ? (
-            <p className="text-gray-400 text-center py-8">No escrow orders found</p>
+            <p className="text-gray-500 dark:text-gray-400 text-center py-8">No escrow orders found</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="text-left text-gray-400 text-sm">
+                  <tr className="text-left text-gray-500 dark:text-gray-400 text-sm">
                     <th className="pb-3">Order #</th>
                     <th className="pb-3">Product</th>
                     <th className="pb-3">Amount</th>
@@ -390,22 +390,22 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
                     <th className="pb-3">Release Date</th>
                     </tr>
                 </thead>
-                <tbody className="text-gray-300">
+                <tbody className="text-gray-700 dark:text-gray-300">
                   {escrowOrders.map((order) => {
                     const settlement = order.settlements?.[0];
                     const isReleased = order.status === 'settled' || settlement?.settlement_status === 'completed';
                     const releaseDate = settlement?.created_at;
-                    
+
                     return (
-                      <tr key={order.id} className="border-t border-white/10">
+                      <tr key={order.id} className="border-t border-gray-100 dark:border-white/10">
                         <td className="py-3 font-mono text-sm">{order.order_number}</td>
                         <td className="py-3">{order.product_name}</td>
                         <td className="py-3 font-medium">{formatCurrency(order.product_price)}</td>
                         <td className="py-3">
                           <span className={`px-2 py-1 rounded-full text-xs ${
-                            isReleased 
-                              ? 'bg-green-500/20 text-green-400' 
-                              : 'bg-yellow-500/20 text-yellow-400'
+                            isReleased
+                              ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
+                              : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400'
                           }`}>
                             {isReleased ? 'Released' : 'Held'}
                           </span>
@@ -424,34 +424,34 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
 
       {/* Payout History */}
       {payoutHistory.length > 0 && (
-        <div className="bg-white/5 rounded-xl overflow-hidden">
-          <div className="px-3 py-3 border-b border-white/10">
-            <h3 className="text-lg font-semibold text-white">Recent Payouts</h3>
+        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-transparent rounded-xl overflow-hidden shadow-sm dark:shadow-none">
+          <div className="px-3 py-3 border-b border-gray-200 dark:border-white/10">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Payouts</h3>
           </div>
-          
+
           <div className="p-4">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="text-left text-gray-400 text-sm">
+                  <tr className="text-left text-gray-500 dark:text-gray-400 text-sm">
                     <th className="pb-3">Date</th>
                     <th className="pb-3">Amount</th>
                     <th className="pb-3">Status</th>
                     <th className="pb-3">Reference</th>
                   </tr>
                 </thead>
-                <tbody className="text-gray-300">
+                <tbody className="text-gray-700 dark:text-gray-300">
                   {payoutHistory.map((payout) => (
-                    <tr key={payout.id} className="border-t border-white/10">
+                    <tr key={payout.id} className="border-t border-gray-100 dark:border-white/10">
                       <td className="py-3">{formatDate(payout.created_at)}</td>
-                      <td className="py-3 font-medium text-green-400">{formatCurrency(payout.amount)}</td>
+                      <td className="py-3 font-medium text-green-600 dark:text-green-400">{formatCurrency(payout.amount)}</td>
                       <td className="py-3">
                         <span className={`px-2 py-1 rounded-full text-xs ${
-                          payout.status === 'paid' 
-                            ? 'bg-green-500/20 text-green-400' 
+                          payout.status === 'paid'
+                            ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
                             : payout.status === 'pending'
-                            ? 'bg-yellow-500/20 text-yellow-400'
-                            : 'bg-red-500/20 text-red-400'
+                            ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400'
+                            : 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
                         }`}>
                           {payout.status}
                         </span>
@@ -1000,7 +1000,7 @@ const SellerDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900">
       {/* Tab Navigation - Simplified, no duplicate header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
@@ -1009,31 +1009,31 @@ const SellerDashboard = () => {
             className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all whitespace-nowrap text-sm ${
               activeTab === 'dashboard'
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
-                : 'text-gray-400 hover:text-white hover:bg-white/10'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
             }`}
           >
             <BarChart3 className="w-4 h-4" />
             Dashboard
           </button>
-          
+
           <button
             onClick={() => setActiveTab('products')}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all whitespace-nowrap text-sm ${
               activeTab === 'products'
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
-                : 'text-gray-400 hover:text-white hover:bg-white/10'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
             }`}
           >
             <Package className="w-4 h-4" />
             Products
           </button>
-          
+
           <button
             onClick={() => setActiveTab('escrow')}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all relative whitespace-nowrap text-sm ${
               activeTab === 'escrow'
                 ? 'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg'
-                : 'text-gray-400 hover:text-white hover:bg-white/10'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
             }`}
           >
             <Shield className="w-4 h-4" />
@@ -1044,13 +1044,13 @@ const SellerDashboard = () => {
               </span>
             )}
           </button>
-          
+
           <button
             onClick={() => setActiveTab('orders')}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all relative whitespace-nowrap text-sm ${
               activeTab === 'orders'
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
-                : 'text-gray-400 hover:text-white hover:bg-white/10'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
             }`}
           >
             <ShoppingBag className="w-4 h-4" />
@@ -1166,16 +1166,16 @@ const SellerDashboard = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.25 }}
-                className="glass-effect border-white/20 rounded-xl p-6"
+                className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-6 shadow-sm dark:shadow-none"
               >
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <Package className="w-5 h-5 text-blue-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Package className="w-5 h-5 text-blue-500 dark:text-blue-400" />
                   Top Products by Quantity
                 </h3>
                 <div className="space-y-1">
                   {dashboardData.topQuantityProducts.length > 0 ? (
                     dashboardData.topQuantityProducts.map((product, index) => (
-                      <TopListItem 
+                      <TopListItem
                         key={product.id}
                         rank={index + 1}
                         name={product.name}
@@ -1185,7 +1185,7 @@ const SellerDashboard = () => {
                       />
                     ))
                   ) : (
-                    <p className="text-gray-400 text-center py-4">No products found</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">No products found</p>
                   )}
                 </div>
               </motion.div>
@@ -1195,16 +1195,16 @@ const SellerDashboard = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="glass-effect border-white/20 rounded-xl p-6"
+                className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-6 shadow-sm dark:shadow-none"
               >
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-green-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-green-500 dark:text-green-400" />
                   Top by Inventory Value
                 </h3>
                 <div className="space-y-1">
                   {dashboardData.topInventoryProducts.length > 0 ? (
                     dashboardData.topInventoryProducts.map((product, index) => (
-                      <TopListItem 
+                      <TopListItem
                         key={product.id}
                         rank={index + 1}
                         name={product.name}
@@ -1214,7 +1214,7 @@ const SellerDashboard = () => {
                       />
                     ))
                   ) : (
-                    <p className="text-gray-400 text-center py-4">No products found</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">No products found</p>
                   )}
                 </div>
               </motion.div>
@@ -1224,27 +1224,27 @@ const SellerDashboard = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.35 }}
-                className="glass-effect border-white/20 rounded-xl p-6"
+                className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-6 shadow-sm dark:shadow-none"
               >
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-red-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
                   Low Stock Alert
                 </h3>
                 <div className="space-y-1">
                   {dashboardData.lowStockProducts.length > 0 ? (
                     dashboardData.lowStockProducts.map((product, index) => (
-                      <div key={product.id} className="flex items-center justify-between py-2 border-b border-gray-700 last:border-0">
+                      <div key={product.id} className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
                         <div className="flex items-center gap-3">
-                          <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center text-xs font-bold text-red-400">
+                          <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center text-xs font-bold text-red-600 dark:text-red-400">
                             {index + 1}
                           </div>
-                          <span className="text-gray-300">{product.name}</span>
+                          <span className="text-gray-700 dark:text-gray-300">{product.name}</span>
                         </div>
-                        <span className="text-red-400 font-medium">{product.quantity} left</span>
+                        <span className="text-red-600 dark:text-red-400 font-medium">{product.quantity} left</span>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-400 text-center py-4">All stock levels are healthy</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">All stock levels are healthy</p>
                   )}
                 </div>
               </motion.div>
@@ -1257,10 +1257,10 @@ const SellerDashboard = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 }}
-                className="glass-effect border-white/20 rounded-xl p-6"
+                className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-6 shadow-sm dark:shadow-none"
               >
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <Award className="w-5 h-5 text-yellow-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Award className="w-5 h-5 text-yellow-500 dark:text-yellow-400" />
                   Top Categories
                 </h3>
                 <div className="space-y-3">
@@ -1268,7 +1268,7 @@ const SellerDashboard = () => {
                     dashboardData.topCategories.map((cat, index) => {
                       const colors = ['blue', 'purple', 'green', 'orange', 'pink'];
                       return (
-                        <CategoryProgressBar 
+                        <CategoryProgressBar
                           key={cat.category}
                           category={cat.category}
                           percentage={cat.percentage}
@@ -1278,7 +1278,7 @@ const SellerDashboard = () => {
                       );
                     })
                   ) : (
-                    <p className="text-gray-400 text-center py-4">No categories found</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">No categories found</p>
                   )}
                 </div>
               </motion.div>
@@ -1301,28 +1301,28 @@ const SellerDashboard = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="glass-effect border-white/20 rounded-xl p-6 mb-8"
+              className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-6 mb-8 shadow-sm dark:shadow-none"
             >
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-green-400" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-green-500 dark:text-green-400" />
                 Best Selling Products
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {dashboardData.topSoldProducts.length > 0 ? (
                   dashboardData.topSoldProducts.map((product, index) => (
-                    <div key={product.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
+                    <div key={product.id} className="bg-gray-50 dark:bg-white/5 rounded-lg p-4 border border-gray-200 dark:border-white/10">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium text-gray-400">#{index + 1}</span>
-                        <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">
+                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">#{index + 1}</span>
+                        <span className="text-xs bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400 px-2 py-1 rounded-full">
                           {product.quantity} sold
                         </span>
                       </div>
-                      <p className="text-white font-medium mb-1">{product.name}</p>
-                      <p className="text-sm text-gray-400">Revenue: {formatCurrency(product.revenue)}</p>
+                      <p className="text-gray-900 dark:text-white font-medium mb-1">{product.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Revenue: {formatCurrency(product.revenue)}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-400 text-center col-span-3 py-4">No sales data yet</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-center col-span-3 py-4">No sales data yet</p>
                 )}
               </div>
             </motion.div>
@@ -1332,15 +1332,15 @@ const SellerDashboard = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.55 }}
-              className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6"
+              className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-6"
             >
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Info className="w-5 h-5 text-blue-400" />
+                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-blue-400 mb-2">Business Insights</h4>
-                  <p className="text-sm text-gray-300">
+                  <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-2">Business Insights</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
                     • Your conversion rate of <strong>{dashboardData.conversionRate}%</strong> means {dashboardData.totalProductViews} product views led to {dashboardData.orderCounts.delivered} sales.<br/>
                     • Average order value is <strong>{formatCurrency(dashboardData.averageOrderValue)}</strong> - {dashboardData.averageOrderValue > 500 ? 'great!' : 'consider bundling products to increase this.'}<br/>
                     • COD success rate is <strong>{dashboardData.codSuccessRate}%</strong> - {dashboardData.codSuccessRate > 90 ? 'excellent!' : 'you may want to follow up on failed deliveries.'}<br/>

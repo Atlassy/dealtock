@@ -132,17 +132,17 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
   return (
     <div className="space-y-6">
       {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
         <form onSubmit={handleSearch} className="space-y-4">
           {/* Search Bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
             <input
               type="text"
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
@@ -151,7 +151,7 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Categories</option>
               {categories.map(cat => (
@@ -162,7 +162,7 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
             <select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Cities</option>
               {cities.map(city => (
@@ -176,14 +176,14 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
                 placeholder="Min (MAD)"
                 value={priceRange.min}
                 onChange={(e) => setPriceRange({...priceRange, min: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="number"
                 placeholder="Max (MAD)"
                 value={priceRange.max}
                 onChange={(e) => setPriceRange({...priceRange, max: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -198,7 +198,7 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
               <button
                 type="button"
                 onClick={clearFilters}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 Clear
               </button>
@@ -211,18 +211,18 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map(n => (
-            <div key={n} className="bg-white rounded-lg shadow p-4 animate-pulse">
-              <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div key={n} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 animate-pulse">
+              <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
             </div>
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
-          <p className="text-gray-500 mb-4">Try adjusting your filters or search terms</p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
+          <Package className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No products found</h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">Try adjusting your filters or search terms</p>
           <button
             onClick={clearFilters}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"

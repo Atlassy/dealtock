@@ -649,15 +649,15 @@ const DeliveryDashboard = () => {
         {/* Order Details Modal */}
         {showDetailsModal && selectedOrder && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
-                <h2 className="text-2xl font-bold flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800">
+                <h2 className="text-2xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
                   <FileText className="w-6 h-6 text-blue-500" />
                   Order Details
                 </h2>
                 <button
                   onClick={closeDetailsModal}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-500 dark:text-gray-400"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -665,38 +665,38 @@ const DeliveryDashboard = () => {
 
               <div className="p-6 space-y-6">
                 {/* Order Info */}
-                <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-blue-600 font-medium">Order Number</p>
-                      <p className="text-lg font-bold text-gray-900">{selectedOrder.order_number || 'N/A'}</p>
+                      <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Order Number</p>
+                      <p className="text-lg font-bold text-gray-900 dark:text-white">{selectedOrder.order_number || 'N/A'}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-blue-600 font-medium">Order ID</p>
-                      <p className="text-sm text-gray-600 break-all">{selectedOrder.id}</p>
+                      <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Order ID</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 break-all">{selectedOrder.id}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Customer Information */}
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <User className="w-5 h-5 text-gray-500" />
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <User className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     Customer Information
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
                     <div>
-                      <p className="text-xs text-gray-500">Name</p>
-                      <p className="font-medium">{selectedOrder.customer_name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Name</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.customer_name}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Phone</p>
-                      <p className="font-medium">{selectedOrder.customer_phone}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.customer_phone}</p>
                     </div>
                     {selectedOrder.customer_email && (
                       <div className="col-span-2">
-                        <p className="text-xs text-gray-500">Email</p>
-                        <p className="font-medium">{selectedOrder.customer_email}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.customer_email}</p>
                       </div>
                     )}
                   </div>
@@ -704,45 +704,45 @@ const DeliveryDashboard = () => {
 
                 {/* Delivery Address */}
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <Home className="w-5 h-5 text-gray-500" />
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <Home className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     Delivery Address
                   </h3>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="font-medium">{selectedOrder.full_address}</p>
-                    <p className="text-sm text-gray-600 mt-1">City: {selectedOrder.city}</p>
+                  <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                    <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.full_address}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">City: {selectedOrder.city}</p>
                   </div>
                 </div>
 
                 {/* Order Details */}
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <Package className="w-5 h-5 text-gray-500" />
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <Package className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     Order Details
                   </h3>
-                  <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+                  <div className="grid grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
                     <div>
-                      <p className="text-xs text-gray-500">Total Amount</p>
-                      <p className="font-bold text-green-600">MAD {selectedOrder.amount.toFixed(2)}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Total Amount</p>
+                      <p className="font-bold text-green-600 dark:text-green-400">MAD {selectedOrder.amount.toFixed(2)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Product Price</p>
-                      <p className="font-medium">MAD {selectedOrder.product_price?.toFixed(2) || '0.00'}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Product Price</p>
+                      <p className="font-medium text-gray-900 dark:text-white">MAD {selectedOrder.product_price?.toFixed(2) || '0.00'}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Shipping Fee</p>
-                      <p className="font-medium">MAD {selectedOrder.shipping_fee?.toFixed(2) || '0.00'}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Shipping Fee</p>
+                      <p className="font-medium text-gray-900 dark:text-white">MAD {selectedOrder.shipping_fee?.toFixed(2) || '0.00'}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Weight</p>
-                      <p className="font-medium flex items-center gap-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Weight</p>
+                      <p className="font-medium flex items-center gap-1 text-gray-900 dark:text-white">
                         <Weight className="w-4 h-4" />
                         {selectedOrder.weight} kg
                       </p>
                     </div>
                     <div className="col-span-2">
-                      <p className="text-xs text-gray-500">Service Type</p>
-                      <p className="font-medium capitalize">{selectedOrder.service_type}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Service Type</p>
+                      <p className="font-medium capitalize text-gray-900 dark:text-white">{selectedOrder.service_type}</p>
                     </div>
                   </div>
                 </div>
@@ -750,12 +750,12 @@ const DeliveryDashboard = () => {
                 {/* Tracking */}
                 {selectedOrder.tracking_code && (
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Truck className="w-5 h-5 text-gray-500" />
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                      <Truck className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                       Tracking Information
                     </h3>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="font-mono text-sm">{selectedOrder.tracking_code}</p>
+                    <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                      <p className="font-mono text-sm text-gray-900 dark:text-white">{selectedOrder.tracking_code}</p>
                     </div>
                   </div>
                 )}
@@ -763,48 +763,48 @@ const DeliveryDashboard = () => {
                 {/* Delivery Notes */}
                 {selectedOrder.notes && (
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <AlertCircle className="w-5 h-5 text-gray-500" />
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                      <AlertCircle className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                       Delivery Notes
                     </h3>
-                    <div className="bg-yellow-50 p-4 rounded-lg">
-                      <p className="text-gray-700">{selectedOrder.notes}</p>
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+                      <p className="text-gray-700 dark:text-gray-300">{selectedOrder.notes}</p>
                     </div>
                   </div>
                 )}
 
                 {/* Timeline */}
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-gray-500" />
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     Timeline
                   </h3>
-                  <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
+                  <div className="space-y-3 bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Order Created:</span>
-                      <span className="font-medium">{formatDate(selectedOrder.created_at)}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Order Created:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{formatDate(selectedOrder.created_at)}</span>
                     </div>
                     {selectedOrder.picked_at && (
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Picked Up:</span>
-                        <span className="font-medium">{formatDate(selectedOrder.picked_at)}</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-300">Picked Up:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{formatDate(selectedOrder.picked_at)}</span>
                       </div>
                     )}
                     {selectedOrder.confirmed_at && (
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Delivered:</span>
-                        <span className="font-medium">{formatDate(selectedOrder.confirmed_at)}</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-300">Delivered:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{formatDate(selectedOrder.confirmed_at)}</span>
                       </div>
                     )}
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Last Updated:</span>
-                      <span className="font-medium">{formatDate(selectedOrder.updated_at)}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Last Updated:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{formatDate(selectedOrder.updated_at)}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-3 pt-4 border-t">
+                <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                   {selectedOrder.status === 'out_for_delivery' && (
                     <button
                       onClick={() => {
@@ -818,7 +818,7 @@ const DeliveryDashboard = () => {
                   )}
                   <button
                     onClick={closeDetailsModal}
-                    className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     Close
                   </button>

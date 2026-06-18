@@ -222,51 +222,51 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-amber-50 to-kraft-50 px-6 py-4 border-b border-amber-100 sticky top-0">
+        <div className="bg-gradient-to-r from-amber-50 to-kraft-50 dark:from-amber-900/30 dark:to-kraft-900/30 px-6 py-4 border-b border-amber-100 dark:border-amber-800/50 sticky top-0">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-gray-800">Place B2B Order</h2>
-            <button onClick={onClose} className="p-1 hover:bg-amber-100 rounded-lg">
-              <X className="w-5 h-5 text-gray-600" />
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white">Place B2B Order</h2>
+            <button onClick={onClose} className="p-1 hover:bg-amber-100 dark:hover:bg-amber-900/40 rounded-lg">
+              <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             </button>
           </div>
-          <p className="text-sm text-gray-600 mt-1">Set your markup to calculate earnings</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Set your markup to calculate earnings</p>
         </div>
 
         <div className="p-6 space-y-6">
           {/* Product Details */}
-          <div className="bg-slate-50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">{product?.name}</h3>
-            <p className="text-sm text-gray-600 mb-2">{product?.category}</p>
+          <div className="bg-slate-50 dark:bg-gray-900 p-4 rounded-lg">
+            <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">{product?.name}</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{product?.category}</p>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="text-xs text-gray-500">Base Price (Seller)</span>
-                <p className="font-bold">{product?.purchase_price} MAD</p>
+                <span className="text-xs text-gray-500 dark:text-gray-400">Base Price (Seller)</span>
+                <p className="font-bold text-gray-900 dark:text-white">{product?.purchase_price} MAD</p>
               </div>
               <div>
-                <span className="text-xs text-gray-500">Available</span>
-                <p className="font-bold">{product?.quantity} units</p>
+                <span className="text-xs text-gray-500 dark:text-gray-400">Available</span>
+                <p className="font-bold text-gray-900 dark:text-white">{product?.quantity} units</p>
               </div>
             </div>
           </div>
 
           {/* Markup Slider - MANDATORY for B2B */}
-          <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+          <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800/50">
             <div className="flex items-center gap-2 mb-2">
-              <Percent className="w-5 h-5 text-amber-600" />
-              <h3 className="font-semibold text-gray-800">Your Markup <span className="text-red-500">*</span></h3>
+              <Percent className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <h3 className="font-semibold text-gray-800 dark:text-white">Your Markup <span className="text-red-500 dark:text-red-400">*</span></h3>
               {markupPercent <= 0 && (
-                <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full flex items-center gap-1">
+                <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 px-2 py-1 rounded-full flex items-center gap-1">
                   <AlertCircle className="w-3 h-3" /> Required
                 </span>
               )}
             </div>
-            
+
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-gray-600">Markup percentage:</span>
-                <span className="text-lg font-bold text-amber-700">{markupPercent}%</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">Markup percentage:</span>
+                <span className="text-lg font-bold text-amber-700 dark:text-amber-400">{markupPercent}%</span>
               </div>
               <input
                 type="range"
@@ -276,7 +276,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
                 onChange={(e) => setMarkupPercent(parseInt(e.target.value))}
                 className="w-full accent-amber-600"
               />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                 <span>1%</span>
                 <span>25%</span>
                 <span>50%</span>
@@ -288,24 +288,24 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
             {/* Price Breakdown */}
             {loadingCommission ? (
               <div className="text-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-600 mx-auto"></div>
-                <p className="text-xs text-gray-500 mt-2">Calculating commission...</p>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-600 dark:border-amber-400 mx-auto"></div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Calculating commission...</p>
               </div>
             ) : (
-              <div className="bg-white p-4 rounded-lg space-y-2">
-                <div className="flex justify-between text-sm">
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg space-y-2">
+                <div className="flex justify-between text-sm text-gray-900 dark:text-gray-100">
                   <span>Your Markup Amount:</span>
-                  <span className="font-bold text-green-600">+{prices.markupAmount.toFixed(2)} MAD</span>
+                  <span className="font-bold text-green-600 dark:text-green-400">+{prices.markupAmount.toFixed(2)} MAD</span>
                 </div>
-                <div className="flex justify-between text-sm text-kraft-600 border-t pt-2">
+                <div className="flex justify-between text-sm text-kraft-600 dark:text-kraft-400 border-t border-gray-200 dark:border-gray-700 pt-2">
                   <span>Dealtock Fee ({prices.commissionRate}%):</span>
                   <span className="font-bold">-{prices.commissionAmount.toFixed(2)} MAD</span>
                 </div>
-                <div className="flex justify-between font-bold text-base bg-green-50 p-2 rounded">
+                <div className="flex justify-between font-bold text-base bg-green-50 dark:bg-green-900/20 text-gray-900 dark:text-white p-2 rounded">
                   <span>Your Net Profit:</span>
-                  <span className="text-green-700">{prices.netProfit.toFixed(2)} MAD</span>
+                  <span className="text-green-700 dark:text-green-400">{prices.netProfit.toFixed(2)} MAD</span>
                 </div>
-                <div className="border-t pt-2 mt-2">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2 text-gray-900 dark:text-gray-100">
                   <div className="flex justify-between text-sm">
                     <span>Customer Price:</span>
                     <span>{prices.subtotal.toFixed(2)} MAD</span>
@@ -324,8 +324,8 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
           </div>
 
           {/* Customer Information */}
-          <div className="border-t pt-4">
-            <h3 className="font-semibold mb-3">Customer Information</h3>
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+            <h3 className="font-semibold mb-3 text-gray-900 dark:text-white">Customer Information</h3>
             {/* ... customer form fields ... */}
           </div>
 

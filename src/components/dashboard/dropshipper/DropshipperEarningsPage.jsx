@@ -193,7 +193,7 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
@@ -202,13 +202,13 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">My Earnings</h1>
-        <p className="text-sm text-gray-500 mt-1">Track your commissions and payouts</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Earnings</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Track your commissions and payouts</p>
       </div>
 
       {/* Timeframe Selector */}
       <div className="flex justify-between items-center">
-        <p className="text-sm text-gray-500">{getDateRangeText()}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{getDateRangeText()}</p>
         <div className="flex space-x-2">
           {['week', 'month', 'year', 'all'].map((t) => (
             <button
@@ -217,7 +217,7 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
               className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${
                 timeframe === t
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               {t}
@@ -228,72 +228,72 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
 
       {/* Main Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-          <p className="text-sm text-gray-500 mb-1">Gross Revenue (Markup)</p>
-          <p className="text-2xl font-bold">{formatCurrency(earnings.grossCommission)}</p>
-          <p className="text-xs text-gray-400 mt-2">Total markup before fees</p>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Gross Revenue (Markup)</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(earnings.grossCommission)}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Total markup before fees</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-          <p className="text-sm text-gray-500 mb-1">Dealtock Fees</p>
-          <p className="text-2xl font-bold text-kraft-600">{formatCurrency(earnings.dealtockFees)}</p>
-          <p className="text-xs text-gray-400 mt-2">{earnings.averageCommission.toFixed(1)}% avg commission</p>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Dealtock Fees</p>
+          <p className="text-2xl font-bold text-kraft-600 dark:text-kraft-400">{formatCurrency(earnings.dealtockFees)}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{earnings.averageCommission.toFixed(1)}% avg commission</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-green-100 p-5">
-          <p className="text-sm text-gray-500 mb-1">Net Earnings</p>
-          <p className="text-2xl font-bold text-green-600">{formatCurrency(earnings.netEarnings)}</p>
-          <p className="text-xs text-gray-400 mt-2">After Dealtock fees</p>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-green-100 dark:border-green-900/40 p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Net Earnings</p>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(earnings.netEarnings)}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">After Dealtock fees</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-          <p className="text-sm text-gray-500 mb-1">Growth</p>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Growth</p>
           <div className="flex items-center">
-            <p className="text-2xl font-bold">{Math.abs(earnings.growth).toFixed(1)}%</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{Math.abs(earnings.growth).toFixed(1)}%</p>
             {earnings.growth >= 0 ? (
-              <ArrowUp className="w-5 h-5 text-green-600 ml-2" />
+              <ArrowUp className="w-5 h-5 text-green-600 dark:text-green-400 ml-2" />
             ) : (
-              <ArrowDown className="w-5 h-5 text-red-600 ml-2" />
+              <ArrowDown className="w-5 h-5 text-red-600 dark:text-red-400 ml-2" />
             )}
           </div>
-          <p className="text-xs text-gray-400 mt-2">vs last month (net)</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">vs last month (net)</p>
         </div>
       </div>
 
       {/* Pending vs Paid Breakdown */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-          <h3 className="font-medium mb-3">Pending Earnings</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+          <h3 className="font-medium mb-3 text-gray-900 dark:text-white">Pending Earnings</h3>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Gross Pending:</span>
-              <span className="font-medium">{formatCurrency(earnings.pendingGross)}</span>
+              <span className="text-gray-600 dark:text-gray-400">Gross Pending:</span>
+              <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(earnings.pendingGross)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Dealtock Fees:</span>
-              <span className="text-kraft-600">-{formatCurrency(earnings.pendingGross - earnings.pendingNet)}</span>
+              <span className="text-gray-600 dark:text-gray-400">Dealtock Fees:</span>
+              <span className="text-kraft-600 dark:text-kraft-400">-{formatCurrency(earnings.pendingGross - earnings.pendingNet)}</span>
             </div>
-            <div className="flex justify-between font-bold pt-2 border-t">
-              <span>Your Net:</span>
-              <span className="text-yellow-600">{formatCurrency(earnings.pendingNet)}</span>
+            <div className="flex justify-between font-bold pt-2 border-t border-gray-200 dark:border-gray-700">
+              <span className="text-gray-900 dark:text-white">Your Net:</span>
+              <span className="text-yellow-600 dark:text-yellow-400">{formatCurrency(earnings.pendingNet)}</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-          <h3 className="font-medium mb-3">Paid Earnings</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+          <h3 className="font-medium mb-3 text-gray-900 dark:text-white">Paid Earnings</h3>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Gross Paid:</span>
-              <span className="font-medium">{formatCurrency(earnings.paidGross)}</span>
+              <span className="text-gray-600 dark:text-gray-400">Gross Paid:</span>
+              <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(earnings.paidGross)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Dealtock Fees:</span>
-              <span className="text-kraft-600">-{formatCurrency(earnings.paidGross - earnings.paidNet)}</span>
+              <span className="text-gray-600 dark:text-gray-400">Dealtock Fees:</span>
+              <span className="text-kraft-600 dark:text-kraft-400">-{formatCurrency(earnings.paidGross - earnings.paidNet)}</span>
             </div>
-            <div className="flex justify-between font-bold pt-2 border-t">
-              <span>Your Net:</span>
-              <span className="text-green-600">{formatCurrency(earnings.paidNet)}</span>
+            <div className="flex justify-between font-bold pt-2 border-t border-gray-200 dark:border-gray-700">
+              <span className="text-gray-900 dark:text-white">Your Net:</span>
+              <span className="text-green-600 dark:text-green-400">{formatCurrency(earnings.paidNet)}</span>
             </div>
           </div>
         </div>
@@ -325,7 +325,7 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
             URL.revokeObjectURL(url);
             toast.success('Earnings exported');
           }}
-          className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+          className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
         >
           <Download className="w-4 h-4 mr-2" />
           Export
@@ -333,46 +333,46 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
       </div>
 
       {/* Recent Transactions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-5 border-b">
-          <h3 className="font-semibold">Recent Transactions</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="p-5 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-900 dark:text-white">Recent Transactions</h3>
         </div>
-        <div className="divide-y max-h-96 overflow-auto">
+        <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-96 overflow-auto">
           {transactions.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <div className="p-12 text-center text-gray-500 dark:text-gray-400">
+              <TrendingUp className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
               <p>No transactions yet</p>
             </div>
           ) : (
             transactions.map((transaction) => (
-              <div key={transaction.id} className="p-4 hover:bg-gray-50">
+              <div key={transaction.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-medium">Order #{transaction.order_number}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">Order #{transaction.order_number}</p>
                       <span className={`text-xs px-2 py-1 rounded-full ${
                         transaction.status === 'delivered' || transaction.status === 'settled'
-                          ? 'bg-green-100 text-green-800'
+                          ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
                           : transaction.status === 'ordered' || transaction.status === 'approved'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-blue-100 text-blue-800'
+                          ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
+                          : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400'
                       }`}>
                         {transaction.status}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600">{transaction.products?.name}</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{transaction.products?.name}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
                       {new Date(transaction.ordered_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-600">
-                      Gross: <span className="font-medium">{formatCurrency(transaction.dropshipper_markup)}</span>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      Gross: <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(transaction.dropshipper_markup)}</span>
                     </p>
-                    <p className="text-xs text-kraft-600">
+                    <p className="text-xs text-kraft-600 dark:text-kraft-400">
                       Fee: -{formatCurrency(transaction.dropshipper_commission_amount)}
                     </p>
-                    <p className="font-bold text-green-600">
+                    <p className="font-bold text-green-600 dark:text-green-400">
                       Net: {formatCurrency(transaction.dropshipper_net_earnings)}
                     </p>
                   </div>

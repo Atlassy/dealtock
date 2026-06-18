@@ -349,10 +349,10 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
       </div>
 
       {/* Escrows Table */}
-      <div className="bg-white rounded-lg border overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
                 <th className="p-4 w-10">
                   <input
@@ -363,12 +363,12 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                     className="rounded"
                   />
                 </th>
-                <th className="text-left p-4 font-medium text-sm">Order Details</th>
-                <th className="text-left p-4 font-medium text-sm">Delivery Partner</th>
-                <th className="text-left p-4 font-medium text-sm">Amount</th>
-                <th className="text-left p-4 font-medium text-sm">Status</th>
-                <th className="text-left p-4 font-medium text-sm">Held Since</th>
-                <th className="text-left p-4 font-medium text-sm">Actions</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Order Details</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Delivery Partner</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Amount</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Status</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Held Since</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -379,7 +379,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                 const isReleasing = releasingIds.has(escrow.id);
                 
                 return (
-                  <tr key={escrow.id} className="border-t hover:bg-gray-50">
+                  <tr key={escrow.id} className="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="p-4">
                       {!escrow.released_at && (
                         <input
@@ -391,24 +391,24 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                       )}
                     </td>
                     <td className="p-4">
-                      <div className="font-medium text-sm">
+                      <div className="font-medium text-sm text-gray-900 dark:text-white">
                         {escrow.orders?.order_number || 'N/A'}
                       </div>
-                      <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
                         <Package className="w-3 h-3" />
                         ID: {escrow.order_id?.substring(0, 8)}...
                       </div>
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-1">
-                        <Truck className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm">
+                        <Truck className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
                           {escrow.delivery_companies?.name || 'N/A'}
                         </span>
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className="font-bold text-green-700">
+                      <div className="font-bold text-green-700 dark:text-green-400">
                         {formatCurrency(escrow.amount_held, escrow.currency)}
                       </div>
                     </td>
@@ -419,7 +419,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                           {status.label}
                         </span>
                         {!escrow.released_at && (
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             <Clock className="w-3 h-3 inline mr-1" />
                             {daysHeld} day{daysHeld !== 1 ? 's' : ''} held
                           </div>
@@ -427,9 +427,9 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className="text-sm">
+                      <div className="text-sm text-gray-700 dark:text-gray-300">
                         <div className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-gray-400" />
+                          <Calendar className="w-3 h-3 text-gray-400 dark:text-gray-500" />
                           {formatDate(escrow.held_at)}
                         </div>
                       </div>
@@ -438,7 +438,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                       <div className="flex gap-2">
                         <button
                           onClick={() => setSelectedEscrow(escrow)}
-                          className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                          className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
                           title="View Details"
                         >
                           <Eye className="w-4 h-4" />
@@ -467,14 +467,14 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
 
         {filteredEscrows.length === 0 && (
           <div className="text-center py-12">
-            <Shield className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">No escrows found matching your filters.</p>
+            <Shield className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-500 dark:text-gray-400">No escrows found matching your filters.</p>
             <button
               onClick={() => {
                 setSearchTerm('');
                 setStatusFilter('pending');
               }}
-              className="mt-4 text-sm text-blue-600 hover:text-blue-800"
+              className="mt-4 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
             >
               Clear filters
             </button>
@@ -485,63 +485,63 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
       {/* Escrow Details Modal */}
       {selectedEscrow && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl w-full max-w-lg">
-            <div className="p-6 border-b flex justify-between items-center">
-              <h3 className="text-xl font-bold">Escrow Details</h3>
-              <button 
-                onClick={() => setSelectedEscrow(null)} 
-                className="p-2 hover:bg-gray-100 rounded-lg"
+          <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Escrow Details</h3>
+              <button
+                onClick={() => setSelectedEscrow(null)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg dark:text-gray-300"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-gray-500">Order Number</p>
-                  <p className="font-medium">{selectedEscrow.orders?.order_number || 'N/A'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Order Number</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{selectedEscrow.orders?.order_number || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Order ID</p>
-                  <p className="text-sm font-mono">{selectedEscrow.order_id}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Order ID</p>
+                  <p className="text-sm font-mono text-gray-700 dark:text-gray-300">{selectedEscrow.order_id}</p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Amount Held</p>
-                <p className="text-2xl font-bold text-green-700">
+              <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Amount Held</p>
+                <p className="text-2xl font-bold text-green-700 dark:text-green-400">
                   {formatCurrency(selectedEscrow.amount_held, selectedEscrow.currency)}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-gray-500">Delivery Company</p>
-                  <p className="font-medium">{selectedEscrow.delivery_companies?.name || 'N/A'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Delivery Company</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{selectedEscrow.delivery_companies?.name || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Days Held</p>
-                  <p className="font-medium">{getDaysHeld(selectedEscrow.held_at)} days</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Days Held</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{getDaysHeld(selectedEscrow.held_at)} days</p>
                 </div>
               </div>
 
               <div>
-                <p className="text-xs text-gray-500">Held Since</p>
-                <p className="font-medium">{formatDateTime(selectedEscrow.held_at)}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Held Since</p>
+                <p className="font-medium text-gray-900 dark:text-white">{formatDateTime(selectedEscrow.held_at)}</p>
               </div>
 
               {selectedEscrow.released_at && (
                 <div>
-                  <p className="text-xs text-gray-500">Released At</p>
-                  <p className="font-medium">{formatDateTime(selectedEscrow.released_at)}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Released At</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{formatDateTime(selectedEscrow.released_at)}</p>
                 </div>
               )}
 
-              <div className="border-t pt-4 flex justify-end gap-3">
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4 flex justify-end gap-3">
                 <button
                   onClick={() => setSelectedEscrow(null)}
-                  className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200"
                 >
                   Close
                 </button>

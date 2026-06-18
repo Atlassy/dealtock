@@ -53,15 +53,15 @@ const STATUSES = [
 // INVENTORY SKELETON
 // ============================================
 const InventorySkeleton = () => (
-  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 p-8">
+  <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900 p-8">
     <div className="animate-pulse space-y-6">
-      <div className="h-8 bg-gray-700/50 rounded w-1/4"></div>
+      <div className="h-8 bg-gray-200 dark:bg-gray-700/50 rounded w-1/4"></div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map(i => (
-          <div key={i} className="h-12 bg-gray-700/30 rounded-lg"></div>
+          <div key={i} className="h-12 bg-gray-200 dark:bg-gray-700/30 rounded-lg"></div>
         ))}
       </div>
-      <div className="h-96 bg-gray-700/30 rounded-xl"></div>
+      <div className="h-96 bg-gray-200 dark:bg-gray-700/30 rounded-xl"></div>
     </div>
   </div>
 );
@@ -70,12 +70,12 @@ const InventorySkeleton = () => (
 // STAT CARD COMPONENT
 // ============================================
 const StatCard = ({ title, value, icon: Icon, color = "blue", subtext }) => (
-  <div className="glass-effect border-white/20 rounded-xl p-4 hover:border-blue-500/50 transition-all duration-300">
+  <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-4 shadow-sm dark:shadow-none hover:border-blue-500/50 transition-all duration-300">
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-xs font-medium text-gray-400">{title}</p>
-        <p className="text-xl font-bold text-white mt-1">{value}</p>
-        {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{title}</p>
+        <p className="text-xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
+        {subtext && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{subtext}</p>}
       </div>
       <div className={`w-10 h-10 bg-gradient-to-br from-${color}-500 to-${color}-600 rounded-lg flex items-center justify-center`}>
         <Icon className="w-5 h-5 text-white" />
@@ -290,11 +290,11 @@ const Inventory = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Please Log In</h2>
-          <p className="text-gray-400">You need to be authenticated to access your inventory.</p>
+          <Package className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Please Log In</h2>
+          <p className="text-gray-500 dark:text-gray-400">You need to be authenticated to access your inventory.</p>
         </div>
       </div>
     );
@@ -303,7 +303,7 @@ const Inventory = () => {
   if (loading) return <InventorySkeleton />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <motion.div
@@ -312,23 +312,23 @@ const Inventory = () => {
           className="flex justify-between items-center mb-8"
         >
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
               Inventory Management
             </h1>
-            <p className="text-gray-400 mt-1">Manage your products and stock levels</p>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your products and stock levels</p>
           </div>
-          
+
           <div className="flex items-center gap-3">
             {/* Refresh Button - Same position as dashboard */}
             <button
               onClick={fetchProducts}
               disabled={loading}
-              className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all flex items-center gap-2 text-white"
+              className="px-4 py-2 bg-gray-100 dark:bg-white/10 dark:backdrop-blur-sm rounded-lg hover:bg-gray-200 dark:hover:bg-white/20 transition-all flex items-center gap-2 text-gray-700 dark:text-white"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               {loading ? 'Refreshing...' : 'Refresh'}
             </button>
-            
+
             {/* Add Product Button */}
             <button
               onClick={() => setShowAddForm(true)}
@@ -382,7 +382,7 @@ const Inventory = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="glass-effect border-white/20 rounded-xl p-4 mb-6"
+          className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-4 mb-6 shadow-sm dark:shadow-none"
         >
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             {/* Search */}
@@ -393,20 +393,20 @@ const Inventory = () => {
                 placeholder="Search products by name or SKU..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400"
+                className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-200 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
               />
             </div>
-            
+
             {/* Status Filter */}
             <div>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
+                className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-200 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
               >
-                <option value="all" className="bg-gray-800">All Status</option>
+                <option value="all" className="bg-white dark:bg-gray-800">All Status</option>
                 {STATUSES.map(s => (
-                  <option key={s.value} value={s.value} className="bg-gray-800">{s.label}</option>
+                  <option key={s.value} value={s.value} className="bg-white dark:bg-gray-800">{s.label}</option>
                 ))}
               </select>
             </div>
@@ -416,11 +416,11 @@ const Inventory = () => {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
+                className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-200 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
               >
-                <option value="all" className="bg-gray-800">All Categories</option>
+                <option value="all" className="bg-white dark:bg-gray-800">All Categories</option>
                 {categories.map(cat => (
-                  <option key={cat} value={cat} className="bg-gray-800">{cat}</option>
+                  <option key={cat} value={cat} className="bg-white dark:bg-gray-800">{cat}</option>
                 ))}
               </select>
             </div>
@@ -430,9 +430,9 @@ const Inventory = () => {
               <button
                 onClick={() => setViewMode('table')}
                 className={`flex-1 px-3 py-2 rounded-lg flex items-center justify-center gap-2 transition ${
-                  viewMode === 'table' 
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' 
-                    : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                  viewMode === 'table'
+                    ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/20'
                 }`}
               >
                 <List className="w-4 h-4" />
@@ -441,9 +441,9 @@ const Inventory = () => {
               <button
                 onClick={() => setViewMode('grid')}
                 className={`flex-1 px-3 py-2 rounded-lg flex items-center justify-center gap-2 transition ${
-                  viewMode === 'grid' 
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' 
-                    : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                  viewMode === 'grid'
+                    ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/20'
                 }`}
               >
                 <Grid className="w-4 h-4" />
@@ -453,7 +453,7 @@ const Inventory = () => {
           </div>
 
           {/* Results count */}
-          <div className="mt-3 text-sm text-gray-400">
+          <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
             Showing {filteredProducts.length} of {products.length} products
           </div>
         </motion.div>
@@ -463,13 +463,13 @@ const Inventory = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-white/5 rounded-xl overflow-hidden"
+          className="bg-white dark:bg-white/5 border border-gray-200 dark:border-transparent rounded-xl overflow-hidden shadow-sm dark:shadow-none"
         >
           {filteredProducts.length === 0 ? (
             <div className="text-center py-16">
-              <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">No products found</h3>
-              <p className="text-gray-400 mb-6">
+              <Package className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No products found</h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
                 {searchTerm || statusFilter !== 'all' || categoryFilter !== 'all'
                   ? 'Try adjusting your filters'
                   : 'Start by adding your first product!'}
@@ -492,12 +492,12 @@ const Inventory = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
               {filteredProducts.map((product) => (
-                <div key={product.id} className="bg-white/10 rounded-lg p-4 border border-white/20 hover:border-blue-500/50 transition">
+                <div key={product.id} className="bg-gray-50 dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-white/20 hover:border-blue-500/50 transition">
                   <div className="flex items-start justify-between mb-3">
-                    <div className="w-16 h-16 bg-gray-700 rounded-lg overflow-hidden">
+                    <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
                       {product.image_url ? (
-                        <img 
-                          src={product.image_url} 
+                        <img
+                          src={product.image_url}
                           alt={product.name}
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -506,47 +506,47 @@ const Inventory = () => {
                           }}
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-600">
-                          <Package className="w-6 h-6 text-gray-400" />
+                        <div className="w-full h-full flex items-center justify-center bg-gray-300 dark:bg-gray-600">
+                          <Package className="w-6 h-6 text-gray-500 dark:text-gray-400" />
                         </div>
                       )}
                     </div>
                     <div className="flex gap-2">
                       <button
                         onClick={() => setEditingProduct(product)}
-                        className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition"
+                        className="p-2 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-500/30 transition"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleToggleAvailability(product.id, !product.available_for_sale)}
                         className={`p-2 rounded-lg transition ${
-                          product.available_for_sale 
-                            ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
-                            : 'bg-gray-500/20 text-gray-400 hover:bg-gray-500/30'
+                          product.available_for_sale
+                            ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-500/30'
+                            : 'bg-gray-200 dark:bg-gray-500/20 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-500/30'
                         }`}
                       >
                         {product.available_for_sale ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                       </button>
                       <button
                         onClick={() => handleDeleteProduct(product.id)}
-                        className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition"
+                        className="p-2 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-500/30 transition"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
-                  <h4 className="font-semibold text-white mb-1">{product.name}</h4>
-                  <p className="text-sm text-gray-400 mb-2">{product.category || 'Uncategorized'}</p>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">{product.name}</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{product.category || 'Uncategorized'}</p>
                   <div className="flex justify-between items-center">
                     <div>
-                      <p className="text-sm text-gray-400">Your Price</p>
-                      <p className="text-lg font-bold text-blue-400">{formatCurrency(product.purchase_price || 0)}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Your Price</p>
+                      <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{formatCurrency(product.purchase_price || 0)}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-gray-400">Quantity</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Quantity</p>
                       <p className={`text-lg font-bold ${
-                        product.quantity <= 3 ? 'text-red-400' : 'text-green-400'
+                        product.quantity <= 3 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
                       }`}>
                         {product.quantity || 0}
                       </p>
@@ -554,13 +554,13 @@ const Inventory = () => {
                   </div>
                   <div className="mt-3 flex items-center justify-between text-sm">
                     <span className={`px-2 py-1 rounded-full ${
-                      product.status === 'available' ? 'bg-green-500/20 text-green-400' :
-                      product.status === 'sold' ? 'bg-purple-500/20 text-purple-400' :
-                      'bg-gray-500/20 text-gray-400'
+                      product.status === 'available' ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400' :
+                      product.status === 'sold' ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400' :
+                      'bg-gray-200 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400'
                     }`}>
                       {product.status || 'available'}
                     </span>
-                    <span className="text-gray-400">
+                    <span className="text-gray-500 dark:text-gray-400">
                       SKU: {product.sku || 'N/A'}
                     </span>
                   </div>

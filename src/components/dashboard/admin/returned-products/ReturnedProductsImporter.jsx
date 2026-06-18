@@ -323,18 +323,18 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Package className="w-6 h-6 text-kraft-500" />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <Package className="w-6 h-6 text-kraft-500 dark:text-kraft-400" />
             Import Returned Products
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Upload a CSV from a delivery company to list returned parcels on the marketplace.
-            All listings go to <span className="font-medium text-kraft-600">pending review</span> before going live.
+            All listings go to <span className="font-medium text-kraft-600 dark:text-kraft-400">pending review</span> before going live.
           </p>
         </div>
         <button
           onClick={downloadTemplate}
-          className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
           <Download className="w-4 h-4" />
           Download Template
@@ -351,18 +351,18 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
           return (
             <React.Fragment key={s}>
               <div className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
-                isCurrent ? "text-kraft-600" : isDone ? "text-green-600" : "text-gray-400"
+                isCurrent ? "text-kraft-600 dark:text-kraft-400" : isDone ? "text-green-600 dark:text-green-400" : "text-gray-400 dark:text-gray-500"
               }`}>
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
                   isCurrent ? "bg-kraft-500 text-white" :
                   isDone    ? "bg-green-500 text-white" :
-                              "bg-gray-200 text-gray-500"
+                              "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
                 }`}>
                   {isDone ? <Check className="w-3 h-3" /> : i + 1}
                 </div>
                 {labels[i]}
               </div>
-              {i < 3 && <div className={`flex-1 h-0.5 ${isDone ? "bg-green-400" : "bg-gray-200"}`} />}
+              {i < 3 && <div className={`flex-1 h-0.5 ${isDone ? "bg-green-400" : "bg-gray-200 dark:bg-gray-700"}`} />}
             </React.Fragment>
           );
         })}
@@ -372,15 +372,15 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
       {step === "upload" && (
         <div className="space-y-4">
           {/* Delivery company selector */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              <Truck className="inline w-4 h-4 mr-1 text-gray-400" />
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              <Truck className="inline w-4 h-4 mr-1 text-gray-400 dark:text-gray-500" />
               Select Delivery Company *
             </label>
             <select
               value={selectedDC}
               onChange={e => setSelectedDC(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-kraft-400 focus:border-kraft-400"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-kraft-400 focus:border-kraft-400"
             >
               <option value="">— Choose delivery company —</option>
               {deliveryCompanies.map(dc => (
@@ -397,26 +397,26 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
             onClick={() => fileRef.current?.click()}
             className={`cursor-pointer rounded-xl border-2 border-dashed p-12 text-center transition-all ${
               dragging
-                ? "border-kraft-400 bg-kraft-50"
-                : "border-gray-300 hover:border-kraft-300 hover:bg-kraft-50/40"
+                ? "border-kraft-400 bg-kraft-50 dark:bg-kraft-900/20"
+                : "border-gray-300 dark:border-gray-600 hover:border-kraft-300 hover:bg-kraft-50/40 dark:hover:bg-kraft-900/10"
             }`}
           >
-            <Upload className={`w-10 h-10 mx-auto mb-3 transition-colors ${dragging ? "text-kraft-500" : "text-gray-400"}`} />
-            <p className="text-base font-semibold text-gray-700">Drop your CSV here or click to browse</p>
-            <p className="text-sm text-gray-400 mt-1">Accepts .csv files — any column format</p>
+            <Upload className={`w-10 h-10 mx-auto mb-3 transition-colors ${dragging ? "text-kraft-500" : "text-gray-400 dark:text-gray-500"}`} />
+            <p className="text-base font-semibold text-gray-700 dark:text-gray-300">Drop your CSV here or click to browse</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Accepts .csv files — any column format</p>
             <input ref={fileRef} type="file" accept=".csv" className="hidden"
               onChange={e => handleFile(e.target.files[0])} />
           </div>
 
           {/* Template info */}
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
             <div className="flex gap-3">
-              <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-amber-800">
+              <AlertCircle className="w-5 h-5 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-amber-800 dark:text-amber-300">
                 <p className="font-semibold mb-1">First time? Download the standard template.</p>
                 <p>The importer accepts <strong>any CSV format</strong> — you'll map columns in the next step.
                 The template is the easiest option to share with delivery company partners.</p>
-                <p className="mt-1 text-xs text-amber-600">
+                <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
                   ℹ️ Days in storage is for internal tracking only — it will never be shown to buyers.
                 </p>
               </div>
@@ -430,15 +430,15 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
         <div className="space-y-4">
           {/* DC selector (shown again if not filled) */}
           {!selectedDC && (
-            <div className="bg-white rounded-xl border border-kraft-200 p-5">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <Truck className="inline w-4 h-4 mr-1 text-gray-400" />
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-kraft-200 dark:border-kraft-800 p-5">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <Truck className="inline w-4 h-4 mr-1 text-gray-400 dark:text-gray-500" />
                 Select Delivery Company *
               </label>
               <select
                 value={selectedDC}
                 onChange={e => setSelectedDC(e.target.value)}
-                className="w-full px-3 py-2 border border-kraft-300 rounded-lg text-sm focus:ring-2 focus:ring-kraft-400"
+                className="w-full px-3 py-2 border border-kraft-300 dark:border-kraft-700 dark:bg-gray-700 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-kraft-400"
               >
                 <option value="">— Choose delivery company —</option>
                 {deliveryCompanies.map(dc => (
@@ -448,11 +448,11 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
             </div>
           )}
 
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-semibold text-gray-800">Map CSV Columns → Dealtock Fields</h3>
-                <p className="text-sm text-gray-500 mt-0.5">
+                <h3 className="font-semibold text-gray-800 dark:text-white">Map CSV Columns → Dealtock Fields</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                   {csvData.rows.length} rows detected · {csvData.headers.length} columns
                   · Auto-mapped where possible
                 </p>
@@ -468,19 +468,19 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
 
                 return (
                   <div key={header} className={`grid grid-cols-[1fr_auto_1fr] gap-3 items-center p-3 rounded-lg border ${
-                    isIgnored ? "border-gray-100 bg-gray-50 opacity-60" :
-                    isRequired && mapping[header] === "ignore" ? "border-red-200 bg-red-50" :
-                    "border-gray-200 bg-white"
+                    isIgnored ? "border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 opacity-60" :
+                    isRequired && mapping[header] === "ignore" ? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20" :
+                    "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
                   }`}>
                     {/* CSV column */}
                     <div>
-                      <div className="text-xs font-mono font-semibold text-gray-600">{header}</div>
-                      <div className="text-xs text-gray-400 mt-0.5 truncate">
+                      <div className="text-xs font-mono font-semibold text-gray-600 dark:text-gray-300">{header}</div>
+                      <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 truncate">
                         {preview3.length ? preview3.join(" · ") : "—"}
                       </div>
                     </div>
 
-                    <ArrowRight className="w-4 h-4 text-gray-400" />
+                    <ArrowRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
 
                     {/* Dealtock field selector */}
                     <div className="relative">
@@ -488,9 +488,9 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
                         value={mapping[header] || "ignore"}
                         onChange={e => setMapping(prev => ({ ...prev, [header]: e.target.value }))}
                         className={`w-full px-3 py-2 border rounded-lg text-sm appearance-none pr-8 focus:ring-2 focus:ring-kraft-400 ${
-                          isIgnored     ? "border-gray-200 text-gray-400" :
-                          isRequired    ? "border-green-300 text-green-800 bg-green-50" :
-                                          "border-gray-300"
+                          isIgnored     ? "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 dark:bg-gray-800" :
+                          isRequired    ? "border-green-300 dark:border-green-700 text-green-800 dark:text-green-400 bg-green-50 dark:bg-green-900/20" :
+                                          "border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                         }`}
                       >
                         {DEALTOCK_FIELDS.map(f => (
@@ -499,9 +499,9 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
                           </option>
                         ))}
                       </select>
-                      <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" />
+                      <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-500" />
                       {dealtockField?.hint && !isIgnored && (
-                        <p className="text-xs text-gray-400 mt-0.5">{dealtockField.hint}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{dealtockField.hint}</p>
                       )}
                     </div>
                   </div>
@@ -510,12 +510,12 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
             </div>
 
             {/* Required fields status */}
-            <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
+            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex flex-wrap gap-2">
               {DEALTOCK_FIELDS.filter(f => f.required).map(f => {
                 const mapped = Object.values(mapping).includes(f.key);
                 return (
                   <span key={f.key} className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
-                    mapped ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                    mapped ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                   }`}>
                     {mapped ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                     {f.label}
@@ -526,7 +526,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
           </div>
 
           <div className="flex gap-3 justify-end">
-            <button onClick={reset} className="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+            <button onClick={reset} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
               ← Back
             </button>
             <button onClick={buildPreview}
@@ -544,61 +544,61 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
           {/* Stats bar */}
           <div className="grid grid-cols-4 gap-3">
             {[
-              { label: "Total rows",    value: preview.length,                                     color: "text-gray-800" },
-              { label: "Valid",         value: preview.filter(r => r._errors.length === 0).length, color: "text-green-600" },
-              { label: "Has errors",    value: preview.filter(r => r._errors.length > 0).length,   color: "text-red-500" },
-              { label: "Selected",      value: Object.values(rowChecked).filter(Boolean).length,    color: "text-kraft-600" },
+              { label: "Total rows",    value: preview.length,                                     color: "text-gray-800 dark:text-white" },
+              { label: "Valid",         value: preview.filter(r => r._errors.length === 0).length, color: "text-green-600 dark:text-green-400" },
+              { label: "Has errors",    value: preview.filter(r => r._errors.length > 0).length,   color: "text-red-500 dark:text-red-400" },
+              { label: "Selected",      value: Object.values(rowChecked).filter(Boolean).length,    color: "text-kraft-600 dark:text-kraft-400" },
             ].map(s => (
-              <div key={s.label} className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+              <div key={s.label} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
                 <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{s.label}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{s.label}</div>
               </div>
             ))}
           </div>
 
           {/* Bulk select */}
-          <div className="flex items-center justify-between bg-white rounded-xl border border-gray-200 px-4 py-3">
+          <div className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3">
             <div className="flex gap-2">
               <button onClick={() => {
                 const next = {};
                 preview.forEach(r => { next[r._rowIndex] = r._errors.length === 0; });
                 setRowChecked(next);
-              }} className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600">
+              }} className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                 Select valid rows
               </button>
               <button onClick={() => {
                 const next = {};
                 preview.forEach(r => { next[r._rowIndex] = false; });
                 setRowChecked(next);
-              }} className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600">
+              }} className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
                 Deselect all
               </button>
             </div>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-400 dark:text-gray-500">
               ℹ️ Rows with errors cannot be selected until fixed
             </p>
           </div>
 
           {/* Row table */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 sticky top-0 z-10">
+                <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0 z-10">
                   <tr>
-                    <th className="text-left p-3 text-xs font-semibold text-gray-500 w-10">#</th>
-                    <th className="text-left p-3 text-xs font-semibold text-gray-500">Import</th>
-                    <th className="text-left p-3 text-xs font-semibold text-gray-500">Product Name</th>
-                    <th className="text-left p-3 text-xs font-semibold text-gray-500">Category</th>
-                    <th className="text-left p-3 text-xs font-semibold text-gray-500">Price (MAD)</th>
-                    <th className="text-left p-3 text-xs font-semibold text-gray-500">Qty</th>
-                    <th className="text-left p-3 text-xs font-semibold text-gray-500">
+                    <th className="text-left p-3 text-xs font-semibold text-gray-500 dark:text-gray-400 w-10">#</th>
+                    <th className="text-left p-3 text-xs font-semibold text-gray-500 dark:text-gray-400">Import</th>
+                    <th className="text-left p-3 text-xs font-semibold text-gray-500 dark:text-gray-400">Product Name</th>
+                    <th className="text-left p-3 text-xs font-semibold text-gray-500 dark:text-gray-400">Category</th>
+                    <th className="text-left p-3 text-xs font-semibold text-gray-500 dark:text-gray-400">Price (MAD)</th>
+                    <th className="text-left p-3 text-xs font-semibold text-gray-500 dark:text-gray-400">Qty</th>
+                    <th className="text-left p-3 text-xs font-semibold text-gray-500 dark:text-gray-400">
                       <MapPin className="inline w-3 h-3 mr-0.5" />City
                     </th>
-                    <th className="text-left p-3 text-xs font-semibold text-gray-500">
+                    <th className="text-left p-3 text-xs font-semibold text-gray-500 dark:text-gray-400">
                       <Clock className="inline w-3 h-3 mr-0.5" />
-                      Days Stored <span className="text-kraft-500">(admin)</span>
+                      Days Stored <span className="text-kraft-500 dark:text-kraft-400">(admin)</span>
                     </th>
-                    <th className="text-left p-3 text-xs font-semibold text-gray-500">Status</th>
+                    <th className="text-left p-3 text-xs font-semibold text-gray-500 dark:text-gray-400">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -606,12 +606,12 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
                     const hasErrors = row._errors.length > 0;
                     const checked   = rowChecked[row._rowIndex];
                     return (
-                      <tr key={row._rowIndex} className={`border-t transition-colors ${
-                        hasErrors ? "bg-red-50/60" :
-                        checked   ? "bg-kraft-50/40" :
-                                    "hover:bg-gray-50"
+                      <tr key={row._rowIndex} className={`border-t border-gray-200 dark:border-gray-700 transition-colors ${
+                        hasErrors ? "bg-red-50/60 dark:bg-red-900/10" :
+                        checked   ? "bg-kraft-50/40 dark:bg-kraft-900/10" :
+                                    "hover:bg-gray-50 dark:hover:bg-gray-700"
                       }`}>
-                        <td className="p-3 text-xs text-gray-400">{row._rowIndex}</td>
+                        <td className="p-3 text-xs text-gray-400 dark:text-gray-500">{row._rowIndex}</td>
                         <td className="p-3">
                           <input
                             type="checkbox"
@@ -621,33 +621,33 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
                             className="rounded accent-kraft-500 disabled:opacity-30"
                           />
                         </td>
-                        <td className="p-3 font-medium text-gray-800 max-w-[200px] truncate">{row.name || "—"}</td>
-                        <td className="p-3 text-gray-600">{row.category || <span className="text-gray-300">—</span>}</td>
-                        <td className="p-3 font-semibold text-gray-800">{row.asking_price ? `${parseFloat(row.asking_price).toFixed(2)}` : <span className="text-red-400">!</span>}</td>
-                        <td className="p-3 text-gray-600">{row.quantity || 1}</td>
+                        <td className="p-3 font-medium text-gray-800 dark:text-white max-w-[200px] truncate">{row.name || "—"}</td>
+                        <td className="p-3 text-gray-600 dark:text-gray-300">{row.category || <span className="text-gray-300 dark:text-gray-600">—</span>}</td>
+                        <td className="p-3 font-semibold text-gray-800 dark:text-white">{row.asking_price ? `${parseFloat(row.asking_price).toFixed(2)}` : <span className="text-red-400 dark:text-red-400">!</span>}</td>
+                        <td className="p-3 text-gray-600 dark:text-gray-300">{row.quantity || 1}</td>
                         <td className="p-3">
                           {row.location
-                            ? <span className="flex items-center gap-1 text-gray-700"><MapPin className="w-3 h-3 text-gray-400" />{row.location}</span>
-                            : <span className="text-red-400">!</span>
+                            ? <span className="flex items-center gap-1 text-gray-700 dark:text-gray-300"><MapPin className="w-3 h-3 text-gray-400 dark:text-gray-500" />{row.location}</span>
+                            : <span className="text-red-400 dark:text-red-400">!</span>
                           }
                         </td>
-                        <td className="p-3 text-gray-500 text-xs">
+                        <td className="p-3 text-gray-500 dark:text-gray-400 text-xs">
                           {row.days_in_storage
-                            ? <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{row.days_in_storage}d</span>
-                            : <span className="text-gray-300">—</span>
+                            ? <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">{row.days_in_storage}d</span>
+                            : <span className="text-gray-300 dark:text-gray-600">—</span>
                           }
                         </td>
                         <td className="p-3">
                           {hasErrors
                             ? <div className="group relative">
-                                <span className="flex items-center gap-1 text-red-500 text-xs cursor-help">
+                                <span className="flex items-center gap-1 text-red-500 dark:text-red-400 text-xs cursor-help">
                                   <XCircle className="w-3.5 h-3.5" />Error
                                 </span>
                                 <div className="hidden group-hover:block absolute z-20 bg-gray-900 text-white text-xs rounded-lg p-2 w-48 bottom-full left-0 mb-1">
                                   {row._errors.map((e, i) => <div key={i}>• {e}</div>)}
                                 </div>
                               </div>
-                            : <span className="flex items-center gap-1 text-green-600 text-xs">
+                            : <span className="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs">
                                 <CheckCircle2 className="w-3.5 h-3.5" />Valid
                               </span>
                           }
@@ -661,7 +661,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
           </div>
 
           <div className="flex gap-3 justify-end">
-            <button onClick={() => setStep("map")} className="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+            <button onClick={() => setStep("map")} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
               ← Back to mapping
             </button>
             <button
