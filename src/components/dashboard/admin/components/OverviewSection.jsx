@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { formatCurrency, formatDate } from '../utils/helpers';
 
-const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabChange }) => {
+const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabChange, dataHealth = { ok: true, failedQueries: [] } }) => {
   const [showAllActivity, setShowAllActivity] = useState(false);
 
   const statCards = [
@@ -26,8 +26,6 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
       value: stats.totalOrders.toLocaleString(),
       icon: Package,
       color: "bg-blue-500",
-      trend: "+12%",
-      trendUp: true,
       description: `${stats.deliveredOrders} delivered`
     },
     {
@@ -237,20 +235,22 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
       {/* System Status */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="text-lg font-bold mb-3 text-gray-900 dark:text-white">System Status</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-900 dark:text-white">Database</span>
+              <div className={`w-2 h-2 rounded-full ${dataHealth.ok ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">Database queries (last refresh)</span>
             </div>
-            <span className="text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded">Operational</span>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-900 dark:text-white">API Services</span>
-            </div>
-            <span className="text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded">Operational</span>
+            <span
+              className={`text-xs px-2 py-1 rounded ${
+                dataHealth.ok
+                  ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30'
+                  : 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30'
+              }`}
+              title={dataHealth.failedQueries.length > 0 ? `Failed: ${dataHealth.failedQueries.join(', ')}` : undefined}
+            >
+              {dataHealth.ok ? 'All OK' : `${dataHealth.failedQueries.length} failed`}
+            </span>
           </div>
           <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded">
             <div className="flex items-center gap-2">

@@ -67,6 +67,10 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 - Le fallback par défaut pour un statut inconnu affiche maintenant "Unknown" au lieu de mentir en affichant "ordered".
 - Ajout d'un encart rouge visible sur la carte de commande quand elle a été refusée/retournée ou que la livraison a échoué, avec les notes de livraison si disponibles.
 
+### 9. Nettoyage divers
+- `.env` local créé à partir du fichier fourni par le propriétaire du repo (jamais commité, déjà dans `.gitignore`).
+
+
 ### 10. Suppression de `AdminReturnsDashboard.jsx`
 **Erreur trouvée :** ce composant interrogeait des colonnes (`reason`, `condition_on_return`, `decision`, `return_status`) qui **n'existent pas** dans la vraie table `returns` (qui ne contient que `id, order_id, product_id, created_at`). En vérifiant, le composant n'était importé/utilisé **nulle part** dans l'app — donc il ne plantait pas en prod, il était juste invisible. Sa fonction (validation des litiges retour) est déjà couverte, en fonctionnel, par `ReturnedProductsQueue.jsx` (lui bien utilisé dans le dashboard admin), qui gère l'approbation/refus des produits retournés sur la vraie table `products`.
 
@@ -106,8 +110,12 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 
 **Solution :** écriture de la migration `supabase/migrations/20260619010000_invoice_overview_views.sql` qui crée les deux vues à partir des vraies tables (`invoices`, `invoice_lines`, `orders`, `order_financials`, `profiles`, `escrow_holdings`, `financial_ledger`, `returns`, `return_inspections`), avec l'alias `status AS invoice_status` pour matcher ce que le frontend attend. Exécutée manuellement par Ali dans l'éditeur SQL Supabase. Vérifié après coup que les deux vues répondent correctement (vides pour l'instant, car aucune facture n'a encore été générée en staging — comportement normal, pas un bug).
 
-### 9. Nettoyage divers
-- `.env` local créé à partir du fichier fourni par le propriétaire du repo (jamais commité, déjà dans `.gitignore`).
+### 16. Chiffres bidons dans l'onglet Overview (admin)
+**Erreur trouvée :** la carte "Total Orders" affichait une tendance "+12%" codée en dur (jamais recalculée), et le bloc "System Status" affichait "Database"/"API Services" toujours en vert "Operational", sans aucun lien avec la réalité.
+
+**Solution :**
+- Suppression de la fausse tendance "+12%" (pas de donnée historique fiable pour la calculer honnêtement pour l'instant — mieux vaut ne rien afficher qu'afficher un chiffre inventé).
+- Remplacement des deux lignes "Database"/"API Services" toujours vertes par une seule ligne réelle "Database queries (last refresh)", basée sur les résultats effectifs des requêtes de chargement du dashboard (`Promise.allSettled`) : si une requête échoue, ça s'affiche en rouge avec le nombre d'échecs et le détail au survol.
 
 ---
 

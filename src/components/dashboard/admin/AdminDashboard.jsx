@@ -70,6 +70,7 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [invoices, setInvoices] = useState([]);  // Add invoices state
   const [recentActivity, setRecentActivity] = useState([]);
+  const [dataHealth, setDataHealth] = useState({ ok: true, failedQueries: [] });
 
   useEffect(() => {
     if (user) {
@@ -89,7 +90,7 @@ const AdminDashboard = () => {
         invoicesResult,
         returnedResult,
       ] = await Promise.allSettled([
-        supabase.from('delivery_companies').select('*').order('created_at', { ascending: false }),
+        /* 0: delivery_companies */ supabase.from('delivery_companies').select('*').order('created_at', { ascending: false }),
         supabase.from('escrow_holdings')
           .select(`
             *,
@@ -119,6 +120,20 @@ const AdminDashboard = () => {
           .eq('source_type', 'returned')
           .eq('listing_status', 'pending_review'),
       ]);
+
+      const namedResults = {
+        'Delivery companies': deliveryResult,
+        'Escrow holdings': escrowResult,
+        Orders: ordersResult,
+        'Recent activity': activityResult,
+        Profiles: profilesResult,
+        Invoices: invoicesResult,
+        'Returned products': returnedResult,
+      };
+      const failedQueries = Object.entries(namedResults)
+        .filter(([, result]) => result.status === 'rejected')
+        .map(([name]) => name);
+      setDataHealth({ ok: failedQueries.length === 0, failedQueries });
 
       // Process delivery companies
       if (deliveryResult.status === 'fulfilled') {
@@ -330,12 +345,13 @@ const AdminDashboard = () => {
         {/* Tab Content */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 sm:p-6">
           {activeTab === TABS.OVERVIEW && (
-            <OverviewSection 
+            <OverviewSection
               stats={stats}
               recentActivity={recentActivity}
               onRefresh={handleRefresh}
               isLoading={refreshing}
               onTabChange={setActiveTab}
+              dataHealth={dataHealth}
             />
           )}
           
