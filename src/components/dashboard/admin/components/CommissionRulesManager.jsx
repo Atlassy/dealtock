@@ -54,16 +54,12 @@ const CommissionRulesManager = () => {
       setLoading(true);
       console.log('🔍 Loading commission data...');
       
-      // Fetch commission rules with categories join
+      // Fetch commission rules. Note: there's no real foreign key between
+      // commission_rules.category_id and categories.id, so PostgREST can't
+      // embed the join — match category names client-side instead (below).
       const { data: rulesData, error: rulesError } = await supabase
         .from('commission_rules')
-        .select(`
-          *,
-          categories (
-            id,
-            name
-          )
-        `)
+        .select('*')
         .order('applies_to', { ascending: true })
         .order('priority', { ascending: false })
         .order('created_at', { ascending: false });
@@ -280,11 +276,12 @@ const CommissionRulesManager = () => {
     : [];
 
   const getCategoryName = (rule) => {
-    // First try to get from category_id join
-    if (rule.categories?.name) {
-      return rule.categories.name;
+    // Match against the separately-fetched categories list (no real FK to embed the join)
+    if (rule.category_id) {
+      const matched = categories.find(c => c.id === rule.category_id);
+      if (matched?.name) return matched.name;
     }
-    // Fallback to old category text field
+    // Fallback to the legacy free-text category field
     if (rule.category) {
       return rule.category;
     }

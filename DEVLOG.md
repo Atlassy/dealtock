@@ -128,6 +128,11 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 
 **Leçon retenue :** les bugs qu'on trouve en lisant le code/le schéma ne suffisent pas — certains (comme celui-ci, un trigger silencieux) ne se révèlent qu'en cliquant réellement dans l'app. À refaire systématiquement après chaque lot de correctifs.
 
+### 18. Commission Rules : la jointure vers `categories` n'a jamais existé en base
+**Erreur trouvée :** en testant avec un compte admin de test, l'onglet "Commissions" affichait "Failed to load commission rules". `CommissionRulesManager.jsx` faisait `.select('*, categories(id, name)')`, mais il n'existe **aucune clé étrangère réelle** entre `commission_rules.category_id` et `categories.id` en base — PostgREST ne peut donc pas faire cette jointure implicite, et la requête entière échoue (pas de dégradation silencieuse). La table `categories` est par ailleurs complètement vide.
+
+**Solution :** retrait de la jointure côté requête ; le nom de catégorie est maintenant retrouvé côté frontend en croisant `rule.category_id` avec la liste `categories` déjà chargée séparément pour le menu déroulant (qui existait déjà dans le composant).
+
 ---
 
 ## En attente de décision
