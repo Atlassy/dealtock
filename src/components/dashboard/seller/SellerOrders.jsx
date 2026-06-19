@@ -190,10 +190,29 @@ const handleMarkReady = async (orderId) => {
         color: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300',
         icon: AlertCircle,
         label: 'Cancelled'
+      },
+      'returned': {
+        color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400',
+        icon: AlertCircle,
+        label: 'Returned'
+      },
+      'failed': {
+        color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400',
+        icon: AlertCircle,
+        label: 'Delivery Failed'
+      },
+      'refunded': {
+        color: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300',
+        icon: AlertCircle,
+        label: 'Refunded'
       }
     };
     
-    const badge = badges[status] || badges.ordered;
+    const badge = badges[status] || {
+      color: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300',
+      icon: AlertCircle,
+      label: status || 'Unknown'
+    };
     const Icon = badge.icon;
     
     return (
@@ -333,6 +352,19 @@ const handleMarkReady = async (orderId) => {
                   </div>
                 </div>
               </div>
+
+              {/* Returned / Failed notice */}
+              {(order.status === 'returned' || order.status === 'failed') && (
+                <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-lg mb-3">
+                  <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-red-700 dark:text-red-300">
+                    {order.status === 'returned'
+                      ? 'This parcel was refused or not collected by the customer and has been returned.'
+                      : 'Delivery failed for this order.'}
+                    {order.delivery_notes && <span className="block mt-1 text-red-600 dark:text-red-400">{order.delivery_notes}</span>}
+                  </p>
+                </div>
+              )}
 
               {/* Customer & Delivery Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">

@@ -53,7 +53,7 @@ const STATUSES = [
 // INVENTORY SKELETON
 // ============================================
 const InventorySkeleton = () => (
-  <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900 p-8">
+  <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
     <div className="animate-pulse space-y-6">
       <div className="h-8 bg-gray-200 dark:bg-gray-700/50 rounded w-1/4"></div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -290,7 +290,7 @@ const Inventory = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <Package className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Please Log In</h2>
@@ -303,7 +303,7 @@ const Inventory = () => {
   if (loading) return <InventorySkeleton />;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <motion.div

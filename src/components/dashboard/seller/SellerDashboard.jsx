@@ -46,7 +46,7 @@ import EditProductForm from '../EditProductForm';
 // DASHBOARD SKELETON
 // ============================================
 const DashboardSkeleton = () => (
-  <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900 p-8">
+  <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
     <div className="animate-pulse space-y-6">
       <div className="h-8 bg-gray-200 dark:bg-gray-700/50 rounded w-1/4"></div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1000,7 +1000,7 @@ const SellerDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Tab Navigation - Simplified, no duplicate header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
