@@ -67,7 +67,10 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 - Le fallback par défaut pour un statut inconnu affiche maintenant "Unknown" au lieu de mentir en affichant "ordered".
 - Ajout d'un encart rouge visible sur la carte de commande quand elle a été refusée/retournée ou que la livraison a échoué, avec les notes de livraison si disponibles.
 
-**Bug trouvé mais pas encore corrigé :** `AdminReturnsDashboard.jsx` interroge des colonnes (`reason`, `condition_on_return`, `decision`, `return_status`) qui **n'existent pas** dans la vraie table `returns` (qui ne contient que `id, order_id, product_id, created_at`). Cette page plante probablement déjà en production. À corriger — en attente de décision.
+### 10. Suppression de `AdminReturnsDashboard.jsx`
+**Erreur trouvée :** ce composant interrogeait des colonnes (`reason`, `condition_on_return`, `decision`, `return_status`) qui **n'existent pas** dans la vraie table `returns` (qui ne contient que `id, order_id, product_id, created_at`). En vérifiant, le composant n'était importé/utilisé **nulle part** dans l'app — donc il ne plantait pas en prod, il était juste invisible. Sa fonction (validation des litiges retour) est déjà couverte, en fonctionnel, par `ReturnedProductsQueue.jsx` (lui bien utilisé dans le dashboard admin), qui gère l'approbation/refus des produits retournés sur la vraie table `products`.
+
+**Solution :** suppression du fichier — code mort, cassé, et redondant avec une fonctionnalité qui marche déjà.
 
 ### 9. Nettoyage divers
 - `.env` local créé à partir du fichier fourni par le propriétaire du repo (jamais commité, déjà dans `.gitignore`).
@@ -76,7 +79,6 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 ---
 
 ## En attente de décision
-- Corriger `AdminReturnsDashboard.jsx` (colonnes inexistantes).
 - Couleur `blue-*` (492 occurrences / 51 fichiers) : la rebrander en kraft/encre, ou la garder comme couleur fonctionnelle séparée de la marque ?
 - App mobile (acheteurs + vendeurs/entrepôts) : pas commencée.
 - Prochaine feature prévue : continuer sur le dashboard admin, puis warehouse (actuellement un simple placeholder "coming soon").
