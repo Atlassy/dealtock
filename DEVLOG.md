@@ -89,6 +89,15 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 
 **Solution :** suppression de `admin.js` — code mort, mal placé, sans impact sur l'app.
 
+### 13. Détection de conflits entre règles de commission
+**Erreur trouvée :** `CommissionRulesManager.jsx` permettait de créer deux règles actives avec le même public cible (`applies_to`), la même catégorie et des tranches de montant qui se chevauchent — sans aucun avertissement. Risque : calcul de commission silencieusement ambigu/imprévisible selon laquelle des deux règles est appliquée.
+
+**Solution :**
+- Ajout d'une logique de détection (`findConflicts`) : deux règles "se chevauchent" si même `applies_to`, même catégorie, et que leurs tranches de montant ET leurs périodes de validité se croisent.
+- Dans la liste des règles, un badge "Conflict" (avec tooltip listant les règles concurrentes) apparaît sur toute règle active en conflit.
+- Dans le formulaire d'ajout/édition, un bandeau d'avertissement jaune liste les règles existantes qui chevauchent celle en cours de création, avant validation (non bloquant — l'admin reste libre de l'enregistrer, mais voit le risque).
+- Corrigé au passage : la modale d'ajout/édition de règle n'avait aucune classe `dark:` (oubliée lors de la passe mode sombre précédente).
+
 ### 9. Nettoyage divers
 - `.env` local créé à partir du fichier fourni par le propriétaire du repo (jamais commité, déjà dans `.gitignore`).
 - Retrait du trailer "Co-Authored-By: Claude" des commits (préférence explicite du collaborateur, à ne jamais remettre).

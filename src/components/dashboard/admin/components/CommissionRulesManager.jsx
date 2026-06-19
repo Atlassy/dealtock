@@ -1,18 +1,19 @@
 ﻿// CommissionRulesManager.jsx - Updated for new commission rules structure
 import React, { useState, useEffect } from "react";
 import { supabase } from "../../../../lib/supabaseClient";
-import { 
-  Percent, 
-  Plus, 
-  Edit, 
-  Trash2, 
+import {
+  Percent,
+  Plus,
+  Edit,
+  Trash2,
   X,
   Save,
   RefreshCw,
   Users,
   Truck,
   Star,
-  Crown
+  Crown,
+  AlertTriangle
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -231,6 +232,53 @@ const CommissionRulesManager = () => {
     setEditingRule(null);
   };
 
+  // Two ranges overlap if each one's min is below the other's max (null = unbounded)
+  const rangesOverlap = (aMin, aMax, bMin, bMax) => {
+    const aLow = aMin ?? -Infinity;
+    const aHigh = aMax ?? Infinity;
+    const bLow = bMin ?? -Infinity;
+    const bHigh = bMax ?? Infinity;
+    return aLow <= bHigh && bLow <= aHigh;
+  };
+
+  const datesOverlap = (aFrom, aTo, bFrom, bTo) => {
+    const aStart = aFrom ? new Date(aFrom).getTime() : -Infinity;
+    const aEnd = aTo ? new Date(aTo).getTime() : Infinity;
+    const bStart = bFrom ? new Date(bFrom).getTime() : -Infinity;
+    const bEnd = bTo ? new Date(bTo).getTime() : Infinity;
+    return aStart <= bEnd && bStart <= aEnd;
+  };
+
+  // Finds other active rules that would silently compete with `candidate` for the
+  // same orders (same applies_to + same category, overlapping amount range and dates).
+  const findConflicts = (candidate, excludeId = null) => {
+    return rules.filter((rule) => {
+      if (rule.id === excludeId) return false;
+      if (!rule.is_active || candidate.is_active === false) return false;
+      if (rule.applies_to !== candidate.applies_to) return false;
+      const sameCategory = (rule.category_id || null) === (candidate.category_id || null);
+      if (!sameCategory) return false;
+      if (!rangesOverlap(rule.min_amount, rule.max_amount, candidate.min_amount, candidate.max_amount)) return false;
+      if (!datesOverlap(rule.valid_from, rule.valid_to, candidate.valid_from, candidate.valid_to)) return false;
+      return true;
+    });
+  };
+
+  const formConflicts = showAddRule
+    ? findConflicts(
+        {
+          applies_to: ruleForm.applies_to,
+          category_id: ruleForm.category || null,
+          min_amount: ruleForm.min_amount ? parseFloat(ruleForm.min_amount) : null,
+          max_amount: ruleForm.max_amount ? parseFloat(ruleForm.max_amount) : null,
+          valid_from: ruleForm.valid_from || null,
+          valid_to: ruleForm.valid_to || null,
+          is_active: ruleForm.is_active
+        },
+        editingRule?.id || null
+      )
+    : [];
+
   const getCategoryName = (rule) => {
     // First try to get from category_id join
     if (rule.categories?.name) {
@@ -361,7 +409,9 @@ const CommissionRulesManager = () => {
                 </tr>
               </thead>
               <tbody>
-                {rules.map((rule) => (
+                {rules.map((rule) => {
+                  const conflicts = findConflicts(rule, rule.id);
+                  return (
                   <tr key={rule.id} className="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="p-4">
                       <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getAppliesToColor(rule.applies_to)}`}>
@@ -370,6 +420,15 @@ const CommissionRulesManager = () => {
                          rule.applies_to === 'Pro_dropshipper' ? 'Pro Dropshipper' :
                          rule.applies_to}
                       </span>
+                      {conflicts.length > 0 && (
+                        <span
+                          className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
+                          title={`Overlaps with ${conflicts.length} other active rule(s): ${conflicts.map(c => `${c.percentage}% (${c.min_amount ?? 0}-${c.max_amount ?? '∞'} MAD)`).join(', ')}`}
+                        >
+                          <AlertTriangle className="w-3 h-3" />
+                          Conflict
+                        </span>
+                      )}
                     </td>
                     <td className="p-4 text-sm text-gray-700 dark:text-gray-300">
                       {getCategoryName(rule)}
@@ -419,7 +478,8 @@ const CommissionRulesManager = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -439,30 +499,30 @@ const CommissionRulesManager = () => {
       {/* Add/Edit Rule Modal */}
       {showAddRule && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-auto">
-            <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
-              <h3 className="text-xl font-bold">
+          <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg max-h-[90vh] overflow-auto">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                 {editingRule ? 'Edit Commission Rule' : 'Add Commission Rule'}
               </h3>
-              <button 
+              <button
                 onClick={() => {
                   setShowAddRule(false);
                   resetForm();
-                }} 
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                }}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-200"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="p-6 space-y-4">
               {/* Applies To */}
               <div>
-                <label className="block text-sm font-medium mb-1">Applies To *</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Applies To *</label>
                 <select
                   value={ruleForm.applies_to}
                   onChange={(e) => setRuleForm({...ruleForm, applies_to: e.target.value})}
-                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   required
                 >
                   <option value="B2C">B2C (Customer Direct)</option>
@@ -471,7 +531,7 @@ const CommissionRulesManager = () => {
                   <option value="Pro_Seller">Pro Seller (Premium)</option>
                   <option value="Pro_dropshipper">Pro Dropshipper (Premium)</option>
                 </select>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {ruleForm.applies_to === 'B2C' && '30% commission on final price'}
                   {ruleForm.applies_to === 'Seller' && 'Commission charged to sellers'}
                   {ruleForm.applies_to === 'dropshipper' && 'Commission on dropshipper markup'}
@@ -482,25 +542,25 @@ const CommissionRulesManager = () => {
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium mb-1">Category (Optional)</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Category (Optional)</label>
                 <select
                   value={ruleForm.category}
                   onChange={(e) => setRuleForm({...ruleForm, category: e.target.value})}
-                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">All Categories (Default Rule)</option>
                   {categories.map(cat => (
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Leave empty for default rule (applies to all categories)
                 </p>
               </div>
 
               {/* Percentage */}
               <div>
-                <label className="block text-sm font-medium mb-1">Commission Percentage *</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Commission Percentage *</label>
                 <div className="relative">
                   <input
                     type="number"
@@ -509,13 +569,13 @@ const CommissionRulesManager = () => {
                     max="100"
                     value={ruleForm.percentage}
                     onChange={(e) => setRuleForm({...ruleForm, percentage: e.target.value})}
-                    className="w-full p-2 border rounded-lg pr-8 focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg pr-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                     placeholder="e.g., 30"
                     required
                   />
                   <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {ruleForm.applies_to === 'Pro_Seller' && 'Pro sellers get 80% discount (20% of regular rates)'}
                   {ruleForm.applies_to === 'Pro_dropshipper' && 'Pro dropshippers get 80% discount (20% of regular rates)'}
                 </p>
@@ -524,26 +584,26 @@ const CommissionRulesManager = () => {
               {/* Order Amount Range */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Min Order Amount (MAD)</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Min Order Amount (MAD)</label>
                   <input
                     type="number"
                     step="0.01"
                     min="0"
                     value={ruleForm.min_amount}
                     onChange={(e) => setRuleForm({...ruleForm, min_amount: e.target.value})}
-                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                     placeholder="0"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Max Order Amount (MAD)</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Max Order Amount (MAD)</label>
                   <input
                     type="number"
                     step="0.01"
                     min="0"
                     value={ruleForm.max_amount}
                     onChange={(e) => setRuleForm({...ruleForm, max_amount: e.target.value})}
-                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                     placeholder="No max"
                   />
                 </div>
@@ -552,21 +612,21 @@ const CommissionRulesManager = () => {
               {/* Valid Period */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Valid From</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Valid From</label>
                   <input
                     type="date"
                     value={ruleForm.valid_from}
                     onChange={(e) => setRuleForm({...ruleForm, valid_from: e.target.value})}
-                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Valid To (Optional)</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Valid To (Optional)</label>
                   <input
                     type="date"
                     value={ruleForm.valid_to}
                     onChange={(e) => setRuleForm({...ruleForm, valid_to: e.target.value})}
-                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -580,20 +640,39 @@ const CommissionRulesManager = () => {
                   onChange={(e) => setRuleForm({...ruleForm, is_active: e.target.checked})}
                   className="rounded text-blue-600 mr-2 focus:ring-blue-500"
                 />
-                <label htmlFor="isActive" className="text-sm font-medium">
+                <label htmlFor="isActive" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Rule is active
                 </label>
               </div>
 
+              {/* Conflict warning */}
+              {formConflicts.length > 0 && (
+                <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800/40 rounded-lg">
+                  <AlertTriangle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-yellow-800 dark:text-yellow-300">
+                    <p className="font-medium">This rule overlaps with {formConflicts.length} other active rule(s) for the same audience/category/range:</p>
+                    <ul className="mt-1 space-y-0.5 list-disc list-inside">
+                      {formConflicts.map((c) => (
+                        <li key={c.id}>
+                          {c.percentage}% on {c.min_amount ?? 0}–{c.max_amount ?? '∞'} MAD
+                          {c.valid_to ? ` (until ${new Date(c.valid_to).toLocaleDateString()})` : ''}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-1">Whichever rule has the higher priority will be applied — double check that's the intended one.</p>
+                  </div>
+                </div>
+              )}
+
               {/* Form Actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t">
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={() => {
                     setShowAddRule(false);
                     resetForm();
                   }}
-                  className="px-4 py-2 border rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
                 >
                   Cancel
                 </button>
