@@ -245,13 +245,18 @@ const CommissionRulesManager = () => {
     return aStart <= bEnd && bStart <= aEnd;
   };
 
-  // Finds other active rules that would silently compete with `candidate` for the
-  // same orders (same applies_to + same category, overlapping amount range and dates).
+  // Finds other active rules that would AMBIGUOUSLY compete with `candidate` for the
+  // same orders (same applies_to + same category, overlapping amount range and dates,
+  // AND the same priority — a lower-priority default/fallback rule overlapping with a
+  // higher-priority specific rule is resolved deterministically by priority, so that's
+  // an intentional default+override pattern, not a real conflict).
   const findConflicts = (candidate, excludeId = null) => {
     return rules.filter((rule) => {
       if (rule.id === excludeId) return false;
       if (!rule.is_active || candidate.is_active === false) return false;
       if (rule.applies_to !== candidate.applies_to) return false;
+      const samePriority = (rule.priority ?? 0) === (candidate.priority ?? 0);
+      if (!samePriority) return false;
       const sameCategory = (rule.category_id || null) === (candidate.category_id || null);
       if (!sameCategory) return false;
       if (!rangesOverlap(rule.min_amount, rule.max_amount, candidate.min_amount, candidate.max_amount)) return false;
@@ -265,6 +270,7 @@ const CommissionRulesManager = () => {
         {
           applies_to: ruleForm.applies_to,
           category_id: ruleForm.category || null,
+          priority: ruleForm.category ? 10 : 0,
           min_amount: ruleForm.min_amount ? parseFloat(ruleForm.min_amount) : null,
           max_amount: ruleForm.max_amount ? parseFloat(ruleForm.max_amount) : null,
           valid_from: ruleForm.valid_from || null,

@@ -133,6 +133,11 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 
 **Solution :** retrait de la jointure côté requête ; le nom de catégorie est maintenant retrouvé côté frontend en croisant `rule.category_id` avec la liste `categories` déjà chargée séparément pour le menu déroulant (qui existait déjà dans le composant).
 
+### 19. Affinage de la détection de conflits : un défaut + une surcharge n'est pas un vrai conflit
+**Ce qu'on a trouvé en testant avec les vraies données :** les 21 règles de commission déjà en production se sont **toutes** affichées en "Conflict" — par exemple pour B2C, 3 règles par tranche (0-200 MAD à 20%, 200.01-1000 à 25%, 1000.01-∞ à 15%) plus une règle "0-∞" à 30%. En vérifiant les vraies valeurs (`priority`, `is_default`), ce n'est pas un vrai conflit ambigu : la règle "0-∞" a `priority: 0` et `is_default: true` (un filet de sécurité), les 3 règles par tranche ont `priority: 10` — le système applique donc déjà la bonne règle de façon déterministe. La fonctionnalité de détection marchait correctement, mais ne distinguait pas "défaut + surcharge intentionnelle" d'un vrai conflit.
+
+**Solution :** `findConflicts` ne signale plus que les paires de règles avec la **même priorité** qui se chevauchent (ambiguïté réelle, puisque rien ne les départage) — un défaut de priorité 0 chevauché par une règle plus spécifique de priorité 10 n'est plus considéré comme un conflit.
+
 ---
 
 ## En attente de décision
