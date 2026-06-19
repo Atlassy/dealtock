@@ -60,7 +60,7 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 ### 8. Statuts de commande retournée/échouée mal affichés (seller)
 **Erreur trouvée :** `SellerOrders.jsx` ne reconnaissait pas les statuts de commande `returned`, `failed`, `refunded` — elles retombaient par défaut sur le badge "Pending Approval", ce qui donnait une fausse information au vendeur (un colis refusé/retourné semblait être "en attente d'approbation").
 
-**Découverte en creusant le vrai schéma de la base (via la clé `service_role`) :** pas besoin de créer une nouvelle table pour gérer les pickups — la table `orders` a déjà toutes les colonnes nécessaires (`delivery_weight_kg`, `ready_for_pickup_at`, `returned_at`, `failed_at`, `delivery_tracking_number`...) et des fonctions backend existent déjà (`seller_approve_order`, `seller_mark_ready`) pour le flux normal d'approbation → mise en prêt pour pickup.
+**Découverte en creusant le vrai schéma de la base (via la clé `service_role`) :** pas besoin de créer une nouvelle table pour gérer les pickups — la table `orders` a déjà toutes les colonnes nécessaires (`delivery_weight_kg`, `ready_for_pickup_at`, `returned_at`, `failed_at`, `delivery_tracking_number`...). (Note : on pensait à ce moment que les fonctions `seller_approve_order`/`seller_mark_ready` existaient déjà côté backend — faux, voir point 11 ci-dessous.)
 
 **Solution :**
 - Ajout des badges manquants "Returned", "Delivery Failed", "Refunded" avec une couleur rouge/grise cohérente.
@@ -71,6 +71,16 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 **Erreur trouvée :** ce composant interrogeait des colonnes (`reason`, `condition_on_return`, `decision`, `return_status`) qui **n'existent pas** dans la vraie table `returns` (qui ne contient que `id, order_id, product_id, created_at`). En vérifiant, le composant n'était importé/utilisé **nulle part** dans l'app — donc il ne plantait pas en prod, il était juste invisible. Sa fonction (validation des litiges retour) est déjà couverte, en fonctionnel, par `ReturnedProductsQueue.jsx` (lui bien utilisé dans le dashboard admin), qui gère l'approbation/refus des produits retournés sur la vraie table `products`.
 
 **Solution :** suppression du fichier — code mort, cassé, et redondant avec une fonctionnalité qui marche déjà.
+
+### 11. BUG CRITIQUE : le flux commande → approbation → pickup était cassé pour tout le monde
+**Erreur trouvée :** en lançant l'audit du dashboard admin, on a vérifié quelles fonctions RPC sont *réellement déployées* sur la base (via le schéma exposé par la clé `service_role`, en comparant à la liste réelle des fonctions exposées par PostgREST). Résultat :
+- `seller_approve_order` et `seller_mark_ready` — utilisées par les boutons "Approve Order" / "Mark Ready for Pickup" du dashboard vendeur — **n'existaient nulle part**, ni en base ni même dans aucun fichier de migration local.
+- `update_order_status` — utilisée par le dashboard admin (Order Oversight) pour changer le statut d'une commande — n'existait pas non plus.
+- Bonus : le fichier de migration local `supabase/migrations/20260211031448_admin_rpc_functions.sql` (6 fonctions : `admin_override_order_status`, `release_escrow_funds`, `get_pending_escrow`, `get_delivery_companies_with_stats`, `update_order_from_delivery`, `validate_order_status_transition`) n'avait **jamais été appliqué** à la base staging — ces fonctionnalités admin (escrow, stats transporteurs) sont donc probablement cassées aussi. Pas encore corrigé, à traiter dans la suite de l'audit admin.
+
+**Impact :** concrètement, avant cette correction, un vendeur ne pouvait pas approuver une commande ni la marquer prête pour pickup — chaque clic plantait avec une erreur "function not found". C'était le cœur du flux de commande, pas une fonctionnalité secondaire.
+
+**Solution :** écriture d'une nouvelle migration `supabase/migrations/20260619000000_seller_admin_order_status_rpcs.sql` avec les 3 fonctions manquantes (`seller_approve_order`, `seller_mark_ready`, `update_order_status`), avec vérification de propriété de la commande, codes d'erreur cohérents avec ce que le frontend attend déjà (`ORDER_NOT_FOUND`, `INVALID_STATUS`, `UPDATE_FAILED`), et journalisation dans `order_status_history`/`admin_actions`. Exécutée manuellement par Ali dans l'éditeur SQL Supabase (pas d'accès DDL direct possible avec la clé `service_role` seule). Vérifié après coup que les 3 fonctions sont bien exposées et actives.
 
 ### 9. Nettoyage divers
 - `.env` local créé à partir du fichier fourni par le propriétaire du repo (jamais commité, déjà dans `.gitignore`).
