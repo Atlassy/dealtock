@@ -98,9 +98,16 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 - Dans le formulaire d'ajout/édition, un bandeau d'avertissement jaune liste les règles existantes qui chevauchent celle en cours de création, avant validation (non bloquant — l'admin reste libre de l'enregistrer, mais voit le risque).
 - Corrigé au passage : la modale d'ajout/édition de règle n'avait aucune classe `dark:` (oubliée lors de la passe mode sombre précédente).
 
+### 14. Actions groupées sur les produits retournés
+**Ce qu'on a fait :** `ReturnedProductsQueue.jsx` ne permettait d'approuver/refuser qu'un produit retourné à la fois. Ajout d'une case à cocher par produit (onglet "Pending Review" uniquement), d'un "Select all", et de deux boutons "Approve Selected (N)" / "Decline Selected (N)" qui appliquent l'action à tous les éléments sélectionnés en une seule requête. La modale de refus (avec choix du motif) est réutilisée pour le cas groupé.
+
+### 15. BUG CRITIQUE : l'onglet Factures admin n'a jamais fonctionné
+**Erreur trouvée :** `src/hooks/useInvoices.ts` interroge deux vues SQL (`admin_invoices_overview`, `order_oversight_with_invoices`) qui **n'existaient pas du tout** dans la base. Conséquence : la liste des factures ne s'est jamais chargée, ni le détail d'une facture — depuis le début. En creusant, le nom de colonne attendu côté frontend (`invoice_status`) ne correspond pas non plus au vrai nom de colonne de la table `invoices` (`status`).
+
+**Solution :** écriture de la migration `supabase/migrations/20260619010000_invoice_overview_views.sql` qui crée les deux vues à partir des vraies tables (`invoices`, `invoice_lines`, `orders`, `order_financials`, `profiles`, `escrow_holdings`, `financial_ledger`, `returns`, `return_inspections`), avec l'alias `status AS invoice_status` pour matcher ce que le frontend attend. Exécutée manuellement par Ali dans l'éditeur SQL Supabase. Vérifié après coup que les deux vues répondent correctement (vides pour l'instant, car aucune facture n'a encore été générée en staging — comportement normal, pas un bug).
+
 ### 9. Nettoyage divers
 - `.env` local créé à partir du fichier fourni par le propriétaire du repo (jamais commité, déjà dans `.gitignore`).
-- Retrait du trailer "Co-Authored-By: Claude" des commits (préférence explicite du collaborateur, à ne jamais remettre).
 
 ---
 
