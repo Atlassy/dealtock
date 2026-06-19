@@ -119,7 +119,19 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 
 ---
 
+### 17. Test manuel en conditions réelles : encore un bug caché trouvé et corrigé
+**Ce qu'on a fait :** après tous les correctifs précédents, on a testé en vrai dans le navigateur (pas seulement via le schéma/le code) : créé une commande de test en base, puis cliqué sur "Approve Order" dans le dashboard seller.
+
+**Erreur trouvée :** ça plantait avec `column "changed_at" of relation "order_status_history" does not exist`. En inspectant les triggers de la table `orders` (`information_schema.triggers`), le trigger `tr_track_order_status` (fonction `track_order_status_change()`) tentait d'insérer une colonne `changed_at` qui n'existe pas (la vraie colonne est `created_at`). Ce trigger se déclenche automatiquement sur **tout** changement de statut de commande — donc ce bug existait déjà avant notre travail et cassait silencieusement bien plus que nos nouvelles fonctions RPC (override admin, webhooks de livraison, etc., dès qu'un statut change).
+
+**Solution :** migration `supabase/migrations/20260619020000_fix_order_status_history_trigger.sql` qui corrige la fonction du trigger (`created_at` au lieu de `changed_at`), et retire au passage l'INSERT manuel dans `order_status_history` qu'on avait ajouté dans `seller_approve_order`/`seller_mark_ready`/`update_order_status` (devenu redondant maintenant que le trigger fonctionne correctement — sinon chaque changement de statut aurait été journalisé deux fois). Exécutée manuellement par Ali dans l'éditeur SQL Supabase. Confirmé que "Approve Order" fonctionne maintenant.
+
+**Leçon retenue :** les bugs qu'on trouve en lisant le code/le schéma ne suffisent pas — certains (comme celui-ci, un trigger silencieux) ne se révèlent qu'en cliquant réellement dans l'app. À refaire systématiquement après chaque lot de correctifs.
+
+---
+
 ## En attente de décision
 - Couleur `blue-*` (492 occurrences / 51 fichiers) : la rebrander en kraft/encre, ou la garder comme couleur fonctionnelle séparée de la marque ?
 - App mobile (acheteurs + vendeurs/entrepôts) : pas commencée.
-- Prochaine feature prévue : continuer sur le dashboard admin, puis warehouse (actuellement un simple placeholder "coming soon").
+- Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
+- Prochaine feature prévue : dashboard dropshipper (audit similaire à seller/admin), puis warehouse (actuellement un simple placeholder "coming soon").
