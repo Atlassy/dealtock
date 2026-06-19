@@ -143,6 +143,9 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 
 **Décision :** on laisse ça de côté pour l'instant (construire la génération automatique de factures est un vrai morceau de travail, pas un fix) — à reprendre quand ce sera prioritaire.
 
+### 21. Tests confirmés OK : actions groupées sur les produits retournés
+Testé avec 3 vrais produits de test ("Pending Review") créés pour l'occasion : sélection multiple, "Approve Selected" et "Decline Selected" fonctionnent comme prévu. Confirmé par Ali.
+
 ---
 
 ## En attente de décision
