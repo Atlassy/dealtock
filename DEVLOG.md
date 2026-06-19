@@ -141,7 +141,7 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 ### 20. La génération de factures n'a jamais été implémentée
 **Ce qu'on a trouvé en testant :** l'onglet Invoices charge bien (cf. point 15) mais reste vide — pas un bug, la table `invoices` est **complètement vide** sur toute la base. Aucun trigger, RPC ou fonction ne crée jamais de ligne dans `invoices` automatiquement (par exemple quand une commande est livrée/réglée). En creusant, on a trouvé une **3e tentative abandonnée** de cette fonctionnalité : `supabase/functions/invoices/index.ts` parle en interne de "bills" (pas "invoices") et pointe vers encore une autre vue inexistante (`admin_bills_overview`) — donc plusieurs essais inachevés par le passé, jamais terminés ni unifiés.
 
-**Décision :** on laisse ça de côté pour l'instant (construire la génération automatique de factures est un vrai morceau de travail, pas un fix) — à reprendre quand ce sera prioritaire.
+**Mise à jour : construit le même jour.** Migration `supabase/migrations/20260619030000_auto_generate_invoice_on_delivery.sql` : ajoute un trigger `tr_generate_invoice` (AFTER UPDATE ON orders) qui génère automatiquement une facture (+ sa ligne dans `invoice_lines`) la première fois qu'une commande passe au statut `delivered`, en réutilisant les montants déjà calculés par le trigger existant `compute_order_financials()` dans `order_financials`. Le numéro de facture reprend celui de la commande (`ORD-000003` → `INV-000003`). Protégé contre la double facturation (vérifie qu'aucune facture n'existe déjà pour la commande). Testé en passant la commande de test au statut "delivered" : la facture `INV-000003` a bien été créée et apparaît correctement dans `admin_invoices_overview` (nom du vendeur, montant, tout est bon).
 
 ### 21. Tests confirmés OK : actions groupées sur les produits retournés
 Testé avec 3 vrais produits de test ("Pending Review") créés pour l'occasion : sélection multiple, "Approve Selected" et "Decline Selected" fonctionnent comme prévu. Confirmé par Ali.
@@ -152,5 +152,4 @@ Testé avec 3 vrais produits de test ("Pending Review") créés pour l'occasion 
 - Couleur `blue-*` (492 occurrences / 51 fichiers) : la rebrander en kraft/encre, ou la garder comme couleur fonctionnelle séparée de la marque ?
 - App mobile (acheteurs + vendeurs/entrepôts) : pas commencée.
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
-- Génération automatique de factures : jamais implémentée (voir point 20 ci-dessus), à construire quand ce sera prioritaire.
 - Prochaine feature prévue : dashboard dropshipper (audit similaire à seller/admin), puis warehouse (actuellement un simple placeholder "coming soon").
