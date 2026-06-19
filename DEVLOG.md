@@ -82,6 +82,13 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 
 **Solution :** écriture d'une nouvelle migration `supabase/migrations/20260619000000_seller_admin_order_status_rpcs.sql` avec les 3 fonctions manquantes (`seller_approve_order`, `seller_mark_ready`, `update_order_status`), avec vérification de propriété de la commande, codes d'erreur cohérents avec ce que le frontend attend déjà (`ORDER_NOT_FOUND`, `INVALID_STATUS`, `UPDATE_FAILED`), et journalisation dans `order_status_history`/`admin_actions`. Exécutée manuellement par Ali dans l'éditeur SQL Supabase (pas d'accès DDL direct possible avec la clé `service_role` seule). Vérifié après coup que les 3 fonctions sont bien exposées et actives.
 
+### 12. `admin.js` : du code backend Express.js égaré dans le dossier React
+**Erreur trouvée :** `src/components/dashboard/admin/admin.js` (361 lignes) était en réalité du code serveur Express.js (`require('express')`, middleware `req/res/next`, rate limiting, vérification JWT) — pas un module React. Il définissait 9 fonctions RPC (`admin_get_orders`, `admin_release_escrow`, `admin_get_dashboard_metrics`, etc.) **dont aucune n'existe en base**, mais le fichier n'était importé/exécuté nulle part dans l'app : il n'avait donc aucun impact réel, juste de la confusion potentielle.
+
+**Vérification faite avant suppression :** on a confirmé que les vraies fonctionnalités escrow (`EscrowManagementSection.jsx`) et transporteurs (`DeliveryCompaniesSection.jsx`) **fonctionnent déjà** — elles font des requêtes directes sur les tables (`escrow_holdings`, `delivery_companies`) plutôt que de passer par des fonctions RPC. Elles ne dépendent donc pas des fonctions manquantes de `admin.js` ni de celles, jamais déployées non plus, du fichier `supabase/migrations/20260211031448_admin_rpc_functions.sql`. Ce dernier fichier de migration reste dans le repo mais n'est appelé par aucun code actif — gardé pour l'instant sans risque, à revoir si on a besoin un jour de ses fonctionnalités (override de statut par RPC, libération d'escrow par RPC, stats transporteurs calculées côté serveur).
+
+**Solution :** suppression de `admin.js` — code mort, mal placé, sans impact sur l'app.
+
 ### 9. Nettoyage divers
 - `.env` local créé à partir du fichier fourni par le propriétaire du repo (jamais commité, déjà dans `.gitignore`).
 - Retrait du trailer "Co-Authored-By: Claude" des commits (préférence explicite du collaborateur, à ne jamais remettre).
