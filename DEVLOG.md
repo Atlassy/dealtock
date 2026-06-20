@@ -173,9 +173,15 @@ Testé avec 3 vrais produits de test ("Pending Review") créés pour l'occasion 
 
 ---
 
+### 25. `delivery_fee_rules` : bug dans notre propre logique de correspondance
+**Suite du point 24 :** confirmé avec l'associé que c'est bien le même projet Supabase (`wicjcdggytwqqvplxlod`) — la table était simplement restée vide (sa précédente tentative d'insertion n'avait apparemment pas abouti). Il a réinséré des règles de test.
+
+**Erreur trouvée dans notre code :** la logique de correspondance ajoutée au point 24 enchaînait deux `.or()` Supabase, ce qui les combine en ET — donc dès qu'une commande avait un `delivery_company_id` mais que la règle de frais n'en précisait aucun (règle générique), la règle était exclue à tort.
+
+**Solution :** la recherche de règle se fait maintenant en une seule requête (par ville de destination), puis le bon tarif est choisi côté client par ordre de préférence : règle liée au transporteur de la commande > règle générique (sans transporteur précis) > première correspondance.
+
 ## En attente de décision
 - Couleur `blue-*` (492 occurrences / 51 fichiers) : la rebrander en kraft/encre, ou la garder comme couleur fonctionnelle séparée de la marque ?
 - App mobile (acheteurs + vendeurs/entrepôts) : pas commencée.
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
-- Vérifier sur quel projet Supabase l'associé a rempli `delivery_fee_rules` (vide sur le projet staging utilisé ici).
 - Prochaine feature prévue : dashboard dropshipper (audit similaire à seller/admin), puis warehouse (actuellement un simple placeholder "coming soon").

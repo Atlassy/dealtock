@@ -65,28 +65,30 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
         return;
       }
 
-      let query = supabase
+      const { data, error } = await supabase
         .from('delivery_fee_rules')
         .select('*')
         .eq('is_active', true)
         .or(`to_city_normalized.eq.${destCity},to_city.ilike.${destCity}`)
         .order('priority', { ascending: false });
 
-      if (selectedOrder.delivery_company_id) {
-        query = query.or(`delivery_company_id.eq.${selectedOrder.delivery_company_id},company_id.eq.${selectedOrder.delivery_company_id}`);
-      }
-
-      const { data, error } = await query;
       if (error || !data || data.length === 0) {
         setComputedDeliveryFee(null);
         return;
       }
 
       const weight = selectedOrder.delivery_weight_kg || 1;
-      const rule = data.find(r =>
+      const fitsWeight = (r) =>
         (r.weight_min == null || weight >= r.weight_min) &&
-        (r.max_weight == null || weight <= r.max_weight)
-      ) || data[0];
+        (r.max_weight == null || weight <= r.max_weight);
+
+      // Prefer a rule tied to this order's delivery company, then any
+      // generic rule (no company set), then fall back to the first match.
+      const companyId = selectedOrder.delivery_company_id;
+      const rule = data.find(r => fitsWeight(r) && (r.delivery_company_id === companyId || r.company_id === companyId))
+        || data.find(r => fitsWeight(r) && !r.delivery_company_id && !r.company_id)
+        || data.find(fitsWeight)
+        || data[0];
 
       const fee = (rule.base_fee || 0)
         + (rule.per_kg_fee || 0) * weight
