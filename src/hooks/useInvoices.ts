@@ -83,35 +83,29 @@ export function useInvoices({
     }
   }, [])
 
-  const generatePDF = useCallback(async (invoiceId: string): Promise<string | null> => {
+  const generatePDF = useCallback(async (invoiceId: string): Promise<boolean> => {
     try {
-      // This will call the Supabase Edge Function
-      const { data, error } = await supabase.functions.invoke('generate-invoice-pdf', {
-        body: { invoiceId }
-      })
-      
-      if (error) throw error
-      
-      // Update the invoice with PDF URL
-      if (data?.pdf_url) {
-        await supabase
-          .from('invoices')
-          .update({ 
-            pdf_url: data.pdf_url,
-            pdf_generated_at: new Date().toISOString()
-          })
-          .eq('id', invoiceId)
-        
-        // Refresh the list
-        fetchInvoices()
-      }
-      
-      return data?.pdf_url
+      const detail = await fetchInvoiceDetail(invoiceId)
+      if (!detail) throw new Error('Invoice not found')
+
+      // Built client-side from data we already have - no backend involved.
+      // (There used to be a call to a 'generate-invoice-pdf' edge function
+      // here, but that function was never written or deployed.)
+      const { downloadInvoicePdf } = await import('@/lib/generateInvoicePdf')
+      downloadInvoicePdf(detail)
+
+      await supabase
+        .from('invoices')
+        .update({ pdf_generated_at: new Date().toISOString() })
+        .eq('id', invoiceId)
+
+      fetchInvoices()
+      return true
     } catch (err) {
       console.error('Error generating PDF:', err)
-      return null
+      return false
     }
-  }, [fetchInvoices])
+  }, [fetchInvoices, fetchInvoiceDetail])
 
   const goToPage = (page: number) => {
     setPagination(prev => ({ ...prev, page }))

@@ -86,7 +86,6 @@ export function InvoiceDetailModal({
             <button
               onClick={() => onDownloadPDF(invoice.invoice_id)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-              disabled={!invoice.pdf_url}
             >
               <Download size={16} />
               Download PDF

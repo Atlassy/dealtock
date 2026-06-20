@@ -146,6 +146,11 @@ Ce fichier liste, dans l'ordre chronologique, chaque modification faite sur le p
 ### 21. Tests confirmés OK : actions groupées sur les produits retournés
 Testé avec 3 vrais produits de test ("Pending Review") créés pour l'occasion : sélection multiple, "Approve Selected" et "Decline Selected" fonctionnent comme prévu. Confirmé par Ali.
 
+### 22. "Download PDF" sur les factures ne marchait pas non plus
+**Erreur trouvée :** le bouton "Download PDF" appelait une fonction edge `generate-invoice-pdf` qui **n'existe ni dans le code ni déployée** — encore une fonctionnalité jamais terminée (comme la génération de factures elle-même). Le bouton était même grisé/désactivé en permanence dans certains cas car il dépendait d'un `pdf_url` qui n'a jamais été renseigné.
+
+**Solution :** plutôt que de construire et déployer une vraie fonction edge (pas d'accès CLI Supabase depuis cet environnement pour la déployer), génération du PDF **directement dans le navigateur** à partir des données déjà affichées (`src/lib/generateInvoicePdf.ts`, librairie `jspdf` ajoutée en dépendance). Le bouton télécharge maintenant un vrai fichier PDF (en-tête, infos vendeur, détail financier, lignes de facture) sans dépendre d'aucun backend. Mis à jour `InvoicesList.tsx`, `InvoiceDetailModal.tsx`, `OrderInvoiceCell.tsx` et `useInvoices.ts` pour ne plus dépendre de `pdf_url` (le bouton est maintenant toujours actif).
+
 ---
 
 ## En attente de décision

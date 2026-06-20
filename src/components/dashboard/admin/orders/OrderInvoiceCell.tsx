@@ -30,10 +30,7 @@ export function OrderInvoiceCell({
 
   const handleDownloadPDF = async () => {
     if (invoiceId) {
-      const pdfUrl = await generatePDF(invoiceId)
-      if (pdfUrl) {
-        window.open(pdfUrl, '_blank')
-      }
+      await generatePDF(invoiceId)
     }
   }
 
@@ -71,9 +68,9 @@ export function OrderInvoiceCell({
         <button
           onClick={handleDownloadPDF}
           className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-          title={pdfUrl ? "Download PDF" : "Generate PDF"}
+          title="Download PDF"
         >
-          <Download size={16} className={pdfUrl ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'} />
+          <Download size={16} className="text-green-600 dark:text-green-400" />
         </button>
 
         <div className="flex flex-col">

@@ -31,10 +31,7 @@ export function InvoicesList() {
   }
 
   const handleDownloadPDF = async (invoiceId: string) => {
-    const pdfUrl = await generatePDF(invoiceId)
-    if (pdfUrl) {
-      window.open(pdfUrl, '_blank')
-    }
+    await generatePDF(invoiceId)
   }
 
   const getStatusBadgeClass = (status: string) => {
@@ -186,13 +183,8 @@ export function InvoicesList() {
                       </button>
                       <button
                         onClick={() => handleDownloadPDF(invoice.invoice_id)}
-                        className={`p-1 rounded ${
-                          invoice.pdf_url
-                            ? 'text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/30'
-                            : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                        }`}
-                        title={invoice.pdf_url ? "Download PDF" : "PDF not generated"}
-                        disabled={!invoice.pdf_url}
+                        className="p-1 rounded text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/30"
+                        title="Download PDF"
                       >
                         <Download size={18} />
                       </button>
