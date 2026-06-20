@@ -184,6 +184,15 @@ Testé avec 3 vrais produits de test ("Pending Review") créés pour l'occasion 
 - Couleur `blue-*` : **on ne touche pas**, reste comme couleur fonctionnelle séparée de la marque.
 - App mobile : **pas pour l'instant**, à reprendre plus tard.
 
+### 26. BUG CRITIQUE : un dropshipper n'a jamais pu passer une commande
+**Erreur trouvée :** audit du dashboard dropshipper (même méthode que seller/admin) sur `PlaceOrderModal.jsx`. Deux problèmes cumulés :
+1. **3 fonctions RPC inexistantes** : `get_dropshipper_customers`, `calculate_commission`, `place_dropshipper_order_v2` — appelées par le code mais jamais créées en base.
+2. **La section "Customer Information" n'était qu'un commentaire vide** (`{/* ... customer form fields ... */}`) — aucun moyen de sélectionner ou créer un client dans l'interface. Impossible de passer une commande, indépendamment des RPC manquantes.
+3. Bonus trouvé en creusant : `product.category_id` n'existe pas sur la table `products` (le vrai champ est `category`, texte) — la logique de commission ne se déclenchait donc même jamais.
+4. Bonus #2 : même en réparant tout ça, la policy RLS sur `profiles` empêche un dropshipper de créer directement un profil pour quelqu'un d'autre (`auth.uid() = id` obligatoire) — la création de nouveau client aurait quand même échoué.
+
+**Solution :** migration `supabase/migrations/20260620010000_dropshipper_place_order_rpcs.sql` avec les 3 fonctions manquantes + une 4ᵉ (`create_dropshipper_customer`, contourne proprement la restriction RLS via `SECURITY DEFINER`). Côté frontend : construction réelle de la section client dans `PlaceOrderModal.jsx` (liste des clients déjà commandés + bouton "+ Add a new customer" avec formulaire), retrait de la dépendance à `category_id`, et correction de l'adresse de livraison envoyée selon qu'on choisit un client existant ou qu'on en crée un nouveau. Exécuté manuellement par Ali, vérifié que les 4 fonctions sont actives.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
-- Prochaine feature prévue : dashboard dropshipper (audit similaire à seller/admin), puis warehouse (actuellement un simple placeholder "coming soon").
+- Reste de l'audit dropshipper à terminer (DropshipperOrders.jsx, DropshipperEarningsPage.jsx, DropshipperCustomersPage.jsx, AddCustomerModal.jsx, MarketplaceProducts.jsx) avant de passer à warehouse.

@@ -37,7 +37,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
   }, [isOpen, dropshipperId]);
 
   useEffect(() => {
-    if (isOpen && product?.category_id && markupPercent > 0) {
+    if (isOpen && product?.id && markupPercent > 0) {
       fetchCommissionRate();
     }
   }, [markupPercent, isOpen]);
@@ -62,16 +62,15 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
   };
 
   const fetchCommissionRate = async () => {
-    if (!product?.category_id) return;
-    
+    if (!product?.id) return;
+
     setLoadingCommission(true);
     try {
       const markupAmount = (product.purchase_price * markupPercent) / 100;
-      
+
       const { data, error } = await supabase
         .rpc('calculate_commission', {
           p_seller_id: product.seller_id || product.user_id,
-          p_category_id: product.category_id,
           p_product_id: product.id,
           p_amount: markupAmount,
           p_for_role: 'dropshipper'
@@ -151,22 +150,23 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
       let customerId = selectedCustomer?.customer_id;
       
       if (newCustomer) {
-        const { data: newUser, error: createError } = await supabase
-          .from('profiles')
-          .insert([{
-            email: `${formData.phone}@temp.customer`,
-            full_name: formData.fullName,
-            phone: formData.phone,
-            city: formData.city,
-            address: formData.address,
-            role: 'customer'
-          }])
-          .select()
-          .single();
+        const { data: newCustomerId, error: createError } = await supabase
+          .rpc('create_dropshipper_customer', {
+            p_full_name: formData.fullName,
+            p_phone: formData.phone,
+            p_city: formData.city,
+            p_address: formData.address
+          });
 
         if (createError) throw createError;
-        customerId = newUser.id;
+        customerId = newCustomerId;
       }
+
+      // Use the new-customer form when creating one, otherwise the
+      // already-selected existing customer's saved info.
+      const shippingInfo = newCustomer
+        ? { fullName: formData.fullName, phone: formData.phone, address: formData.address, city: formData.city, notes: formData.notes }
+        : { fullName: selectedCustomer?.full_name, phone: selectedCustomer?.phone, address: selectedCustomer?.address, city: selectedCustomer?.city, notes: formData.notes };
 
       // Place order with ALL commission details
       const { data, error } = await supabase
@@ -179,14 +179,8 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
           p_commission_rate: prices.commissionRate, // ✅ Store commission rate
           p_commission_amount: prices.commissionAmount, // ✅ Store commission amount
           p_net_profit: prices.netProfit,           // ✅ Store net profit
-          p_shipping_address: {
-            fullName: formData.fullName,
-            phone: formData.phone,
-            address: formData.address,
-            city: formData.city,
-            notes: formData.notes
-          },
-          p_shipping_city: formData.city,
+          p_shipping_address: shippingInfo,
+          p_shipping_city: shippingInfo.city,
           p_shipping_fee: prices.shippingFee
         });
 
@@ -325,8 +319,91 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
 
           {/* Customer Information */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-            <h3 className="font-semibold mb-3 text-gray-900 dark:text-white">Customer Information</h3>
-            {/* ... customer form fields ... */}
+            <h3 className="font-semibold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Customer Information <span className="text-red-500 dark:text-red-400">*</span>
+            </h3>
+
+            {!newCustomer ? (
+              <>
+                {customers.length > 0 && (
+                  <div className="mb-3 max-h-40 overflow-y-auto space-y-1.5">
+                    {customers.map((c) => (
+                      <button
+                        key={c.customer_id}
+                        type="button"
+                        onClick={() => setSelectedCustomer(c)}
+                        className={`w-full text-left px-3 py-2 rounded-lg border text-sm transition ${
+                          selectedCustomer?.customer_id === c.customer_id
+                            ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-500'
+                            : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        <span className="font-medium text-gray-900 dark:text-white">{c.full_name}</span>
+                        <span className="text-gray-500 dark:text-gray-400 ml-2">{c.phone} · {c.city}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => { setNewCustomer(true); setSelectedCustomer(null); }}
+                  className="text-sm text-amber-700 dark:text-amber-400 font-medium hover:underline"
+                >
+                  + Add a new customer
+                </button>
+              </>
+            ) : (
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={() => setNewCustomer(false)}
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:underline"
+                >
+                  ← Back to customer list
+                </button>
+                <input
+                  type="text"
+                  placeholder="Full name *"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    placeholder="Phone"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                  />
+                  <select
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                  >
+                    <option value="">City</option>
+                    {moroccanCities.map((city) => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Address"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                />
+                <input
+                  type="text"
+                  placeholder="Delivery notes (optional)"
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                />
+              </div>
+            )}
           </div>
 
           {/* Submit Button */}
