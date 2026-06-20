@@ -276,6 +276,17 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Décision prise :** l'automatisation du suivi (mise à jour automatique du statut par le transporteur via webhook/API, fonction `update_order_from_delivery` déjà prévue mais jamais déployée) est reportée — aucun vrai transporteur n'est connecté actuellement (uniquement "Test Delivery Co", fictif), donc rien à automatiser concrètement pour l'instant. Le suivi manuel par l'admin reste le bouche-trou logique tant qu'un vrai partenaire transporteur n'est pas intégré.
 
+### 37. Email de confirmation de commande automatisé (Resend) — bug `ALTER DATABASE` non autorisé sur Supabase hébergé
+**Demande d'Ali :** envoyer automatiquement au client un email de confirmation contenant son numéro de commande, dès qu'une commande est créée — sans déployer d'edge function (pas d'accès CLI Supabase depuis cet environnement).
+
+**Ce qu'on a fait :** migration `supabase/migrations/20260620150000_auto_send_order_confirmation_email.sql` — active l'extension `pg_net` (appels HTTP asynchrones depuis Postgres) et ajoute un trigger `tr_send_order_confirmation_email` (AFTER INSERT ON orders) qui appelle directement l'API Resend (`POST https://api.resend.com/emails`) avec le numéro de commande et le total.
+
+**Erreur trouvée :** aucun email n'est arrivé, et le tableau de bord Resend affichait "No sent emails yet" — `pg_net` n'avait même pas tenté l'appel (confirmé en lisant `net._http_response` : 0 ligne). Cause : la clé API était censée être lue via `current_setting('app.settings.resend_api_key', true)`, réglée par `ALTER DATABASE postgres SET app.settings.resend_api_key = '...'` — mais Supabase hébergé **refuse cette commande aux comptes non-superutilisateur** (`ERROR 42501: permission denied to set parameter`), même si le rôle s'appelle "postgres" dans l'éditeur SQL. La clé n'a donc jamais été enregistrée (confirmé : `current_setting(...)` renvoyait `null`).
+
+**Solution :** remplacement par **Supabase Vault** (mécanisme officiel pour stocker des secrets accessibles depuis des fonctions SQL sur Supabase hébergé) : la clé est stockée une fois via `SELECT vault.create_secret('...', 'resend_api_key');` (commande à coller directement dans l'éditeur SQL, jamais commitée), et la fonction du trigger la lit désormais via `SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'resend_api_key'`. En attente de test après que la clé soit re-stockée via Vault.
+
+**Leçon retenue :** sur Supabase hébergé, ne jamais utiliser `ALTER DATABASE ... SET app.settings.*` pour des secrets — toujours passer par Vault (`vault.create_secret`/`vault.decrypted_secrets`).
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).
