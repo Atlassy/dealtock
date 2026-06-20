@@ -2,10 +2,9 @@
 import { useState } from 'react';
 import { X, User, Phone, Mail, MapPin, Home } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
-import { useToast } from '../../ui/use-toast';
+import { toast } from 'sonner';
 
 const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
-  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -19,11 +18,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
     e.preventDefault();
     
     if (!formData.fullName || !formData.phone) {
-      toast({
-        title: "Error",
-        description: "Name and phone are required",
-        variant: "destructive",
-      });
+      toast.error("Name and phone are required");
       return;
     }
 
@@ -65,10 +60,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
         customerId = newProfile.id;
       }
 
-      toast({
-        title: "Success",
-        description: "Customer added successfully",
-      });
+      toast.success("Customer added successfully");
 
       onSuccess();
       onClose();
@@ -81,11 +73,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
       });
     } catch (error) {
       console.error('Error adding customer:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to add customer",
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to add customer");
     } finally {
       setLoading(false);
     }

@@ -4,10 +4,9 @@ import {
   X, Package, User, MapPin, Phone, TrendingUp, Percent, DollarSign, Truck, Shield, ChevronRight, Info, AlertCircle
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
-import { useToast } from '../../ui/use-toast';
+import { toast } from 'sonner';
 
 const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess }) => {
-  const { toast } = useToast();
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [newCustomer, setNewCustomer] = useState(false);
@@ -53,11 +52,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
       setCustomers(data || []);
     } catch (error) {
       console.error('Error fetching customers:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load customers",
-        variant: "destructive",
-      });
+      toast.error("Failed to load customers");
     }
   };
 
@@ -116,31 +111,19 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
     
     // Validate customer selection
     if (!selectedCustomer && !newCustomer) {
-      toast({
-        title: "Error",
-        description: "Please select or add a customer",
-        variant: "destructive",
-      });
+      toast.error("Please select or add a customer");
       return;
     }
 
     // Validate new customer form
     if (newCustomer && !formData.fullName) {
-      toast({
-        title: "Error",
-        description: "Please fill in customer details",
-        variant: "destructive",
-      });
+      toast.error("Please fill in customer details");
       return;
     }
 
     // ✅ Validate markup is positive (mandatory for B2B)
     if (markupPercent <= 0) {
-      toast({
-        title: "Error",
-        description: "Please set a markup percentage greater than 0%",
-        variant: "destructive",
-      });
+      toast.error("Please set a markup percentage greater than 0%");
       return;
     }
 
@@ -187,26 +170,15 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
       if (error) throw error;
 
       if (data.success) {
-        toast({
-          title: "✅ Order Placed Successfully",
-          description: `Your markup: ${prices.markupAmount.toFixed(2)} MAD | Net profit: ${prices.netProfit.toFixed(2)} MAD`,
-        });
+        toast.success(`Order placed! Your markup: ${prices.markupAmount.toFixed(2)} MAD | Net profit: ${prices.netProfit.toFixed(2)} MAD`);
         onSuccess();
         onClose();
       } else {
-        toast({
-          title: "Error",
-          description: data.error,
-          variant: "destructive",
-        });
+        toast.error(data.error);
       }
     } catch (error) {
       console.error('Error placing order:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to place order",
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to place order");
     } finally {
       setLoading(false);
     }

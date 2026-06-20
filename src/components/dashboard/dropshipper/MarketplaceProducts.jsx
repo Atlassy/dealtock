@@ -9,11 +9,10 @@ import {
   Star
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
-import { useToast } from '../../ui/use-toast';
+import { toast } from 'sonner';
 import ProductCard from './ProductCard';
 
 const MarketplaceProducts = ({ onPlaceOrder }) => {
-  const { toast } = useToast();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -74,11 +73,7 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
       setProducts(data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load products",
-        variant: "destructive",
-      });
+      toast.error("Failed to load products");
     } finally {
       setLoading(false);
     }
