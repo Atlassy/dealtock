@@ -39,25 +39,22 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
         }
       }
 
-      // If no existing user, create new customer profile
+      // If no existing user, create new customer profile. The profiles
+      // table only allows inserting your own row (auth.uid() = id), so a
+      // dropshipper can't insert a profile for someone else directly -
+      // this RPC bypasses that safely.
       if (!customerId) {
-        // Note: In a real app, you might want to create an auth user here
-        // For now, we'll just create a profile
-        const { data: newProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert([{
-            email: formData.email || `${formData.phone}@temp.customer`,
-            full_name: formData.fullName,
-            phone: formData.phone,
-            city: formData.city,
-            address: formData.address,
-            role: 'customer'
-          }])
-          .select()
-          .single();
+        const { data: newCustomerId, error: createError } = await supabase
+          .rpc('create_dropshipper_customer', {
+            p_full_name: formData.fullName,
+            p_phone: formData.phone,
+            p_city: formData.city,
+            p_address: formData.address,
+            p_email: formData.email || null
+          });
 
         if (createError) throw createError;
-        customerId = newProfile.id;
+        customerId = newCustomerId;
       }
 
       toast.success("Customer added successfully");

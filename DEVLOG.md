@@ -193,6 +193,13 @@ Testé avec 3 vrais produits de test ("Pending Review") créés pour l'occasion 
 
 **Solution :** migration `supabase/migrations/20260620010000_dropshipper_place_order_rpcs.sql` avec les 3 fonctions manquantes + une 4ᵉ (`create_dropshipper_customer`, contourne proprement la restriction RLS via `SECURITY DEFINER`). Côté frontend : construction réelle de la section client dans `PlaceOrderModal.jsx` (liste des clients déjà commandés + bouton "+ Add a new customer" avec formulaire), retrait de la dépendance à `category_id`, et correction de l'adresse de livraison envoyée selon qu'on choisit un client existant ou qu'on en crée un nouveau. Exécuté manuellement par Ali, vérifié que les 4 fonctions sont actives.
 
+### 27. Notifications invisibles dans tout le module dropshipper
+**Erreur trouvée en testant :** en cliquant sur "Place B2B Order", rien ne semblait se passer — pas de message de succès ni d'erreur, juste "Processing..." puis retour à la normale. Cause : `PlaceOrderModal.jsx`, `AddCustomerModal.jsx` et `MarketplaceProducts.jsx` utilisaient le hook `useToast` (shadcn), mais l'app entière n'affiche que le `<Toaster />` de la librairie "sonner" (monté une fois dans `App.jsx`). Les notifications de `useToast` étaient donc créées en mémoire mais **jamais affichées à l'écran** — tout échec (ou succès) était invisible.
+
+**Solution :** remplacement par `toast` de "sonner" dans les 3 fichiers, cohérent avec le reste de l'app.
+
+**Conséquence positive :** une fois les messages visibles, un vrai bug est apparu : `new row violates row-level security policy for table "profiles"` en ajoutant un client depuis l'onglet "Customers" (`AddCustomerModal.jsx`) — exactement le même problème RLS déjà identifié et contourné dans `PlaceOrderModal.jsx` (point 26), mais ce fichier-ci faisait encore une insertion directe. Corrigé pour utiliser la même fonction `create_dropshipper_customer`, étendue avec un paramètre email optionnel (migration `20260620020000_add_email_to_create_dropshipper_customer.sql`) puisque ce formulaire en propose un. Confirmé par Ali que l'ajout de client fonctionne maintenant.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
-- Reste de l'audit dropshipper à terminer (DropshipperOrders.jsx, DropshipperEarningsPage.jsx, DropshipperCustomersPage.jsx, AddCustomerModal.jsx, MarketplaceProducts.jsx) avant de passer à warehouse.
+- Reste de l'audit dropshipper à terminer (DropshipperOrders.jsx, DropshipperEarningsPage.jsx, DropshipperCustomersPage.jsx) avant de passer à warehouse.
