@@ -215,7 +215,7 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Solution :** la comparaison utilise maintenant `category_id` en priorité, sinon `category` (texte) en repli.
 
-**Signalé par l'associé, en attente de vérification :** "access denied" en modifiant une règle de commission dropshipper. La policy RLS `cr_manage_admin` exige `profiles.role = 'admin'` — probablement pas un bug mais un compte sans le bon rôle, à confirmer avec lui une fois réveillé (`SELECT role FROM profiles WHERE email = '...'`).
+**Signalé par l'associé, vérifié et résolu :** "access denied" en modifiant une règle de commission dropshipper. Vérification faite : son compte (`allblue.contact@gmail.com`) a bien le rôle `admin` en base, et la policy RLS `cr_manage_admin` vérifie correctement `profiles.role = 'admin'` (pas de bug de JWT comme au point 23). En retestant avec ce compte connecté, la modification d'une règle de commission s'enregistre normalement — l'erreur initiale était probablement liée à une session pas encore rafraîchie au moment du signalement, pas un bug du site.
 
 ### 30. Fin de l'audit dropshipper : 3 bugs supplémentaires trouvés
 **`DropshipperOrders.jsx`** : la liste des statuts de commande ne correspondait pas aux vrais statuts utilisés ailleurs (`ready_for_pickup`/`with_delivery_partner` au lieu de `ready`/`picked_up`, et `returned`/`failed`/`refunded`/`settled` manquaient complètement) — même bug que celui déjà corrigé côté seller. Corrigé, plus un filtre de statut plus complet et un statut par défaut honnête ("Unknown" au lieu de mentir).
