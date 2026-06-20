@@ -485,11 +485,16 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
           orderData.customer_id = user.id;
         }
 
-        const { data: order, error: orderError } = await supabase
-          .from('orders')
-          .insert([orderData])
-          .select()
-          .single();
+        // Guests have no stable identity, so RLS can't let them read back
+        // the row they just inserted (no policy grants that without opening
+        // up reading ALL guest orders to ANY anonymous visitor, leaking
+        // other customers' names/addresses/phones). Skip the .select() for
+        // guests and use the locally-built orderData instead - logged-in
+        // users can still read their own row back via orders_select_own.
+        const insertQuery = supabase.from('orders').insert([orderData]);
+        const { data: order, error: orderError } = user
+          ? await insertQuery.select().single()
+          : await insertQuery;
 
         if (orderError) {
           console.error('Order error for item:', item.name, orderError);
@@ -497,7 +502,7 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
           continue;
         }
 
-        orders.push(order);
+        orders.push(order || orderData);
       }
 
       if (errors.length > 0) {

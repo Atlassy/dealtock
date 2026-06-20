@@ -254,6 +254,16 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Solution :** les deux valeurs remplacées par `'admin_override'`, qui existe déjà dans la liste autorisée — aucun changement de base nécessaire.
 
+### 34. BUG CRITIQUE : personne n'a jamais pu commander en tant qu'invité
+**Découvert en simulant le parcours client réel.** Une chaîne de 4 bugs empilés, trouvés un par un en testant le vrai checkout marketplace (pas via script) :
+
+1. **`orders_insert_buyer` exigeait `auth.uid() IS NOT NULL`** — alors que le panier propose explicitement "Guest checkout" et affiche "You're ordering as a guest." Le guest checkout était donc **techniquement impossible** depuis toujours. Ajout d'une policy `orders_insert_guest` qui autorise l'insertion anonyme, mais seulement pour des commandes B2C "propres" (`customer_id` et `dropshipper_id` doivent être `NULL`, pour empêcher un invité de usurper l'identité d'un client/dropshipper enregistré).
+2. **`create_escrow_on_order()` n'était pas `SECURITY DEFINER`** — ce trigger se déclenche automatiquement à la création de n'importe quelle commande, mais s'exécutait avec les droits de l'appelant (l'invité), qui n'a pas le droit d'écrire dans `escrow_holdings`. Corrigé.
+3. **8 autres triggers de la table `orders` avaient le même problème** (`create_ledger_entry`, `create_payouts_on_delivery`, `detect_order_anomalies`, `finalize_ledger_on_delivery`, `generate_order_number`, `notify_order_update`, `release_escrow_on_delivery`, `set_default_order_status`, `track_order_status_change`) — vérifié systématiquement via `pg_trigger`/`pg_proc` plutôt que de les découvrir un par un, et tous corrigés en une seule migration (`ALTER FUNCTION ... SECURITY DEFINER`).
+4. **Le code du checkout relisait la commande juste après l'avoir créée** (`.insert().select().single()`), mais un invité n'a aucune policy de lecture sur `orders` (il n'a pas d'identité stable pour scoper "ses propres" commandes) — ouvrir cette lecture à tout le monde aurait exposé les noms/adresses/téléphones de tous les autres clients invités. Corrigé côté frontend : on ne redemande la relecture que si l'utilisateur est connecté, sinon on réutilise les données déjà construites localement.
+
+**Leçon retenue :** un trigger qui se déclenche automatiquement sur une action accessible à un utilisateur non-admin (ici : passer une commande) doit systématiquement être `SECURITY DEFINER` s'il écrit dans une table que cet utilisateur n'a pas le droit de modifier directement. À vérifier en premier réflexe pour tout futur trigger ajouté sur une table accessible aux invités/clients.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).
