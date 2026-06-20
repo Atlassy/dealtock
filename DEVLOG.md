@@ -242,6 +242,13 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 - Étendu la contrainte CHECK sur `profiles.role` pour autoriser `'warehouse'`.
 - Créé un compte warehouse de test avec 2 produits assignés pour valider le flux complet.
 
+### 32. RÉGRESSION CRITIQUE (auto-infligée) : récursion infinie cassait TOUS les comptes
+**Erreur trouvée :** juste après le point 31, plus aucun compte ne pouvait se connecter — "Unauthorized role:" s'affichait pour seller, admin, dropshipper, warehouse, tout le monde. Cause : la policy `profiles_select_own_customers` ajoutée plus tôt (point 30) vérifiait une condition en lisant la table `orders` — mais la policy RLS de `orders` lit elle-même `profiles` pour vérifier le rôle de l'appelant. Résultat : `profiles` → `orders` → `profiles` → `orders`... récursion infinie (`infinite recursion detected in policy for relation "profiles"`), qui fait échouer **toute** lecture de `profiles`, pour tout le monde, peu importe quelle autre policy aurait suffi.
+
+**Solution :** la condition est passée dans une fonction `SECURITY DEFINER` (`is_own_customer()`), qui contourne le RLS de `orders` en interne et casse ainsi le cycle. Vérifié immédiatement après par Ali : tous les comptes refonctionnent, et le dashboard warehouse de test s'affiche correctement (2 produits, stats, prix, bouton "Mark as Sold").
+
+**Leçon retenue :** toute policy RLS qui lit une autre table doit être vérifiée pour un risque de cycle si cette autre table a elle-même une policy qui relit la première — à surveiller systématiquement pour toute future policy ajoutée.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).
