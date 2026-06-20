@@ -8,14 +8,14 @@
 //   5. Bulk approve/reject per row before import
 //   6. Bulk insert to products as pending_review
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { supabase } from "../../../../lib/supabaseClient";
 import { toast } from "sonner";
 import {
   Upload, Download, FileText, X, Check, AlertCircle,
   ChevronDown, RefreshCw, Package, MapPin, Clock,
   Tag, ArrowRight, CheckCircle2, XCircle, Eye,
-  RotateCcw, Truck
+  RotateCcw, Truck, Warehouse
 } from "lucide-react";
 
 // ── Dealtock standard fields ─────────────────────────────────────
@@ -173,7 +173,26 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
   const [importing, setImporting]   = useState(false);
   const [result, setResult]         = useState(null);     // { imported, skipped, errors }
   const [selectedDC, setSelectedDC] = useState("");       // delivery company id
+  const [warehousePartners, setWarehousePartners] = useState([]);
+  const [selectedWarehouse, setSelectedWarehouse] = useState(""); // warehouse partner profile id
   const fileRef = useRef();
+
+  // Products need a real owner (products.user_id has a FK to profiles) -
+  // the delivery company is just who dropped the parcel off, not who
+  // manages/resells it. Load warehouse partner accounts to assign to.
+  useEffect(() => {
+    supabase
+      .from("profiles")
+      .select("id, full_name, email, city")
+      .eq("role", "warehouse")
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Error loading warehouse partners:", error);
+        } else {
+          setWarehousePartners(data || []);
+        }
+      });
+  }, []);
 
   // ── File handling ───────────────────────────────────────────────
   const handleFile = useCallback((file) => {
@@ -237,6 +256,10 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
       toast.error("Please select the delivery company before proceeding");
       return;
     }
+    if (!selectedWarehouse) {
+      toast.error("Please select the warehouse partner before proceeding");
+      return;
+    }
 
     const mapped = csvData.rows.map((row) => {
       const out = { _rowIndex: row._rowIndex };
@@ -286,7 +309,7 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
         available_for_sale:         false,          // goes live only after admin approval
         status:                     "available",
         origin_delivery_company_id: selectedDC,
-        user_id:                    selectedDC,     // delivery company acts as "seller"
+        user_id:                    selectedWarehouse, // the warehouse partner who manages/resells it
       };
 
       const { error } = await supabase.from("products").insert([payload]);
@@ -389,6 +412,29 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
             </select>
           </div>
 
+          {/* Warehouse partner selector */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              <Warehouse className="inline w-4 h-4 mr-1 text-gray-400 dark:text-gray-500" />
+              Select Warehouse Partner *
+            </label>
+            <select
+              value={selectedWarehouse}
+              onChange={e => setSelectedWarehouse(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-kraft-400 focus:border-kraft-400"
+            >
+              <option value="">— Choose warehouse partner —</option>
+              {warehousePartners.map(w => (
+                <option key={w.id} value={w.id}>{w.full_name || w.email}{w.city ? ` (${w.city})` : ""}</option>
+              ))}
+            </select>
+            {warehousePartners.length === 0 && (
+              <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                No warehouse partner accounts found — create one with role "warehouse" first.
+              </p>
+            )}
+          </div>
+
           {/* Drop zone */}
           <div
             onDragOver={e => { e.preventDefault(); setDragging(true); }}
@@ -443,6 +489,26 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
                 <option value="">— Choose delivery company —</option>
                 {deliveryCompanies.map(dc => (
                   <option key={dc.id} value={dc.id}>{dc.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Warehouse selector (shown again if not filled) */}
+          {!selectedWarehouse && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-kraft-200 dark:border-kraft-800 p-5">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <Warehouse className="inline w-4 h-4 mr-1 text-gray-400 dark:text-gray-500" />
+                Select Warehouse Partner *
+              </label>
+              <select
+                value={selectedWarehouse}
+                onChange={e => setSelectedWarehouse(e.target.value)}
+                className="w-full px-3 py-2 border border-kraft-300 dark:border-kraft-700 dark:bg-gray-700 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-kraft-400"
+              >
+                <option value="">— Choose warehouse partner —</option>
+                {warehousePartners.map(w => (
+                  <option key={w.id} value={w.id}>{w.full_name || w.email}{w.city ? ` (${w.city})` : ""}</option>
                 ))}
               </select>
             </div>

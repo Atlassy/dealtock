@@ -226,7 +226,23 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Bug racine trouvé en plus, qui touchait les 3 fichiers à la fois :** la table `profiles` n'avait que 2 policies de lecture (son propre profil, ou être admin) — un dropshipper n'avait **aucun moyen de lire les profils de ses propres clients**. La jointure `customer:customer_id(...)` aurait donc toujours renvoyé `null` silencieusement (RLS ne génère pas d'erreur, juste un résultat vide), affichant "Customer: N/A" indéfiniment même avec de vraies données en base. Nouvelle policy ajoutée (`profiles_select_own_customers`) : un dropshipper peut lire le profil d'un client s'il existe une commande les reliant.
 
+### 31. Le dashboard warehouse n'a jamais été branché, et le rôle "warehouse" n'existait pas en base
+**Erreur trouvée :** `Dashboard.jsx` avait l'import et le `case "warehouse"` du switch de routage **commentés** — un utilisateur avec ce rôle voyait littéralement "Unauthorized role: warehouse". `WarehouseDashboard.jsx` lui-même n'était qu'une page "coming soon" vide.
+
+**Découvertes en construisant le vrai dashboard :**
+1. Les policies RLS `products_update_seller`/`products_delete_seller` limitaient la modification de ses propres produits aux rôles `seller`/`pro_seller` — un compte warehouse n'aurait jamais pu gérer ses produits même une fois assigné.
+2. **Bug critique trouvé en profondeur :** `ReturnedProductsImporter.jsx` (l'import CSV admin des produits retournés) assignait `user_id = id de la société de livraison` au lieu d'un vrai profil utilisateur — or `products.user_id` a une **vraie clé étrangère vers `profiles`**. Testé directement : chaque tentative d'import a **toujours échoué** avec une violation de clé étrangère, depuis le début. Personne n'a dû s'en rendre compte car rien ne signalait clairement l'erreur exacte.
+3. Encore plus en profondeur : `profiles.role` avait une **contrainte CHECK** qui n'autorisait que `'', 'seller', 'dropshipper', 'customer', 'admin', 'delivery'` — `'warehouse'` n'y figurait même pas. Impossible de créer un compte warehouse, point final.
+
+**Solution :**
+- Reconnecté `WarehouseDashboard` dans `Dashboard.jsx`.
+- Reconstruit `WarehouseDashboard.jsx` : statistiques (total, en attente, disponible, valeur du stock), liste des produits retournés assignés au compte connecté, modification du prix demandé, marquage "vendu".
+- Étendu les policies RLS produits pour inclure le rôle `warehouse`.
+- Ajouté un vrai sélecteur "Warehouse Partner" dans l'import CSV (liste des profils `role='warehouse'`), qui assigne désormais `user_id` au bon partenaire au lieu de la société de livraison (`origin_delivery_company_id` reste pour tracer qui a déposé le colis).
+- Étendu la contrainte CHECK sur `profiles.role` pour autoriser `'warehouse'`.
+- Créé un compte warehouse de test avec 2 produits assignés pour valider le flux complet.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).
-- Audit dropshipper terminé (Orders, Earnings, Customers) — prochaine étape : warehouse.
+- Warehouse MVP en place (pas de table dédiée — réutilise `products.user_id` + rôle `warehouse`). Une vraie modélisation (table `warehouses`, capacité, plusieurs entrepôts par partenaire...) pourra être envisagée plus tard si besoin.
