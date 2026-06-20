@@ -151,10 +151,31 @@ Testé avec 3 vrais produits de test ("Pending Review") créés pour l'occasion 
 
 **Solution :** plutôt que de construire et déployer une vraie fonction edge (pas d'accès CLI Supabase depuis cet environnement pour la déployer), génération du PDF **directement dans le navigateur** à partir des données déjà affichées (`src/lib/generateInvoicePdf.ts`, librairie `jspdf` ajoutée en dépendance). Le bouton télécharge maintenant un vrai fichier PDF (en-tête, infos vendeur, détail financier, lignes de facture) sans dépendre d'aucun backend. Mis à jour `InvoicesList.tsx`, `InvoiceDetailModal.tsx`, `OrderInvoiceCell.tsx` et `useInvoices.ts` pour ne plus dépendre de `pdf_url` (le bouton est maintenant toujours actif).
 
+### 23. Bugs trouvés par l'associé en testant Order Oversight : RLS cassée + colonnes inexistantes
+**Erreur trouvée #1 (la plus grave) :** la policy RLS `profiles_select_admin` vérifiait `auth.jwt() -> 'app_metadata' ->> 'role'` — mais **rien dans le code n'a jamais rempli ce champ** sur les utilisateurs (le vrai rôle vit dans la colonne `profiles.role`). Résultat : **aucun admin n'a jamais pu lire le profil d'un autre utilisateur** via la jointure `orders -> seller:profiles!seller_id(...)`, ni en prod ni en test — c'est pour ça que "Seller Information" et la colonne Seller du tableau affichaient toujours "N/A".
+
+**Solution :** migration `supabase/migrations/20260620000000_fix_admin_profiles_select_policy.sql` — la policy utilise maintenant `current_user_role()` (la même fonction déjà utilisée correctement par la policy de mise à jour), qui lit la vraie colonne. Vérifié après coup avec une vraie session admin : la jointure renvoie maintenant les bonnes infos.
+
+**Erreur trouvée #2 :** `OrderOversightSection.jsx` lisait des colonnes qui n'existent pas du tout sur `orders` (`customer_name`, `customer_phone`, `customer_address`, `city`) — d'où "Customer Information" toujours vide. Les vraies données sont dans `shipping_address` (jsonb : `name`, `phone`, `address`, `city`, `postal_code`) et `shipping_city`.
+
+**Solution :** toutes les références corrigées pour lire `order.shipping_address?.name/phone/address` et `order.shipping_city`.
+
+**Erreur trouvée #3 :** le détail "Order Amount" ne montrait que Product Price + Delivery Fee + Commission, sans la marge dropshipper/B2C — sur une commande de test à 35 MAD (20 MAD produit + 15 MAD marge), les 15 MAD manquants n'étaient nulle part visibles. La "Commission" affichée était aussi toujours à 0 car elle lisait `selectedOrder.dealtock_commission`, une colonne qui n'existe pas sur `orders` (le vrai calcul vit dans `order_financials`, déjà calculé automatiquement par un trigger existant).
+
+**Solution :** jointure ajoutée vers `order_financials` dans la requête de `AdminDashboard.jsx`, affichage de la marge (markup) quand présente, et un avertissement visuel si le total ne correspond toujours pas à la somme des parties.
+
+### 24. Frais de livraison : calcul depuis `delivery_fee_rules` ajouté (en attente de données)
+**Demande de l'associé :** il a rempli la table `delivery_fee_rules` (ville, poids, transporteur) et voulait que le frais de livraison affiché dans Order Details en tienne compte plutôt que de rester à 0.
+
+**Constat :** la table `delivery_fee_rules` est **vide** sur le projet staging utilisé ici (`wicjcdggytwqqvplxlod`) — ses données ont probablement été ajoutées sur un autre projet Supabase. À vérifier avec lui.
+
+**Ce qu'on a fait quand même :** ajout de la logique de recherche/calcul (ville de destination, poids, transporteur, priorité) dans `OrderOversightSection.jsx` — affiche un avertissement si le frais calculé par règle diffère de celui enregistré sur la commande. Prêt à fonctionner dès que les données seront au bon endroit.
+
 ---
 
 ## En attente de décision
 - Couleur `blue-*` (492 occurrences / 51 fichiers) : la rebrander en kraft/encre, ou la garder comme couleur fonctionnelle séparée de la marque ?
 - App mobile (acheteurs + vendeurs/entrepôts) : pas commencée.
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
+- Vérifier sur quel projet Supabase l'associé a rempli `delivery_fee_rules` (vide sur le projet staging utilisé ici).
 - Prochaine feature prévue : dashboard dropshipper (audit similaire à seller/admin), puis warehouse (actuellement un simple placeholder "coming soon").

@@ -102,7 +102,8 @@ const AdminDashboard = () => {
           .select(`
             *,
             seller:profiles!seller_id (id, email, full_name),
-            delivery_company:delivery_companies (id, name)
+            delivery_company:delivery_companies (id, name),
+            financials:order_financials (dealtock_commission, dropshipper_commission, seller_net)
           `)
           .order('created_at', { ascending: false })
           .limit(100),

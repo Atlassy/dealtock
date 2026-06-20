@@ -41,12 +41,62 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
   const [paymentFilter, setPaymentFilter] = useState('all');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [computedDeliveryFee, setComputedDeliveryFee] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
 
   // Update orders when prop changes
   useEffect(() => {
     setOrders(initialOrders || []);
   }, [initialOrders]);
+
+  // Look up the matching delivery_fee_rules row for the selected order's
+  // destination city / weight / carrier, so admins can compare it against
+  // whatever shipping_fee was actually stored on the order.
+  useEffect(() => {
+    if (!selectedOrder) {
+      setComputedDeliveryFee(null);
+      return;
+    }
+
+    const lookupFee = async () => {
+      const destCity = (selectedOrder.shipping_city || '').trim().toLowerCase();
+      if (!destCity) {
+        setComputedDeliveryFee(null);
+        return;
+      }
+
+      let query = supabase
+        .from('delivery_fee_rules')
+        .select('*')
+        .eq('is_active', true)
+        .or(`to_city_normalized.eq.${destCity},to_city.ilike.${destCity}`)
+        .order('priority', { ascending: false });
+
+      if (selectedOrder.delivery_company_id) {
+        query = query.or(`delivery_company_id.eq.${selectedOrder.delivery_company_id},company_id.eq.${selectedOrder.delivery_company_id}`);
+      }
+
+      const { data, error } = await query;
+      if (error || !data || data.length === 0) {
+        setComputedDeliveryFee(null);
+        return;
+      }
+
+      const weight = selectedOrder.delivery_weight_kg || 1;
+      const rule = data.find(r =>
+        (r.weight_min == null || weight >= r.weight_min) &&
+        (r.max_weight == null || weight <= r.max_weight)
+      ) || data[0];
+
+      const fee = (rule.base_fee || 0)
+        + (rule.per_kg_fee || 0) * weight
+        + (selectedOrder.is_cod ? (rule.cod_fee || 0) : 0);
+
+      setComputedDeliveryFee({ fee, rule });
+    };
+
+    lookupFee();
+  }, [selectedOrder]);
 
   // Filter and sort orders
   const filteredOrders = orders
@@ -67,8 +117,8 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
         const orderNumber = order.order_number?.toLowerCase() || '';
         const sellerName = order.seller?.full_name?.toLowerCase() || 
                           order.seller?.email?.toLowerCase() || '';
-        const customerName = order.customer_name?.toLowerCase() || '';
-        const customerPhone = order.customer_phone?.toLowerCase() || '';
+        const customerName = order.shipping_address?.name?.toLowerCase() || '';
+        const customerPhone = order.shipping_address?.phone?.toLowerCase() || '';
         
         return orderNumber.includes(searchLower) || 
                sellerName.includes(searchLower) ||
@@ -193,10 +243,10 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
       'Order Number': o.order_number,
       'Order ID': o.id,
       'Seller': o.seller?.full_name || o.seller?.email || 'N/A',
-      'Customer Name': o.customer_name || 'N/A',
-      'Customer Phone': o.customer_phone || 'N/A',
-      'Customer Address': o.customer_address || 'N/A',
-      'City': o.city || 'N/A',
+      'Customer Name': o.shipping_address?.name || 'N/A',
+      'Customer Phone': o.shipping_address?.phone || 'N/A',
+      'Customer Address': o.shipping_address?.address || 'N/A',
+      'City': o.shipping_city || 'N/A',
       'Amount': o.final_customer_price,
       'Payment Method': o.payment_method,
       'Payment Status': o.payment_status,
@@ -453,19 +503,19 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                     </div>
                   </td>
                   <td className="p-4">
-                    {order.customer_name && (
-                      <div className="text-sm text-gray-700 dark:text-gray-300">{order.customer_name}</div>
+                    {order.shipping_address?.name && (
+                      <div className="text-sm text-gray-700 dark:text-gray-300">{order.shipping_address.name}</div>
                     )}
-                    {order.customer_phone && (
+                    {order.shipping_address?.phone && (
                       <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
                         <Phone className="w-3 h-3" />
-                        {order.customer_phone}
+                        {order.shipping_address.phone}
                       </div>
                     )}
-                    {order.city && (
+                    {order.shipping_city && (
                       <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
                         <MapPin className="w-3 h-3" />
-                        {order.city}
+                        {order.shipping_city}
                       </div>
                     )}
                   </td>
@@ -618,20 +668,53 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                 <p className="text-2xl font-bold text-green-700 dark:text-green-400">
                   {formatCurrency(selectedOrder.final_customer_price)}
                 </p>
-                <div className="grid grid-cols-3 gap-4 mt-2 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2 text-sm">
                   <div>
                     <p className="text-xs text-gray-500 dark:text-gray-400">Product Price</p>
                     <p className="text-gray-700 dark:text-gray-300">{formatCurrency(selectedOrder.product_price || 0)}</p>
                   </div>
+                  {(selectedOrder.dropshipper_markup > 0 || selectedOrder.b2c_markup > 0) && (
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Markup</p>
+                      <p className="text-gray-700 dark:text-gray-300">{formatCurrency((selectedOrder.dropshipper_markup || 0) + (selectedOrder.b2c_markup || 0))}</p>
+                    </div>
+                  )}
                   <div>
                     <p className="text-xs text-gray-500 dark:text-gray-400">Delivery Fee</p>
                     <p className="text-gray-700 dark:text-gray-300">{formatCurrency(selectedOrder.shipping_fee || 0)}</p>
+                    {computedDeliveryFee && Math.abs(computedDeliveryFee.fee - (selectedOrder.shipping_fee || 0)) > 0.01 && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+                        Rule says {formatCurrency(computedDeliveryFee.fee)} ({computedDeliveryFee.rule.carrier || 'carrier'})
+                      </p>
+                    )}
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Commission</p>
-                    <p className="text-gray-700 dark:text-gray-300">{formatCurrency(selectedOrder.dealtock_commission || 0)}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Dealtock Commission</p>
+                    <p className="text-gray-700 dark:text-gray-300">{formatCurrency(selectedOrder.financials?.dealtock_commission || 0)}</p>
+                  </div>
+                  {selectedOrder.financials?.dropshipper_commission > 0 && (
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Dropshipper Commission</p>
+                      <p className="text-gray-700 dark:text-gray-300">{formatCurrency(selectedOrder.financials.dropshipper_commission)}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Seller Net</p>
+                    <p className="text-gray-700 dark:text-gray-300">{formatCurrency(selectedOrder.financials?.seller_net || 0)}</p>
                   </div>
                 </div>
+                {(() => {
+                  const accounted = (selectedOrder.product_price || 0)
+                    + (selectedOrder.dropshipper_markup || 0)
+                    + (selectedOrder.b2c_markup || 0)
+                    + (selectedOrder.shipping_fee || 0);
+                  const gap = (selectedOrder.final_customer_price || 0) - accounted;
+                  return Math.abs(gap) > 0.01 ? (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                      ⚠️ {formatCurrency(gap)} of the order amount isn't explained by product price + markup + delivery fee.
+                    </p>
+                  ) : null;
+                })()}
               </div>
 
               {/* Parties */}
@@ -649,14 +732,15 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Customer Information</p>
                   <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded space-y-2">
-                    <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.customer_name || 'N/A'}</p>
-                    {selectedOrder.customer_phone && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">📞 {selectedOrder.customer_phone}</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.shipping_address?.name || 'N/A'}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{selectedOrder.customer_email || 'N/A'}</p>
+                    {selectedOrder.shipping_address?.phone && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400">📞 {selectedOrder.shipping_address.phone}</p>
                     )}
-                    {selectedOrder.customer_address && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">📍 {selectedOrder.customer_address}</p>
+                    {selectedOrder.shipping_address?.address && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400">📍 {selectedOrder.shipping_address.address}</p>
                     )}
-                    <p className="text-sm text-gray-600 dark:text-gray-400">🏙️ {selectedOrder.city || 'N/A'}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">🏙️ {selectedOrder.shipping_city || 'N/A'}</p>
                   </div>
                 </div>
               </div>
