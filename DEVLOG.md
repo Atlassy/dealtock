@@ -200,6 +200,16 @@ Testé avec 3 vrais produits de test ("Pending Review") créés pour l'occasion 
 
 **Conséquence positive :** une fois les messages visibles, un vrai bug est apparu : `new row violates row-level security policy for table "profiles"` en ajoutant un client depuis l'onglet "Customers" (`AddCustomerModal.jsx`) — exactement le même problème RLS déjà identifié et contourné dans `PlaceOrderModal.jsx` (point 26), mais ce fichier-ci faisait encore une insertion directe. Corrigé pour utiliser la même fonction `create_dropshipper_customer`, étendue avec un paramètre email optionnel (migration `20260620020000_add_email_to_create_dropshipper_customer.sql`) puisque ce formulaire en propose un. Confirmé par Ali que l'ajout de client fonctionne maintenant.
 
+### 28. Chaîne de 4 bugs supplémentaires découverts en testant la création de client jusqu'au bout
+En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en bout, quatre bugs en cascade sont apparus l'un après l'autre (chacun corrigé puis le suivant révélé en retestant) :
+
+1. **`profiles_id_fkey`** : `profiles.id` a une clé étrangère obligatoire vers `auth.users.id` — impossible de créer un profil "client" sans compte d'authentification associé. Décision prise avec Ali : créer un vrai compte `auth.users` minimal et inutilisable (email généré, mot de passe aléatoire jamais communiqué) en arrière-plan, plutôt que de modifier la contrainte existante.
+2. **`function gen_salt(unknown) does not exist`** : les fonctions de chiffrement (`pgcrypto`) sont dans le schéma `extensions`, pas `public` — la fonction RPC limitait sa recherche à `public`. Corrigé en les appelant explicitement (`extensions.crypt(...)`, `extensions.gen_salt(...)`).
+3. **`duplicate key value violates unique constraint "profiles_pkey"`** : il existe déjà un trigger sur `auth.users` qui crée automatiquement une ligne `profiles` correspondante à la création d'un compte — notre propre `INSERT` entrait donc en conflit. Corrigé en `UPSERT` (`ON CONFLICT (id) DO UPDATE`).
+4. **`null value in column "delivery_company_id" of relation "escrow_holdings"`** : le trigger `create_escrow_on_order()` crée une ligne d'escrow sur **toute** commande sans vérifier qu'un transporteur est assigné — or une commande dropshipper n'en a pas encore au moment de sa création (assigné plus tard). C'est un bug de conception préexistant, pas spécifique au dropshipper : n'importe quel flux de commande sans transporteur dès la création aurait crashé pareil. Corrigé pour ignorer la création d'escrow quand `delivery_company_id` est `NULL`.
+
+**Résultat :** testé et confirmé par Ali — création de client + passage de commande B2B fonctionnent maintenant de bout en bout (commande ORD-000006 créée, stats du dashboard dropshipper à jour : marge brute, frais Dealtock, profit net).
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Reste de l'audit dropshipper à terminer (DropshipperOrders.jsx, DropshipperEarningsPage.jsx, DropshipperCustomersPage.jsx) avant de passer à warehouse.
