@@ -287,6 +287,8 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Leçon retenue :** sur Supabase hébergé, ne jamais utiliser `ALTER DATABASE ... SET app.settings.*` pour des secrets — toujours passer par Vault (`vault.create_secret`/`vault.decrypted_secrets`).
 
+**Confirmé par Ali :** email reçu après le passage à Vault. Le design/contenu du message (HTML) reste basique pour l'instant — à retravailler plus tard, ce n'est pas urgent.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).
