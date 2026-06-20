@@ -257,7 +257,9 @@ const CommissionRulesManager = () => {
       if (rule.applies_to !== candidate.applies_to) return false;
       const samePriority = (rule.priority ?? 0) === (candidate.priority ?? 0);
       if (!samePriority) return false;
-      const sameCategory = (rule.category_id || null) === (candidate.category_id || null);
+      // category_id is legacy/unused (no real FK to categories, table is empty) -
+      // the actual category lives in the free-text `category` column instead.
+      const sameCategory = (rule.category_id || rule.category || null) === (candidate.category_id || candidate.category || null);
       if (!sameCategory) return false;
       if (!rangesOverlap(rule.min_amount, rule.max_amount, candidate.min_amount, candidate.max_amount)) return false;
       if (!datesOverlap(rule.valid_from, rule.valid_to, candidate.valid_from, candidate.valid_to)) return false;

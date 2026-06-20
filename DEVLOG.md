@@ -210,6 +210,14 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Résultat :** testé et confirmé par Ali — création de client + passage de commande B2B fonctionnent maintenant de bout en bout (commande ORD-000006 créée, stats du dashboard dropshipper à jour : marge brute, frais Dealtock, profit net).
 
+### 29. Faux conflits sur les règles de commission par catégorie
+**Erreur trouvée :** l'associé a rempli de vraies règles de commission dropshipper par catégorie (Electronics, Home, Beauty...) — toutes se sont affichées en "Conflict" à tort. Cause : ces règles utilisent le champ texte historique `category`, pas `category_id` (qui n'a jamais été lié à de vraies catégories — voir point 18). Mon code de détection de conflit ne comparait que `category_id`, donc des règles avec des catégories différentes mais `category_id` vide étaient toutes considérées comme "même catégorie".
+
+**Solution :** la comparaison utilise maintenant `category_id` en priorité, sinon `category` (texte) en repli.
+
+**Signalé par l'associé, en attente de vérification :** "access denied" en modifiant une règle de commission dropshipper. La policy RLS `cr_manage_admin` exige `profiles.role = 'admin'` — probablement pas un bug mais un compte sans le bon rôle, à confirmer avec lui une fois réveillé (`SELECT role FROM profiles WHERE email = '...'`).
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
+- Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).
 - Reste de l'audit dropshipper à terminer (DropshipperOrders.jsx, DropshipperEarningsPage.jsx, DropshipperCustomersPage.jsx) avant de passer à warehouse.
