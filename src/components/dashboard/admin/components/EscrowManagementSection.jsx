@@ -148,7 +148,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
         .from('escrow_holdings')
         .update({ 
           released_at: new Date().toISOString(),
-          release_reason: 'admin_release'
+          release_reason: 'admin_override'
         })
         .eq('id', escrowId)
         .is('released_at', null);
@@ -194,7 +194,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
           .from('escrow_holdings')
           .update({ 
             released_at: new Date().toISOString(),
-            release_reason: 'bulk_admin_release'
+            release_reason: 'admin_override'
           })
           .in('id', selectedEscrows)
           .is('released_at', null);

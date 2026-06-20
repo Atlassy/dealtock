@@ -249,6 +249,11 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Leçon retenue :** toute policy RLS qui lit une autre table doit être vérifiée pour un risque de cycle si cette autre table a elle-même une policy qui relit la première — à surveiller systématiquement pour toute future policy ajoutée.
 
+### 33. "Failed to release escrow" — valeur non autorisée
+**Erreur trouvée :** en testant le bouton "Release" dans Escrow Management, message générique "Failed to release escrow". En reproduisant la requête directement, le vrai message était `violates check constraint "escrow_holdings_release_reason_check"` — le code envoie `release_reason: 'admin_release'` (et `'bulk_admin_release'` pour la libération groupée), mais la contrainte en base n'autorise que `'delivered', 'returned', 'settled', 'admin_override', 'order_delivered'`.
+
+**Solution :** les deux valeurs remplacées par `'admin_override'`, qui existe déjà dans la liste autorisée — aucun changement de base nécessaire.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).
