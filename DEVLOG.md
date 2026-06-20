@@ -264,7 +264,20 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Leçon retenue :** un trigger qui se déclenche automatiquement sur une action accessible à un utilisateur non-admin (ici : passer une commande) doit systématiquement être `SECURITY DEFINER` s'il écrit dans une table que cet utilisateur n'a pas le droit de modifier directement. À vérifier en premier réflexe pour tout futur trigger ajouté sur une table accessible aux invités/clients.
 
+### 35. `update_order_status` plantait quand aucun motif n'était fourni
+**Erreur trouvée :** en changeant le statut d'une commande via le menu déroulant de Order Oversight, `null value in column "reason" of relation "admin_actions" violates not-null constraint`. La fonction insère le motif (`p_reason`) dans `admin_actions.reason`, mais ce champ est obligatoire et le frontend envoie toujours `null` (le menu déroulant ne demande pas de motif).
+
+**Solution :** valeur par défaut `'Status updated via Order Oversight'` quand aucun motif n'est fourni.
+
+### 36. Le client n'avait jamais aucun moyen de connaître son numéro de commande
+**Constat (soulevé par Ali) :** après un achat, le client (invité ou connecté) voit juste un toast générique "Order placed!" — le numéro de commande (`order_number`, ex: `ORD-000006`) est bien généré côté base mais n'était **jamais affiché**, donc strictement aucun moyen de suivre sa commande ensuite.
+
+**Solution :** le toast de succès affiche maintenant le(s) numéro(s) de commande, avec une durée d'affichage plus longue (10s) pour laisser le temps de le noter.
+
+**Décision prise :** l'automatisation du suivi (mise à jour automatique du statut par le transporteur via webhook/API, fonction `update_order_from_delivery` déjà prévue mais jamais déployée) est reportée — aucun vrai transporteur n'est connecté actuellement (uniquement "Test Delivery Co", fictif), donc rien à automatiser concrètement pour l'instant. Le suivi manuel par l'admin reste le bouche-trou logique tant qu'un vrai partenaire transporteur n'est pas intégré.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).
 - Warehouse MVP en place (pas de table dédiée — réutilise `products.user_id` + rôle `warehouse`). Une vraie modélisation (table `warehouses`, capacité, plusieurs entrepôts par partenaire...) pourra être envisagée plus tard si besoin.
+- Automatisation du suivi de livraison (webhook transporteur) : à construire quand un vrai partenaire transporteur sera intégré, pas avant.

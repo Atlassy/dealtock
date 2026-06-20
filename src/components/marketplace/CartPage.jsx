@@ -375,9 +375,19 @@ const CartPage = () => {
         <OrderConfirmation
           cartItems={cartItems}
           onClose={() => setShowCheckoutForm(false)}
-          onSubmitSuccess={async () => {
+          onSubmitSuccess={async (placedOrders) => {
             await clearCart();
-            toast.success('Order placed!');
+            const numbers = (placedOrders || []).map(o => o.order_number).filter(Boolean);
+            if (numbers.length > 0) {
+              toast.success(
+                numbers.length === 1
+                  ? `Order placed! Your order number is ${numbers[0]} — save it to track your delivery.`
+                  : `Order placed! Your order numbers: ${numbers.join(', ')} — save them to track your delivery.`,
+                { duration: 10000 }
+              );
+            } else {
+              toast.success('Order placed!');
+            }
           }}
         />
       )}
