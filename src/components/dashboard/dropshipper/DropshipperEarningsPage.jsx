@@ -59,8 +59,7 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
         .select(`
           *,
           products!inner (
-            name,
-            category_id
+            name
           )
         `)
         .eq('dropshipper_id', dropshipperId)

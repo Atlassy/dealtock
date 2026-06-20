@@ -83,30 +83,33 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
     }
 
     try {
-      const { data: existingUser } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', newCustomer.email)
-        .single();
+      let customerId;
 
-      let customerId = existingUser?.id;
+      if (newCustomer.email) {
+        const { data: existingUser } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', newCustomer.email)
+          .maybeSingle();
+        customerId = existingUser?.id;
+      }
 
       if (!customerId) {
-        const { data: newProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert([{
-            email: newCustomer.email || `${newCustomer.phone}@temp.customer`,
-            full_name: newCustomer.fullName,
-            phone: newCustomer.phone,
-            city: newCustomer.city,
-            address: newCustomer.address,
-            role: 'customer'
-          }])
-          .select()
-          .single();
+        // profiles only allows inserting your own row (auth.uid() = id), so
+        // a dropshipper can't insert a profile for someone else directly -
+        // this RPC bypasses that safely (also creates the required shadow
+        // auth.users row, since profiles.id has a FK to it).
+        const { data: newCustomerId, error: createError } = await supabase
+          .rpc('create_dropshipper_customer', {
+            p_full_name: newCustomer.fullName,
+            p_phone: newCustomer.phone,
+            p_city: newCustomer.city,
+            p_address: newCustomer.address,
+            p_email: newCustomer.email || null
+          });
 
         if (createError) throw createError;
-        customerId = newProfile.id;
+        customerId = newCustomerId;
       }
 
       toast.success('Customer added successfully');

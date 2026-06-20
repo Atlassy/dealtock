@@ -217,7 +217,16 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Signalé par l'associé, en attente de vérification :** "access denied" en modifiant une règle de commission dropshipper. La policy RLS `cr_manage_admin` exige `profiles.role = 'admin'` — probablement pas un bug mais un compte sans le bon rôle, à confirmer avec lui une fois réveillé (`SELECT role FROM profiles WHERE email = '...'`).
 
+### 30. Fin de l'audit dropshipper : 3 bugs supplémentaires trouvés
+**`DropshipperOrders.jsx`** : la liste des statuts de commande ne correspondait pas aux vrais statuts utilisés ailleurs (`ready_for_pickup`/`with_delivery_partner` au lieu de `ready`/`picked_up`, et `returned`/`failed`/`refunded`/`settled` manquaient complètement) — même bug que celui déjà corrigé côté seller. Corrigé, plus un filtre de statut plus complet et un statut par défaut honnête ("Unknown" au lieu de mentir).
+
+**`DropshipperEarningsPage.jsx`** : la requête sélectionnait `products.category_id`, une colonne qui n'existe pas — confirmé que ça fait planter toute la requête (`column products_1.category_id does not exist`), donc la page Earnings ne chargeait jamais rien. Colonne retirée (elle n'était utilisée nulle part dans le fichier).
+
+**`DropshipperCustomersPage.jsx`** : **3ᵉ copie** du même bug déjà vu deux fois (`PlaceOrderModal.jsx`, `AddCustomerModal.jsx`) — un formulaire "Add Customer" intégré directement dans cette page, qui insérait encore directement dans `profiles` au lieu de passer par `create_dropshipper_customer`. Corrigé. Au passage, `.single()` remplacé par `.maybeSingle()` sur la recherche d'email existant (plantait avec une erreur si aucun client ne correspondait).
+
+**Bug racine trouvé en plus, qui touchait les 3 fichiers à la fois :** la table `profiles` n'avait que 2 policies de lecture (son propre profil, ou être admin) — un dropshipper n'avait **aucun moyen de lire les profils de ses propres clients**. La jointure `customer:customer_id(...)` aurait donc toujours renvoyé `null` silencieusement (RLS ne génère pas d'erreur, juste un résultat vide), affichant "Customer: N/A" indéfiniment même avec de vraies données en base. Nouvelle policy ajoutée (`profiles_select_own_customers`) : un dropshipper peut lire le profil d'un client s'il existe une commande les reliant.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).
-- Reste de l'audit dropshipper à terminer (DropshipperOrders.jsx, DropshipperEarningsPage.jsx, DropshipperCustomersPage.jsx) avant de passer à warehouse.
+- Audit dropshipper terminé (Orders, Earnings, Customers) — prochaine étape : warehouse.

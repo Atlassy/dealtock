@@ -91,20 +91,15 @@ const DropshipperOrders = ({ dropshipperId, onUpdate }) => {
         icon: CheckCircle,
         label: 'Approved'
       },
-      'pickup_requested': {
-        color: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400',
-        icon: Truck,
-        label: 'Pickup Requested'
-      },
-      'ready_for_pickup': {
+      'ready': {
         color: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400',
         icon: Package,
         label: 'Ready for Pickup'
       },
-      'with_delivery_partner': {
+      'picked_up': {
         color: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400',
         icon: Truck,
-        label: 'With Courier'
+        label: 'Picked Up'
       },
       'in_transit': {
         color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400',
@@ -125,10 +120,34 @@ const DropshipperOrders = ({ dropshipperId, onUpdate }) => {
         color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400',
         icon: AlertCircle,
         label: 'Cancelled'
+      },
+      'returned': {
+        color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400',
+        icon: AlertCircle,
+        label: 'Returned'
+      },
+      'failed': {
+        color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400',
+        icon: AlertCircle,
+        label: 'Delivery Failed'
+      },
+      'refunded': {
+        color: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300',
+        icon: AlertCircle,
+        label: 'Refunded'
+      },
+      'settled': {
+        color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400',
+        icon: CheckCircle,
+        label: 'Settled'
       }
     };
-    
-    const badge = badges[status] || badges.ordered;
+
+    const badge = badges[status] || {
+      color: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300',
+      icon: AlertCircle,
+      label: status || 'Unknown'
+    };
     const Icon = badge.icon;
     
     return (
@@ -182,7 +201,11 @@ const DropshipperOrders = ({ dropshipperId, onUpdate }) => {
             <option value="all">All Orders</option>
             <option value="ordered">Pending</option>
             <option value="approved">Approved</option>
+            <option value="ready">Ready for Pickup</option>
+            <option value="in_transit">In Transit</option>
             <option value="delivered">Delivered</option>
+            <option value="returned">Returned</option>
+            <option value="failed">Delivery Failed</option>
             <option value="cancelled">Cancelled</option>
           </select>
           <button
