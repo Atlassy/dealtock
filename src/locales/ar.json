@@ -509,5 +509,61 @@
     "selectAppliesTo": "يرجى تحديد من تنطبق عليه هذه القاعدة",
     "invalidPercentage": "يرجى إدخال نسبة صحيحة",
     "loadFailed": "فشل تحميل قواعد العمولة"
+  },
+  "escrowManagement": {
+    "title": "إدارة الضمان",
+    "subtitle": "إدارة أموال الدفع عند التسليم المحتفظ بها لشركاء التوصيل",
+    "export": "تصدير",
+    "refresh": "تحديث",
+    "releaseSelected": "تحرير المحدد ({{count}})",
+    "stats": {
+      "totalEscrows": "إجمالي الضمانات",
+      "pendingRelease": "في انتظار الإفراج",
+      "released": "تم الإفراج عنها",
+      "totalValue": "القيمة الإجمالية",
+      "allCombined": "جميع الضمانات مجتمعة"
+    },
+    "searchPlaceholder": "البحث برقم الطلب أو الشركة...",
+    "pendingOnly": "المعلّقة فقط",
+    "releasedOption": "تم الإفراج عنها",
+    "allEscrows": "جميع الضمانات",
+    "table": {
+      "orderDetails": "تفاصيل الطلب",
+      "deliveryPartner": "شريك التوصيل",
+      "amount": "المبلغ",
+      "status": "الحالة",
+      "heldSince": "محتفظ به منذ",
+      "actions": "إجراءات",
+      "id": "المعرّف: {{id}}",
+      "daysHeld_one": "محتفظ به منذ {{count}} يوم",
+      "daysHeld_other": "محتفظ به منذ {{count}} أيام",
+      "viewDetails": "عرض التفاصيل",
+      "release": "تحرير",
+      "released": "تم الإفراج",
+      "pending": "معلّق"
+    },
+    "noEscrowsFound": "لم يتم العثور على ضمانات تطابق الفلاتر.",
+    "clearFilters": "مسح الفلاتر",
+    "modal": {
+      "title": "تفاصيل الضمان",
+      "orderNumber": "رقم الطلب",
+      "orderId": "معرّف الطلب",
+      "amountHeld": "المبلغ المحتفظ به",
+      "deliveryCompany": "شركة التوصيل",
+      "daysHeld": "الأيام المحتفظ بها",
+      "days": "{{count}} أيام",
+      "heldSince": "محتفظ به منذ",
+      "releasedAt": "تم الإفراج في",
+      "close": "إغلاق",
+      "releaseEscrow": "تحرير الضمان"
+    },
+    "confirmRelease": "تحرير الضمان للطلب {{order}}؟",
+    "confirmBulkRelease": "تحرير {{count}} ضمان (ضمانات) بمبلغ إجمالي {{amount}}؟",
+    "noEscrowsSelected": "لم يتم تحديد أي ضمان",
+    "escrowReleased": "تم تحرير الضمان بنجاح",
+    "releaseFailed": "فشل تحرير الضمان",
+    "bulkReleaseFailed": "فشل تحرير بعض الضمانات",
+    "bulkReleased": "تم تحرير {{count}} ضمان (ضمانات)",
+    "exported": "تم تصدير بيانات الضمان"
   }
 }

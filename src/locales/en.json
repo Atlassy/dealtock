@@ -509,5 +509,61 @@
     "selectAppliesTo": "Please select who this rule applies to",
     "invalidPercentage": "Please enter a valid percentage",
     "loadFailed": "Failed to load commission rules"
+  },
+  "escrowManagement": {
+    "title": "Escrow Management",
+    "subtitle": "Manage COD funds held for delivery partners",
+    "export": "Export",
+    "refresh": "Refresh",
+    "releaseSelected": "Release Selected ({{count}})",
+    "stats": {
+      "totalEscrows": "Total Escrows",
+      "pendingRelease": "Pending Release",
+      "released": "Released",
+      "totalValue": "Total Value",
+      "allCombined": "All escrows combined"
+    },
+    "searchPlaceholder": "Search by order number or company...",
+    "pendingOnly": "Pending Only",
+    "releasedOption": "Released",
+    "allEscrows": "All Escrows",
+    "table": {
+      "orderDetails": "Order Details",
+      "deliveryPartner": "Delivery Partner",
+      "amount": "Amount",
+      "status": "Status",
+      "heldSince": "Held Since",
+      "actions": "Actions",
+      "id": "ID: {{id}}",
+      "daysHeld_one": "{{count}} day held",
+      "daysHeld_other": "{{count}} days held",
+      "viewDetails": "View Details",
+      "release": "Release",
+      "released": "Released",
+      "pending": "Pending"
+    },
+    "noEscrowsFound": "No escrows found matching your filters.",
+    "clearFilters": "Clear filters",
+    "modal": {
+      "title": "Escrow Details",
+      "orderNumber": "Order Number",
+      "orderId": "Order ID",
+      "amountHeld": "Amount Held",
+      "deliveryCompany": "Delivery Company",
+      "daysHeld": "Days Held",
+      "days": "{{count}} days",
+      "heldSince": "Held Since",
+      "releasedAt": "Released At",
+      "close": "Close",
+      "releaseEscrow": "Release Escrow"
+    },
+    "confirmRelease": "Release escrow for order {{order}}?",
+    "confirmBulkRelease": "Release {{count}} escrow(s) totaling {{amount}}?",
+    "noEscrowsSelected": "No escrows selected",
+    "escrowReleased": "Escrow released successfully",
+    "releaseFailed": "Failed to release escrow",
+    "bulkReleaseFailed": "Failed to release some escrows",
+    "bulkReleased": "{{count}} escrow(s) released",
+    "exported": "Escrow data exported"
   }
 }

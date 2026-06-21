@@ -509,5 +509,61 @@
     "selectAppliesTo": "Veuillez sélectionner à qui s'applique cette règle",
     "invalidPercentage": "Veuillez entrer un pourcentage valide",
     "loadFailed": "Échec du chargement des règles de commission"
+  },
+  "escrowManagement": {
+    "title": "Gestion Escrow",
+    "subtitle": "Gérer les fonds COD détenus pour les partenaires de livraison",
+    "export": "Exporter",
+    "refresh": "Actualiser",
+    "releaseSelected": "Libérer la sélection ({{count}})",
+    "stats": {
+      "totalEscrows": "Total des escrows",
+      "pendingRelease": "En attente de libération",
+      "released": "Libérés",
+      "totalValue": "Valeur totale",
+      "allCombined": "Tous les escrows combinés"
+    },
+    "searchPlaceholder": "Rechercher par numéro de commande ou société...",
+    "pendingOnly": "En attente uniquement",
+    "releasedOption": "Libérés",
+    "allEscrows": "Tous les escrows",
+    "table": {
+      "orderDetails": "Détails de la commande",
+      "deliveryPartner": "Partenaire de livraison",
+      "amount": "Montant",
+      "status": "Statut",
+      "heldSince": "Détenu depuis",
+      "actions": "Actions",
+      "id": "ID : {{id}}",
+      "daysHeld_one": "{{count}} jour détenu",
+      "daysHeld_other": "{{count}} jours détenus",
+      "viewDetails": "Voir les détails",
+      "release": "Libérer",
+      "released": "Libéré",
+      "pending": "En attente"
+    },
+    "noEscrowsFound": "Aucun escrow ne correspond à vos filtres.",
+    "clearFilters": "Effacer les filtres",
+    "modal": {
+      "title": "Détails de l'escrow",
+      "orderNumber": "Numéro de commande",
+      "orderId": "ID de commande",
+      "amountHeld": "Montant détenu",
+      "deliveryCompany": "Société de livraison",
+      "daysHeld": "Jours détenus",
+      "days": "{{count}} jours",
+      "heldSince": "Détenu depuis",
+      "releasedAt": "Libéré le",
+      "close": "Fermer",
+      "releaseEscrow": "Libérer l'escrow"
+    },
+    "confirmRelease": "Libérer l'escrow pour la commande {{order}} ?",
+    "confirmBulkRelease": "Libérer {{count}} escrow(s) pour un total de {{amount}} ?",
+    "noEscrowsSelected": "Aucun escrow sélectionné",
+    "escrowReleased": "Escrow libéré avec succès",
+    "releaseFailed": "Échec de la libération de l'escrow",
+    "bulkReleaseFailed": "Échec de la libération de certains escrows",
+    "bulkReleased": "{{count}} escrow(s) libéré(s)",
+    "exported": "Données d'escrow exportées"
   }
 }

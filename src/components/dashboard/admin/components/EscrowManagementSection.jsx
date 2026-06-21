@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "../../../../lib/supabaseClient";
+import { useTranslation } from "react-i18next";
 
 // Helper functions
 const formatCurrency = (amount, currency = 'MAD') => {
@@ -64,6 +65,7 @@ const downloadCSV = (data, filename) => {
 };
 
 const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRelease, onExport }) => {
+  const { t } = useTranslation();
   const [escrows, setEscrows] = useState(initialEscrows || []);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -119,14 +121,14 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
   const getEscrowStatus = (escrow) => {
     if (escrow.released_at) {
       return {
-        label: 'Released',
+        label: t('escrowManagement.table.released'),
         color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
         icon: CheckCircle
       };
     }
-    
+
     return {
-      label: 'Pending',
+      label: t('escrowManagement.table.pending'),
       color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
       icon: AlertCircle
     };
@@ -137,7 +139,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
     const escrow = escrows.find(e => e.id === escrowId);
     if (!escrow) return;
 
-    if (!window.confirm(`Release escrow for order ${escrow.orders?.order_number || escrow.order_id}?`)) {
+    if (!window.confirm(t('escrowManagement.confirmRelease', { order: escrow.orders?.order_number || escrow.order_id }))) {
       return;
     }
 
@@ -146,7 +148,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
 
       const { error } = await supabase
         .from('escrow_holdings')
-        .update({ 
+        .update({
           released_at: new Date().toISOString(),
           release_reason: 'admin_override'
         })
@@ -155,11 +157,11 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
 
       if (error) throw error;
 
-      toast.success('Escrow released successfully');
+      toast.success(t('escrowManagement.escrowReleased'));
       onRefresh();
     } catch (error) {
       console.error('Error releasing escrow:', error);
-      toast.error('Failed to release escrow');
+      toast.error(t('escrowManagement.releaseFailed'));
     } finally {
       setReleasingIds(prev => {
         const next = new Set(prev);
@@ -172,7 +174,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
   // Handle bulk release
   const handleBulkRelease = async () => {
     if (selectedEscrows.length === 0) {
-      toast.warning('No escrows selected');
+      toast.warning(t('escrowManagement.noEscrowsSelected'));
       return;
     }
 
@@ -180,7 +182,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
       .filter(e => selectedEscrows.includes(e.id))
       .reduce((sum, e) => sum + (e.amount_held || 0), 0);
 
-    if (!window.confirm(`Release ${selectedEscrows.length} escrow(s) totaling ${formatCurrency(selectedAmount)}?`)) {
+    if (!window.confirm(t('escrowManagement.confirmBulkRelease', { count: selectedEscrows.length, amount: formatCurrency(selectedAmount) }))) {
       return;
     }
 
@@ -192,7 +194,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
         // Fallback direct update if parent function not provided
         const { error } = await supabase
           .from('escrow_holdings')
-          .update({ 
+          .update({
             released_at: new Date().toISOString(),
             release_reason: 'admin_override'
           })
@@ -200,15 +202,15 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
           .is('released_at', null);
 
         if (error) throw error;
-        toast.success(`${selectedEscrows.length} escrow(s) released`);
+        toast.success(t('escrowManagement.bulkReleased', { count: selectedEscrows.length }));
         onRefresh();
       }
-      
+
       setSelectedEscrows([]);
       setSelectAll(false);
     } catch (error) {
       console.error('Bulk release error:', error);
-      toast.error('Failed to release some escrows');
+      toast.error(t('escrowManagement.bulkReleaseFailed'));
     }
   };
 
@@ -251,7 +253,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
     }));
     
     downloadCSV(exportData, 'escrows');
-    toast.success('Escrow data exported');
+    toast.success(t('escrowManagement.exported'));
   };
 
   const pendingCount = filteredEscrows.filter(e => !e.released_at).length;
@@ -263,10 +265,10 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Shield className="w-6 h-6" />
-            Escrow Management
+            {t('escrowManagement.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
-            Manage COD funds held for delivery partners
+            {t('escrowManagement.subtitle')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -275,14 +277,14 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 flex items-center gap-2 text-sm"
           >
             <Download className="w-4 h-4" />
-            Export
+            {t('escrowManagement.export')}
           </button>
           <button
             onClick={onRefresh}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 flex items-center gap-2 text-sm"
           >
             <RefreshCw className="w-4 h-4" />
-            Refresh
+            {t('escrowManagement.refresh')}
           </button>
           {selectedEscrows.length > 0 && (
             <button
@@ -290,7 +292,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 text-sm"
             >
               <CheckCircle className="w-4 h-4" />
-              Release Selected ({selectedEscrows.length})
+              {t('escrowManagement.releaseSelected', { count: selectedEscrows.length })}
             </button>
           )}
         </div>
@@ -299,24 +301,24 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Total Escrows</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('escrowManagement.stats.totalEscrows')}</p>
           <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatCurrency(stats.totalAmount)}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Pending Release</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('escrowManagement.stats.pendingRelease')}</p>
           <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.pending}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatCurrency(stats.pendingAmount)}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Released</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('escrowManagement.stats.released')}</p>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.released}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatCurrency(stats.releasedAmount)}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Total Value</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('escrowManagement.stats.totalValue')}</p>
           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{formatCurrency(stats.totalAmount)}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">All escrows combined</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('escrowManagement.stats.allCombined')}</p>
         </div>
       </div>
 
@@ -327,7 +329,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
-              placeholder="Search by order number or company..."
+              placeholder={t('escrowManagement.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg w-full text-sm"
@@ -341,9 +343,9 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg min-w-[150px] text-sm"
           >
-            <option value="pending">Pending Only</option>
-            <option value="released">Released</option>
-            <option value="all">All Escrows</option>
+            <option value="pending">{t('escrowManagement.pendingOnly')}</option>
+            <option value="released">{t('escrowManagement.releasedOption')}</option>
+            <option value="all">{t('escrowManagement.allEscrows')}</option>
           </select>
         </div>
       </div>
@@ -363,12 +365,12 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                     className="rounded"
                   />
                 </th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Order Details</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Delivery Partner</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Amount</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Status</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Held Since</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Actions</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('escrowManagement.table.orderDetails')}</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('escrowManagement.table.deliveryPartner')}</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('escrowManagement.table.amount')}</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('escrowManagement.table.status')}</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('escrowManagement.table.heldSince')}</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('escrowManagement.table.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -396,7 +398,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
                         <Package className="w-3 h-3" />
-                        ID: {escrow.order_id?.substring(0, 8)}...
+                        {t('escrowManagement.table.id', { id: `${escrow.order_id?.substring(0, 8)}...` })}
                       </div>
                     </td>
                     <td className="p-4">
@@ -421,7 +423,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                         {!escrow.released_at && (
                           <div className="text-xs text-gray-500 dark:text-gray-400">
                             <Clock className="w-3 h-3 inline mr-1" />
-                            {daysHeld} day{daysHeld !== 1 ? 's' : ''} held
+                            {t('escrowManagement.table.daysHeld', { count: daysHeld })}
                           </div>
                         )}
                       </div>
@@ -439,7 +441,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                         <button
                           onClick={() => setSelectedEscrow(escrow)}
                           className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
-                          title="View Details"
+                          title={t('escrowManagement.table.viewDetails')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -452,7 +454,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                             {isReleasing ? (
                               <RefreshCw className="w-3 h-3 animate-spin" />
                             ) : (
-                              'Release'
+                              t('escrowManagement.table.release')
                             )}
                           </button>
                         )}
@@ -468,7 +470,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
         {filteredEscrows.length === 0 && (
           <div className="text-center py-12">
             <Shield className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">No escrows found matching your filters.</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('escrowManagement.noEscrowsFound')}</p>
             <button
               onClick={() => {
                 setSearchTerm('');
@@ -476,7 +478,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
               }}
               className="mt-4 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
             >
-              Clear filters
+              {t('escrowManagement.clearFilters')}
             </button>
           </div>
         )}
@@ -487,7 +489,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Escrow Details</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('escrowManagement.modal.title')}</h3>
               <button
                 onClick={() => setSelectedEscrow(null)}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg dark:text-gray-300"
@@ -499,17 +501,17 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Order Number</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('escrowManagement.modal.orderNumber')}</p>
                   <p className="font-medium text-gray-900 dark:text-white">{selectedEscrow.orders?.order_number || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Order ID</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('escrowManagement.modal.orderId')}</p>
                   <p className="text-sm font-mono text-gray-700 dark:text-gray-300">{selectedEscrow.order_id}</p>
                 </div>
               </div>
 
               <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Amount Held</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('escrowManagement.modal.amountHeld')}</p>
                 <p className="text-2xl font-bold text-green-700 dark:text-green-400">
                   {formatCurrency(selectedEscrow.amount_held, selectedEscrow.currency)}
                 </p>
@@ -517,23 +519,23 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Delivery Company</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('escrowManagement.modal.deliveryCompany')}</p>
                   <p className="font-medium text-gray-900 dark:text-white">{selectedEscrow.delivery_companies?.name || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Days Held</p>
-                  <p className="font-medium text-gray-900 dark:text-white">{getDaysHeld(selectedEscrow.held_at)} days</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('escrowManagement.modal.daysHeld')}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{t('escrowManagement.modal.days', { count: getDaysHeld(selectedEscrow.held_at) })}</p>
                 </div>
               </div>
 
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Held Since</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('escrowManagement.modal.heldSince')}</p>
                 <p className="font-medium text-gray-900 dark:text-white">{formatDateTime(selectedEscrow.held_at)}</p>
               </div>
 
               {selectedEscrow.released_at && (
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Released At</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('escrowManagement.modal.releasedAt')}</p>
                   <p className="font-medium text-gray-900 dark:text-white">{formatDateTime(selectedEscrow.released_at)}</p>
                 </div>
               )}
@@ -543,7 +545,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                   onClick={() => setSelectedEscrow(null)}
                   className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200"
                 >
-                  Close
+                  {t('escrowManagement.modal.close')}
                 </button>
                 {!selectedEscrow.released_at && (
                   <button
@@ -553,7 +555,7 @@ const EscrowManagementSection = ({ escrows: initialEscrows, onRefresh, onBulkRel
                     }}
                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                   >
-                    Release Escrow
+                    {t('escrowManagement.modal.releaseEscrow')}
                   </button>
                 )}
               </div>
