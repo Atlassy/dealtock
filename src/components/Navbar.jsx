@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/SupabaseAuthContext';
+import { useTranslation } from 'react-i18next';
 import { useNotifications } from '../hooks/useNotifications';
 import NotificationBell from './notifications/NotificationBell';
 import { 
@@ -170,6 +171,7 @@ const PromoBanner = ({ userRole }) => {
 
 // ✅ Main Navbar Component (unchanged from your original)
 const Navbar = () => {
+  const { t, i18n } = useTranslation();
   const { user, profile, signOut } = useAuth();
   const {
     notifications,
@@ -191,7 +193,7 @@ const Navbar = () => {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [cartCount, setCartCount] = useState(0);
-  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
+  const [language, setLanguage] = useState(i18n.language || 'en');
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true');
@@ -274,13 +276,13 @@ const Navbar = () => {
   };
 
   const sidebarNavItems = user ? [
-    { path: '/marketplace', label: 'Marketplace', icon: ShoppingBag, roles: ['seller', 'admin', 'dropshipper'] },
-    { path: '/inventory', label: 'Inventory', icon: Package, roles: ['seller', 'admin'] },
-    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['seller', 'admin', 'dropshipper'] },
-    { path: '/profile', label: 'Profile', icon: User, roles: ['seller', 'admin', 'dropshipper'] },
-    { path: '/dropshipper/orders', label: 'My Orders', icon: Package, roles: ['dropshipper'] },
-    { path: '/dropshipper/customers', label: 'Customers', icon: Users, roles: ['dropshipper'] },
-    { path: '/dropshipper/earnings', label: 'Earnings', icon: TrendingUp, roles: ['dropshipper'] }
+    { path: '/marketplace', label: t('navbar.sidebar.marketplace'), icon: ShoppingBag, roles: ['seller', 'admin', 'dropshipper'] },
+    { path: '/inventory', label: t('navbar.sidebar.inventory'), icon: Package, roles: ['seller', 'admin'] },
+    { path: '/dashboard', label: t('navbar.dashboard'), icon: LayoutDashboard, roles: ['seller', 'admin', 'dropshipper'] },
+    { path: '/profile', label: t('navbar.profile'), icon: User, roles: ['seller', 'admin', 'dropshipper'] },
+    { path: '/dropshipper/orders', label: t('navbar.myOrders'), icon: Package, roles: ['dropshipper'] },
+    { path: '/dropshipper/customers', label: t('navbar.sidebar.customers'), icon: Users, roles: ['dropshipper'] },
+    { path: '/dropshipper/earnings', label: t('navbar.sidebar.earnings'), icon: TrendingUp, roles: ['dropshipper'] }
   ].filter(item => {
     if (!item.roles) return true;
     if (!profile?.role) return false;
@@ -288,9 +290,10 @@ const Navbar = () => {
   }) : [];
 
   const changeLanguage = (code) => {
+    i18n.changeLanguage(code);
     setLanguage(code);
     setShowLanguageMenu(false);
-    toast.success(`Language changed to ${languages.find(l => l.code === code)?.name}`);
+    toast.success(t('navbar.languageChanged', { language: languages.find(l => l.code === code)?.name }));
   };
 
   return (
@@ -318,8 +321,8 @@ const Navbar = () => {
               <div className="hidden lg:flex items-center gap-1 ml-1 px-2 py-1 hover:bg-[#5C3A21] dark:hover:bg-[#febd69] hover:text-white dark:hover:text-gray-900 rounded-lg transition cursor-pointer group">
                 <MapPin className="w-4 h-4 text-[#5C3A21] dark:text-gray-300 group-hover:text-white dark:group-hover:text-gray-900" />
                 <div className="text-[#5C3A21] dark:text-gray-200 group-hover:text-white dark:group-hover:text-gray-900 text-xs">
-                  <p className="text-[10px] text-[#8B6B4A] dark:text-gray-400 group-hover:text-white/80">Deliver to</p>
-                  <p className="font-medium text-sm">Morocco</p>
+                  <p className="text-[10px] text-[#8B6B4A] dark:text-gray-400 group-hover:text-white/80">{t('navbar.deliverTo')}</p>
+                  <p className="font-medium text-sm">{t('navbar.morocco')}</p>
                 </div>
               </div>
             </div>
@@ -424,18 +427,18 @@ const Navbar = () => {
                         <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{profile?.full_name || 'User'}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
                       </div>
-                      <Link to="/dashboard" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"><LayoutDashboard className="w-4 h-4" /> Dashboard</Link>
+                      <Link to="/dashboard" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"><LayoutDashboard className="w-4 h-4" /> {t('navbar.dashboard')}</Link>
                       {(!profile?.role || profile.role === 'customer') && (
-                        <Link to="/my-orders" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"><Package className="w-4 h-4" /> My Orders</Link>
+                        <Link to="/my-orders" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"><Package className="w-4 h-4" /> {t('navbar.myOrders')}</Link>
                       )}
-                      <Link to="/profile" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"><User className="w-4 h-4" /> Profile</Link>
-                      <button onClick={() => { signOut(); setShowUserMenu(false); }} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700"><LogOut className="w-4 h-4" /> Sign Out</button>
+                      <Link to="/profile" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"><User className="w-4 h-4" /> {t('navbar.profile')}</Link>
+                      <button onClick={() => { signOut(); setShowUserMenu(false); }} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700"><LogOut className="w-4 h-4" /> {t('navbar.signOut')}</button>
                     </div>
                   )}
                 </div>
               ) : (
                 <Link to="/login" className="flex items-center gap-1 px-2.5 py-1.5 bg-[#5C3A21] dark:bg-[#febd69] hover:bg-[#3D2515] dark:hover:bg-[#f3a847] text-[#FEDEB8] dark:text-gray-900 rounded-lg transition text-xs font-semibold">
-                  <LogIn className="w-4 h-4" /><span>Sign In</span>
+                  <LogIn className="w-4 h-4" /><span>{t('navbar.signIn')}</span>
                 </Link>
               )}
             </div>
@@ -456,22 +459,22 @@ const Navbar = () => {
           <div className="flex items-center justify-between gap-3 w-full">
             <div className="flex-shrink-0">
               <select value={category} onChange={(e) => setCategory(e.target.value)} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
-                <option value="">Category</option>
+                <option value="">{t('navbar.category')}</option>
                 {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
             </div>
             <div className="flex-1 relative">
-              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search products..." className="w-full pl-3 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm" />
+              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('navbar.searchPlaceholder')} className="w-full pl-3 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm" />
               <button onClick={handleSearch} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#febd69]"><Search className="w-4 h-4" /></button>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <select value={city} onChange={(e) => setCity(e.target.value)} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
-                <option value="">City</option>
+                <option value="">{t('marketplace.city')}</option>
                 {MOROCCAN_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
-              <button onClick={handleSearch} className="px-4 py-2 bg-[#febd69] hover:bg-[#f3a847] text-gray-900 rounded font-medium text-sm">Search</button>
+              <button onClick={handleSearch} className="px-4 py-2 bg-[#febd69] hover:bg-[#f3a847] text-gray-900 rounded font-medium text-sm">{t('navbar.search')}</button>
               <button onClick={() => setShowFilters(!showFilters)} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm flex items-center gap-1">
-                <ChevronDown className={`w-3 h-3 transition-transform ${showFilters ? 'rotate-180' : ''}`} /> Filters
+                <ChevronDown className={`w-3 h-3 transition-transform ${showFilters ? 'rotate-180' : ''}`} /> {t('navbar.filters')}
               </button>
             </div>
           </div>
@@ -480,7 +483,7 @@ const Navbar = () => {
             <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
               <div className="flex flex-wrap items-center gap-2">
                 <select value={condition} onChange={(e) => setCondition(e.target.value)} className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm">
-                  <option value="">Condition: Any</option>
+                  <option value="">{t('navbar.conditionAny')}</option>
                   {CONDITIONS.map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
                 </select>
                 <div className="flex items-center gap-1">
@@ -489,10 +492,10 @@ const Navbar = () => {
                   <input type="number" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} placeholder="Max" className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm" />
                 </div>
                 <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm">
-                  <option value="newest">Sort: Newest</option>
-                  <option value="price_low">Price: Low to High</option>
-                  <option value="price_high">Price: High to Low</option>
-                  <option value="rating">Top Rated</option>
+                  <option value="newest">{t('navbar.sortNewest')}</option>
+                  <option value="price_low">{t('navbar.sortPriceLow')}</option>
+                  <option value="price_high">{t('navbar.sortPriceHigh')}</option>
+                  <option value="rating">{t('navbar.sortTopRated')}</option>
                 </select>
               </div>
             </div>
@@ -506,7 +509,7 @@ const Navbar = () => {
           <div ref={sidebarRef} className={`fixed left-0 top-0 bottom-0 z-50 bg-white dark:bg-gray-900 shadow-xl transition-all duration-300 ${sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'}`}>
             <div className="flex flex-col h-full overflow-y-auto">
               <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Menu</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('navbar.menu')}</h2>
                 <button onClick={() => setSidebarOpen(false)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
               </div>
               <nav className="flex-1 py-2">
@@ -521,7 +524,7 @@ const Navbar = () => {
                 })}
               </nav>
               <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-                <div className="text-xs text-gray-500 dark:text-gray-400"><p>Dealtock v1.0</p><p>© 2024 All rights reserved</p></div>
+                <div className="text-xs text-gray-500 dark:text-gray-400"><p>Dealtock v1.0</p><p>© 2024 {t('navbar.footerTagline')}</p></div>
               </div>
             </div>
           </div>

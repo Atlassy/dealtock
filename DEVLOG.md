@@ -328,6 +328,24 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Non testé visuellement par moi** (toujours pas d'outil de navigateur ici) — à valider par Ali sur chaque rôle.
 
+### 41. Le sélecteur de langue (FR/AR) ne traduisait rien — mise en place du vrai i18n
+**Constat d'Ali :** changer la langue en français ou arabe dans la navbar ne changeait jamais le texte affiché, tout restait en anglais.
+
+**Erreur trouvée :** le sélecteur ne faisait que changer le sens d'écriture (`dir`, ltr/rtl) et l'icône du drapeau (`Navbar.jsx`) — il n'y avait **aucun système de traduction réel** dans tout le site. Pas de `react-i18next`, pas de fichiers de traduction, pas de fonction `t()` : chaque texte était écrit en dur en anglais directement dans le JSX de chaque composant.
+
+**Décision prise avec Ali :** construire le vrai système de traduction (pas juste masquer le sélecteur), à faire progressivement — marketplace d'abord, puis dashboards dans une prochaine étape.
+
+**Solution (1ère étape) :**
+- Installation de `i18next` + `react-i18next`. Config dans `src/lib/i18n.js`, chargée au démarrage (`main.jsx`).
+- Fichiers de traduction `src/locales/{en,fr,ar}.json` (clés `navbar`, `marketplace`, `categories`), avec gestion du pluriel via les suffixes `_one`/`_other` (convention i18next v26).
+- `Navbar.jsx` : `changeLanguage()` appelle désormais réellement `i18n.changeLanguage(code)` (avant : changeait juste un state local sans effet) ; tous les textes (recherche, filtres, tri, menu utilisateur, sidebar mobile, pied de page) remplacés par des appels `t(...)`.
+- `MarketplacePage.jsx` : catégories, onglets (Tous/Nouveaux/Deals Dealtock), bannière de deals locaux, badges produit, modale de détail — tout traduit.
+- Le nom anglais des catégories (`Electronics`, `Fashion`...) reste la valeur canonique utilisée pour le filtrage/les requêtes Supabase ; seul l'**affichage** est traduit, pour ne rien casser dans la logique de filtre existante.
+
+**Reste à faire (prochaine étape, signalé à Ali) :** traduire les dashboards (seller/admin/dropshipper/warehouse/delivery), le panier/checkout, les formulaires d'authentification — pas encore fait, portée volontairement limitée à la navbar + marketplace pour cette première passe.
+
+**Non testé visuellement par moi** (pas d'outil de navigateur ici) — à valider par Ali : changer de langue et vérifier que la marketplace et la navbar changent réellement de texte, y compris le sens d'écriture en arabe (RTL).
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).

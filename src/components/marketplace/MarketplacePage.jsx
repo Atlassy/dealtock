@@ -19,6 +19,7 @@ import {
   Truck, Tag, Sparkles, Shield, X, ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { StampBadge } from '../ui/stamp-badge';
 
 const CATEGORIES = [
@@ -31,56 +32,63 @@ const CATEGORIES = [
   { name: 'Promotions',  icon: '🎉', color: 'bg-red-100 text-red-600', isPromo: true },
 ];
 
-const SOURCE_TABS = [
-  { key: 'all',      label: 'All Products',   icon: '🛍️' },
-  { key: 'new',      label: 'New Stock',       icon: '✨' },
-  { key: 'returned', label: 'Dealtock Deals',  icon: '🔥' },
+const SOURCE_TAB_KEYS = [
+  { key: 'all',      tKey: 'tabs.all',      icon: '🛍️' },
+  { key: 'new',      tKey: 'tabs.new',      icon: '✨' },
+  { key: 'returned', tKey: 'tabs.returned', icon: '🔥' },
 ];
 
 // ── Category Card ─────────────────────────────────────────────────
-const CategoryCard = ({ name, icon, color, onClick }) => (
-  <div
-    onClick={onClick}
-    className="bg-white dark:bg-gray-800 rounded-lg p-3 text-center hover:shadow-lg transition cursor-pointer border border-gray-200 dark:border-gray-700 group"
-  >
-    <div className={`w-10 h-10 ${color} rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform`}>
-      <span className="text-xl">{icon}</span>
+const CategoryCard = ({ name, icon, color, onClick }) => {
+  const { t } = useTranslation();
+  return (
+    <div
+      onClick={onClick}
+      className="bg-white dark:bg-gray-800 rounded-lg p-3 text-center hover:shadow-lg transition cursor-pointer border border-gray-200 dark:border-gray-700 group"
+    >
+      <div className={`w-10 h-10 ${color} rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform`}>
+        <span className="text-xl">{icon}</span>
+      </div>
+      <p className="font-medium text-gray-900 dark:text-white text-sm">{t(`categories.${name}`)}</p>
     </div>
-    <p className="font-medium text-gray-900 dark:text-white text-sm">{name}</p>
-  </div>
-);
+  );
+};
 
 // ── City-locked Deal Banner ───────────────────────────────────────
-const CityDealsBanner = ({ city, count, onFilter }) => (
-  <motion.div
-    initial={{ opacity: 0, y: -12 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="mb-4 bg-kraft-700 rounded-xl p-4 flex items-center justify-between shadow-md"
-  >
-    <div className="flex items-center gap-3">
-      <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-        <MapPin className="w-5 h-5 text-white" />
-      </div>
-      <div>
-        <p className="text-white font-bold text-sm">
-          🔥 {count} local deal{count > 1 ? 's' : ''} near you in {city}!
-        </p>
-        <p className="text-kraft-100 text-xs mt-0.5">
-          Sealed returned parcels · Instant local delivery · Big discounts
-        </p>
-      </div>
-    </div>
-    <button
-      onClick={onFilter}
-      className="flex items-center gap-1 bg-white text-kraft-600 font-semibold text-xs px-3 py-2 rounded-lg hover:bg-kraft-50 transition flex-shrink-0 ml-3"
+const CityDealsBanner = ({ city, count, onFilter }) => {
+  const { t } = useTranslation();
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mb-4 bg-kraft-700 rounded-xl p-4 flex items-center justify-between shadow-md"
     >
-      See deals <ChevronRight className="w-3 h-3" />
-    </button>
-  </motion.div>
-);
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+          <MapPin className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <p className="text-white font-bold text-sm">
+            🔥 {t('marketplace.localDealsNear', { count, city })}
+          </p>
+          <p className="text-kraft-100 text-xs mt-0.5">
+            {t('marketplace.localDealsSub')}
+          </p>
+        </div>
+      </div>
+      <button
+        onClick={onFilter}
+        className="flex items-center gap-1 bg-white text-kraft-600 font-semibold text-xs px-3 py-2 rounded-lg hover:bg-kraft-50 transition flex-shrink-0 ml-3"
+      >
+        {t('marketplace.seeDeals')} <ChevronRight className="w-3 h-3" />
+      </button>
+    </motion.div>
+  );
+};
 
 // ── Product Card ──────────────────────────────────────────────────
 const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCart, buyerCity }) => {
+  const { t } = useTranslation();
   const [isHovered,    setIsHovered]    = useState(false);
   const [imageError,   setImageError]   = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
@@ -139,10 +147,10 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
           {isReturned && (
             <div className="absolute top-2 left-2 flex flex-col gap-1">
               <StampBadge variant="kraft" className="shadow">
-                <Sparkles className="w-3 h-3" /> Dealtock Deal
+                <Sparkles className="w-3 h-3" /> {t('marketplace.dealtockDeal')}
               </StampBadge>
               <StampBadge variant="verified" className="shadow">
-                <Shield className="w-3 h-3" /> Sealed
+                <Shield className="w-3 h-3" /> {t('marketplace.sealed')}
               </StampBadge>
             </div>
           )}
@@ -150,14 +158,14 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
           {/* City match badge — top right */}
           {isCityMatch && (
             <span className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 bg-blue-600 text-white text-xs font-semibold rounded-full shadow">
-              <MapPin className="w-3 h-3" /> Local
+              <MapPin className="w-3 h-3" /> {t('marketplace.local')}
             </span>
           )}
 
           {/* Low stock */}
           {product.quantity <= 3 && product.quantity > 0 && !isReturned && (
             <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-              Only {product.quantity} left
+              {t('marketplace.onlyXLeft', { count: product.quantity })}
             </div>
           )}
         </div>
@@ -171,9 +179,9 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
           <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-2">
             <MapPin className="w-3 h-3" />
             <span className="truncate">
-              {product.city || 'Morocco'}
+              {product.city || t('navbar.morocco')}
               {product.city_locked && (
-                <span className="ml-1 text-kraft-500 font-medium">· Local pickup</span>
+                <span className="ml-1 text-kraft-500 font-medium">· {t('marketplace.localPickup')}</span>
               )}
             </span>
           </div>
@@ -190,7 +198,7 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
               <button
                 onClick={(e) => { e.stopPropagation(); onViewDetails(e); }}
                 className="p-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition"
-                title="View Details"
+                title={t('marketplace.viewDetails')}
               >
                 <Eye className="w-4 h-4 text-gray-600 dark:text-gray-300" />
               </button>
@@ -202,7 +210,7 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
                     ? 'bg-kraft-500 hover:bg-kraft-600'
                     : 'bg-blue-600 hover:bg-blue-700'
                 }`}
-                title="Add to Cart"
+                title={t('marketplace.addToCart')}
               >
                 <ShoppingCart className="w-4 h-4 text-white" />
               </button>
@@ -239,6 +247,7 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
 
 // ── Main Page ─────────────────────────────────────────────────────
 const MarketplacePage = () => {
+  const { t }                 = useTranslation();
   const { user, profile }     = useAuth();
   const { addToCart: addToCartHook } = useCart();
   const navigate              = useNavigate();
@@ -348,8 +357,8 @@ const MarketplacePage = () => {
         {/* Category grid */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Shop by Category</h2>
-            <Link to="/categories" className="text-sm text-blue-600 hover:text-blue-700">View All</Link>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('marketplace.shopByCategory')}</h2>
+            <Link to="/categories" className="text-sm text-blue-600 hover:text-blue-700">{t('marketplace.viewAll')}</Link>
           </div>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2">
             {CATEGORIES.map(cat => (
@@ -360,7 +369,7 @@ const MarketplacePage = () => {
 
         {/* Source type tabs */}
         <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-          {SOURCE_TABS.map(tab => (
+          {SOURCE_TAB_KEYS.map(tab => (
             <button
               key={tab.key}
               onClick={() => handleSourceTab(tab.key)}
@@ -373,7 +382,7 @@ const MarketplacePage = () => {
               }`}
             >
               <span>{tab.icon}</span>
-              {tab.label}
+              {t(`marketplace.${tab.tKey}`)}
               {tab.key === 'returned' && cityLockedCount > 0 && buyerCity && (
                 <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs font-bold ${
                   activeSource === 'returned' ? 'bg-white/30 text-white' : 'bg-kraft-500 text-white'
@@ -413,17 +422,15 @@ const MarketplacePage = () => {
             <Sparkles className="w-5 h-5 text-kraft-500 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-semibold text-kraft-800 dark:text-kraft-300">
-                Dealtock Deals — Returned & Sealed Products
+                {t('marketplace.dealsTitle')}
               </p>
               <p className="text-xs text-kraft-600 dark:text-kraft-400 mt-0.5">
-                These are sealed, unopened parcels that couldn't be delivered to their original recipient.
-                Products are verified by Dealtock and delivered by the same company that holds the stock —
-                meaning faster delivery and bigger discounts.
+                {t('marketplace.dealsBody')}{' '}
                 {filters.location
-                  ? ` Showing deals available in ${filters.location}.`
+                  ? t('marketplace.dealsBodyCity', { city: filters.location })
                   : buyerCity
-                  ? ` Showing deals near you in ${buyerCity} and elsewhere.`
-                  : ' Set your city to see local deals first.'}
+                  ? t('marketplace.dealsBodyBuyerCity', { city: buyerCity })
+                  : t('marketplace.dealsBodySetCity')}
               </p>
             </div>
           </motion.div>
@@ -442,20 +449,20 @@ const MarketplacePage = () => {
           </div>
         ) : error ? (
           <div className="text-center py-12">
-            <p className="text-red-600 dark:text-red-400">Error loading products: {error}</p>
+            <p className="text-red-600 dark:text-red-400">{t('marketplace.errorLoading', { error })}</p>
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12">
             <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
               {activeSource === 'returned'
-                ? 'No Dealtock Deals available right now'
-                : 'No products found'}
+                ? t('marketplace.noReturnedTitle')
+                : t('marketplace.noResultsTitle')}
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
               {activeSource === 'returned'
-                ? 'Check back soon — delivery companies add new sealed deals daily.'
-                : 'Try adjusting your filters'}
+                ? t('marketplace.noReturnedBody')
+                : t('marketplace.noResultsBody')}
             </p>
           </div>
         ) : (
@@ -496,10 +503,10 @@ const MarketplacePage = () => {
               <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-kraft-50 dark:bg-kraft-900/20 rounded-xl border border-kraft-200">
                 <Sparkles className="w-4 h-4 text-kraft-500" />
                 <span className="text-sm font-semibold text-kraft-700 dark:text-kraft-300">
-                  Dealtock Deal — Sealed & Verified
+                  {t('marketplace.dealtockDeal')} — {t('marketplace.sealed')} & Verified
                 </span>
                 <Shield className="w-4 h-4 text-green-500 ml-auto" />
-                <span className="text-xs text-green-600 font-medium">Condition A</span>
+                <span className="text-xs text-green-600 font-medium">{t('marketplace.condition')} A</span>
               </div>
             )}
 
@@ -516,7 +523,7 @@ const MarketplacePage = () => {
             )}
 
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              {selectedProduct.description || 'No description available'}
+              {selectedProduct.description || t('marketplace.noDescription')}
             </p>
 
             {/* Price */}
@@ -534,32 +541,32 @@ const MarketplacePage = () => {
             <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl space-y-2">
               {selectedProduct.source_type === 'returned' && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">Type:</span>
-                  <span className="text-kraft-600 font-semibold">🔥 Returned & Sealed</span>
+                  <span className="text-gray-500 dark:text-gray-400">{t('marketplace.type')}:</span>
+                  <span className="text-kraft-600 font-semibold">🔥 {t('marketplace.returnedAndSealed')}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Condition:</span>
+                <span className="text-gray-500 dark:text-gray-400">{t('marketplace.condition')}:</span>
                 <span className="text-gray-700 dark:text-gray-300 capitalize">
                   {selectedProduct.condition === 'A'
-                    ? '✅ Sealed / Unopened'
-                    : selectedProduct.condition || 'New'}
+                    ? `✅ ${t('marketplace.sealedUnopened')}`
+                    : selectedProduct.condition || t('marketplace.new')}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">City:</span>
+                <span className="text-gray-500 dark:text-gray-400">{t('marketplace.city')}:</span>
                 <span className="flex items-center gap-1 text-gray-700 dark:text-gray-300">
                   <MapPin className="w-3 h-3" />
-                  {selectedProduct.city || selectedProduct.location || 'Morocco'}
+                  {selectedProduct.city || selectedProduct.location || t('navbar.morocco')}
                   {selectedProduct.city_locked && (
-                    <span className="text-blue-500 text-xs">(local delivery)</span>
+                    <span className="text-blue-500 text-xs">({t('marketplace.localDelivery')})</span>
                   )}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Stock:</span>
+                <span className="text-gray-500 dark:text-gray-400">{t('marketplace.stock')}:</span>
                 <span className={selectedProduct.quantity <= 3 ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}>
-                  {selectedProduct.quantity > 0 ? `${selectedProduct.quantity} unit${selectedProduct.quantity > 1 ? 's' : ''}` : 'Out of stock'}
+                  {selectedProduct.quantity > 0 ? `${selectedProduct.quantity} ${t('marketplace.unit', { count: selectedProduct.quantity })}` : t('marketplace.outOfStock')}
                 </span>
               </div>
             </div>
@@ -574,13 +581,13 @@ const MarketplacePage = () => {
                     : 'bg-blue-600 hover:bg-blue-700'
                 }`}
               >
-                Add to Cart
+                {t('marketplace.addToCart')}
               </button>
               <button
                 onClick={() => setShowDetailModal(false)}
                 className="px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition"
               >
-                Close
+                {t('marketplace.close')}
               </button>
             </div>
           </div>
