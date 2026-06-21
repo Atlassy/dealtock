@@ -13,6 +13,7 @@ import {
   Package
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 // Import section components
 import OverviewSection from './components/OverviewSection';
@@ -38,6 +39,7 @@ const TABS = {
 };
 
 const AdminDashboard = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(TABS.OVERVIEW);
@@ -271,13 +273,13 @@ const AdminDashboard = () => {
   };
 
   const tabs = [
-    { key: TABS.OVERVIEW,     label: 'Overview',           icon: TrendingUp },
-    { key: TABS.ORDERS,       label: 'Order Oversight',    icon: Eye },
-    { key: TABS.RETURNED,     label: 'Returned Products',  icon: Package },
-    { key: TABS.INVOICES,     label: 'Invoices',           icon: FileText },
-    { key: TABS.ESCROW,       label: 'Escrow Management',  icon: Shield },
-    { key: TABS.DELIVERY,     label: 'Delivery Companies', icon: Truck },
-    { key: TABS.COMMISSIONS,  label: 'Commissions',        icon: Percent },
+    { key: TABS.OVERVIEW,     label: t('adminDashboard.tabs.overview'),           icon: TrendingUp },
+    { key: TABS.ORDERS,       label: t('adminDashboard.tabs.orderOversight'),    icon: Eye },
+    { key: TABS.RETURNED,     label: t('adminDashboard.tabs.returnedProducts'),  icon: Package },
+    { key: TABS.INVOICES,     label: t('adminDashboard.tabs.invoices'),           icon: FileText },
+    { key: TABS.ESCROW,       label: t('adminDashboard.tabs.escrowManagement'),  icon: Shield },
+    { key: TABS.DELIVERY,     label: t('adminDashboard.tabs.deliveryCompanies'), icon: Truck },
+    { key: TABS.COMMISSIONS,  label: t('adminDashboard.tabs.commissions'),        icon: Percent },
   ];
 
   if (loading) {
@@ -286,8 +288,8 @@ const AdminDashboard = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-20">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto"></div>
-            <h2 className="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Loading Dashboard</h2>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">Preparing your admin overview...</p>
+            <h2 className="mt-6 text-xl font-semibold text-gray-900 dark:text-white">{t('adminDashboard.loadingDashboard')}</h2>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">{t('adminDashboard.preparingOverview')}</p>
           </div>
         </div>
       </div>
@@ -300,9 +302,9 @@ const AdminDashboard = () => {
         {/* Header */}
         <div className="mb-4 flex flex-wrap gap-3 justify-between items-center">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">{t('adminDashboard.title')}</h1>
             <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">
-              Welcome back, {user?.user_metadata?.full_name || user?.email}
+              {t('adminDashboard.welcomeBack', { name: user?.user_metadata?.full_name || user?.email })}
             </p>
           </div>
           <button
@@ -311,7 +313,7 @@ const AdminDashboard = () => {
             className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-sm shadow-sm disabled:opacity-50 text-gray-700 dark:text-gray-300"
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-            {refreshing ? 'Refreshing...' : 'Refresh All Data'}
+            {refreshing ? t('adminDashboard.refreshing') : t('adminDashboard.refreshAllData')}
           </button>
         </div>
 

@@ -362,7 +362,8 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Reste à faire (volontairement pas fait dans ce lot, pour rester fiable) :**
 - Le paragraphe "Business Insights" (texte dynamique avec logique conditionnelle intégrée) — le titre est traduit, le corps reste en anglais pour l'instant.
-- Dashboards admin, dropshipper, warehouse, delivery — aucun n'est encore traduit.
+- Dashboard admin : seulement le squelette (`AdminDashboard.jsx`, onglets) et "Vue d'ensemble" sont traduits pour l'instant. Restent en anglais : Order Oversight, Returned Products, Invoices, Escrow Management, Delivery Companies, Commission Rules (gros fichiers, ~6300 lignes au total sur ces sections) — prochaine étape.
+- Dashboards dropshipper, warehouse, delivery — aucun n'est encore traduit.
 - Formulaires d'authentification (login/signup/mot de passe oublié), page Profil, page Mes commandes, factures.
 
 ## En attente de décision

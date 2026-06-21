@@ -283,5 +283,67 @@
     },
     "orderNumberLabel": "Order Number",
     "quantityLabel": "Quantity"
+  },
+  "adminDashboard": {
+    "title": "Admin Dashboard",
+    "welcomeBack": "Welcome back, {{name}}",
+    "refreshAllData": "Refresh All Data",
+    "refreshing": "Refreshing...",
+    "loadingDashboard": "Loading Dashboard",
+    "preparingOverview": "Preparing your admin overview...",
+    "tabs": {
+      "overview": "Overview",
+      "orderOversight": "Order Oversight",
+      "returnedProducts": "Returned Products",
+      "invoices": "Invoices",
+      "escrowManagement": "Escrow Management",
+      "deliveryCompanies": "Delivery Companies",
+      "commissions": "Commissions"
+    }
+  },
+  "overviewSection": {
+    "platformOverview": "Platform Overview",
+    "realTimeMetrics": "Real-time metrics and platform health",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing...",
+    "cards": {
+      "totalOrders": "Total Orders",
+      "deliveredSub": "{{count}} delivered",
+      "pendingEscrows": "Pending Escrows",
+      "awaitingRelease": "Awaiting release",
+      "activeDeliveries": "Active Deliveries",
+      "inTransitSub": "{{count}} orders in transit",
+      "totalRevenue": "Total Revenue",
+      "codSub": "COD: {{count}} orders",
+      "orderStatus": "Order Status",
+      "orderStatusSub": "Delivered/In Transit/Pending",
+      "users": "Users",
+      "usersSub": "{{sellers}} sellers, {{dropshippers}} dropshippers"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "manageDelivery": "Manage Delivery",
+      "manageDeliveryDesc": "Add/Edit companies",
+      "reviewEscrows": "Review Escrows",
+      "reviewEscrowsDesc": "Release payments",
+      "orderOversight": "Order Oversight",
+      "orderOversightDesc": "View all orders",
+      "commissionRules": "Commission Rules",
+      "commissionRulesDesc": "Configure fees"
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "system": "System",
+      "noActivity": "No recent activity",
+      "viewAll": "View all activity →"
+    },
+    "systemStatus": {
+      "title": "System Status",
+      "dbQueries": "Database queries (last refresh)",
+      "allOk": "All OK",
+      "failed": "{{count}} failed",
+      "escrowQueue": "Escrow Queue",
+      "pending": "{{count}} pending"
+    }
   }
 }

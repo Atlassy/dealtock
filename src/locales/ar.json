@@ -283,5 +283,67 @@
     },
     "orderNumberLabel": "رقم الطلب",
     "quantityLabel": "الكمية"
+  },
+  "adminDashboard": {
+    "title": "لوحة تحكم المسؤول",
+    "welcomeBack": "مرحباً بعودتك، {{name}}",
+    "refreshAllData": "تحديث جميع البيانات",
+    "refreshing": "جارٍ التحديث...",
+    "loadingDashboard": "جارٍ تحميل لوحة التحكم",
+    "preparingOverview": "جارٍ تحضير نظرة عامة على لوحة التحكم...",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "orderOversight": "مراقبة الطلبات",
+      "returnedProducts": "المنتجات المرتجعة",
+      "invoices": "الفواتير",
+      "escrowManagement": "إدارة الضمان",
+      "deliveryCompanies": "شركات التوصيل",
+      "commissions": "العمولات"
+    }
+  },
+  "overviewSection": {
+    "platformOverview": "نظرة عامة على المنصة",
+    "realTimeMetrics": "مقاييس فورية وصحة المنصة",
+    "refresh": "تحديث",
+    "refreshing": "جارٍ التحديث...",
+    "cards": {
+      "totalOrders": "إجمالي الطلبات",
+      "deliveredSub": "{{count}} تم تسليمها",
+      "pendingEscrows": "ضمانات معلّقة",
+      "awaitingRelease": "في انتظار الإفراج",
+      "activeDeliveries": "التوصيلات النشطة",
+      "inTransitSub": "{{count}} طلبات في الطريق",
+      "totalRevenue": "الإيراد الإجمالي",
+      "codSub": "الدفع عند التسليم: {{count}} طلبات",
+      "orderStatus": "حالة الطلبات",
+      "orderStatusSub": "تم التسليم/في الطريق/معلّق",
+      "users": "المستخدمون",
+      "usersSub": "{{sellers}} بائعين، {{dropshippers}} موزعين"
+    },
+    "quickActions": {
+      "title": "إجراءات سريعة",
+      "manageDelivery": "إدارة التوصيل",
+      "manageDeliveryDesc": "إضافة/تعديل الشركات",
+      "reviewEscrows": "مراجعة الضمانات",
+      "reviewEscrowsDesc": "تحرير المدفوعات",
+      "orderOversight": "مراقبة الطلبات",
+      "orderOversightDesc": "عرض جميع الطلبات",
+      "commissionRules": "قواعد العمولة",
+      "commissionRulesDesc": "تكوين الرسوم"
+    },
+    "recentActivity": {
+      "title": "النشاط الأخير",
+      "system": "النظام",
+      "noActivity": "لا يوجد نشاط حديث",
+      "viewAll": "عرض كل النشاط ←"
+    },
+    "systemStatus": {
+      "title": "حالة النظام",
+      "dbQueries": "استعلامات قاعدة البيانات (آخر تحديث)",
+      "allOk": "كل شيء على ما يرام",
+      "failed": "{{count}} فشل",
+      "escrowQueue": "قائمة انتظار الضمان",
+      "pending": "{{count}} معلّق"
+    }
   }
 }

@@ -283,5 +283,67 @@
     },
     "orderNumberLabel": "Numéro de commande",
     "quantityLabel": "Quantité"
+  },
+  "adminDashboard": {
+    "title": "Tableau de bord admin",
+    "welcomeBack": "Bon retour, {{name}}",
+    "refreshAllData": "Actualiser toutes les données",
+    "refreshing": "Actualisation...",
+    "loadingDashboard": "Chargement du tableau de bord",
+    "preparingOverview": "Préparation de votre vue d'ensemble admin...",
+    "tabs": {
+      "overview": "Vue d'ensemble",
+      "orderOversight": "Suivi des commandes",
+      "returnedProducts": "Produits retournés",
+      "invoices": "Factures",
+      "escrowManagement": "Gestion Escrow",
+      "deliveryCompanies": "Sociétés de livraison",
+      "commissions": "Commissions"
+    }
+  },
+  "overviewSection": {
+    "platformOverview": "Vue d'ensemble de la plateforme",
+    "realTimeMetrics": "Métriques en temps réel et santé de la plateforme",
+    "refresh": "Actualiser",
+    "refreshing": "Actualisation...",
+    "cards": {
+      "totalOrders": "Total des commandes",
+      "deliveredSub": "{{count}} livrées",
+      "pendingEscrows": "Escrows en attente",
+      "awaitingRelease": "En attente de libération",
+      "activeDeliveries": "Livraisons actives",
+      "inTransitSub": "{{count}} commandes en transit",
+      "totalRevenue": "Revenu total",
+      "codSub": "COD : {{count}} commandes",
+      "orderStatus": "Statut des commandes",
+      "orderStatusSub": "Livrées/En transit/En attente",
+      "users": "Utilisateurs",
+      "usersSub": "{{sellers}} vendeurs, {{dropshippers}} dropshippers"
+    },
+    "quickActions": {
+      "title": "Actions rapides",
+      "manageDelivery": "Gérer les livraisons",
+      "manageDeliveryDesc": "Ajouter/Modifier des sociétés",
+      "reviewEscrows": "Examiner les escrows",
+      "reviewEscrowsDesc": "Libérer les paiements",
+      "orderOversight": "Suivi des commandes",
+      "orderOversightDesc": "Voir toutes les commandes",
+      "commissionRules": "Règles de commission",
+      "commissionRulesDesc": "Configurer les frais"
+    },
+    "recentActivity": {
+      "title": "Activité récente",
+      "system": "Système",
+      "noActivity": "Aucune activité récente",
+      "viewAll": "Voir toute l'activité →"
+    },
+    "systemStatus": {
+      "title": "État du système",
+      "dbQueries": "Requêtes base de données (dernière actualisation)",
+      "allOk": "Tout va bien",
+      "failed": "{{count}} échec(s)",
+      "escrowQueue": "File d'attente Escrow",
+      "pending": "{{count}} en attente"
+    }
   }
 }

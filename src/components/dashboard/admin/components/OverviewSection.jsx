@@ -16,89 +16,91 @@ import {
   Activity
 } from "lucide-react";
 import { formatCurrency, formatDate } from '../utils/helpers';
+import { useTranslation } from 'react-i18next';
 
 const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabChange, dataHealth = { ok: true, failedQueries: [] } }) => {
+  const { t } = useTranslation();
   const [showAllActivity, setShowAllActivity] = useState(false);
 
   const statCards = [
     {
-      title: "Total Orders",
+      title: t('overviewSection.cards.totalOrders'),
       value: stats.totalOrders.toLocaleString(),
       icon: Package,
       color: "bg-blue-500",
-      description: `${stats.deliveredOrders} delivered`
+      description: t('overviewSection.cards.deliveredSub', { count: stats.deliveredOrders })
     },
     {
-      title: "Pending Escrows",
+      title: t('overviewSection.cards.pendingEscrows'),
       value: stats.pendingEscrows,
       icon: Shield,
       color: "bg-yellow-500",
       amount: formatCurrency(stats.totalEscrowAmount),
-      description: "Awaiting release"
+      description: t('overviewSection.cards.awaitingRelease')
     },
     {
-      title: "Active Deliveries",
+      title: t('overviewSection.cards.activeDeliveries'),
       value: stats.activeDeliveries,
       icon: Truck,
       color: "bg-green-500",
-      description: `${stats.shippedOrders} orders in transit`
+      description: t('overviewSection.cards.inTransitSub', { count: stats.shippedOrders })
     },
     {
-      title: "Total Revenue",
+      title: t('overviewSection.cards.totalRevenue'),
       value: formatCurrency(stats.totalRevenue),
       icon: DollarSign,
       color: "bg-purple-500",
-      description: `COD: ${stats.codOrders} orders`
+      description: t('overviewSection.cards.codSub', { count: stats.codOrders })
     },
     {
-      title: "Order Status",
+      title: t('overviewSection.cards.orderStatus'),
       value: `${stats.deliveredOrders}/${stats.shippedOrders}/${stats.pendingOrders}`,
       icon: TrendingUp,
       color: "bg-kraft-500",
-      description: "Delivered/In Transit/Pending"
+      description: t('overviewSection.cards.orderStatusSub')
     },
     {
-      title: "Users",
+      title: t('overviewSection.cards.users'),
       value: stats.totalSellers + stats.totalDropshippers,
       icon: Users,
       color: "bg-indigo-500",
-      description: `${stats.totalSellers} sellers, ${stats.totalDropshippers} dropshippers`
+      description: t('overviewSection.cards.usersSub', { sellers: stats.totalSellers, dropshippers: stats.totalDropshippers })
     }
   ];
 
   const quickActions = [
     {
-      label: "Manage Delivery",
+      label: t('overviewSection.quickActions.manageDelivery'),
       icon: Truck,
       color: "text-blue-600 dark:text-blue-400",
       bgColor: "bg-blue-50 dark:bg-blue-900/30",
       tab: "delivery",
-      description: "Add/Edit companies"
+      description: t('overviewSection.quickActions.manageDeliveryDesc')
     },
     {
-      label: "Review Escrows",
+      label: t('overviewSection.quickActions.reviewEscrows'),
       icon: Shield,
       color: "text-green-600 dark:text-green-400",
       bgColor: "bg-green-50 dark:bg-green-900/30",
       tab: "escrow",
-      description: "Release payments",
+      description: t('overviewSection.quickActions.reviewEscrowsDesc'),
       badge: stats.pendingEscrows
     },
     {
-      label: "Order Oversight",
+      label: t('overviewSection.quickActions.orderOversight'),
       icon: Eye,
       color: "text-kraft-600 dark:text-kraft-400",
       bgColor: "bg-kraft-50 dark:bg-kraft-900/30",
       tab: "orders",
-      description: "View all orders"
+      description: t('overviewSection.quickActions.orderOversightDesc')
     },
     {
-      label: "Commission Rules",
+      label: t('overviewSection.quickActions.commissionRules'),
       icon: Percent,
       color: "text-purple-600 dark:text-purple-400",
       bgColor: "bg-purple-50 dark:bg-purple-900/30",
       tab: "commissions",
-      description: "Configure fees"
+      description: t('overviewSection.quickActions.commissionRulesDesc')
     }
   ];
 
@@ -109,10 +111,10 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Activity className="w-6 h-6" />
-            Platform Overview
+            {t('overviewSection.platformOverview')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
-            Real-time metrics and platform health
+            {t('overviewSection.realTimeMetrics')}
           </p>
         </div>
         <button
@@ -121,7 +123,7 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
           className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 flex items-center gap-2 text-sm"
         >
           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          {isLoading ? 'Refreshing...' : 'Refresh'}
+          {isLoading ? t('overviewSection.refreshing') : t('overviewSection.refresh')}
         </button>
       </div>
 
@@ -160,7 +162,7 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
           <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
             <Clock className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            Quick Actions
+            {t('overviewSection.quickActions.title')}
           </h3>
           <div className="grid grid-cols-2 gap-3">
             {quickActions.map((action, index) => (
@@ -194,7 +196,7 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
           <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
             <Activity className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            Recent Activity
+            {t('overviewSection.recentActivity.title')}
           </h3>
           <div className="space-y-3 max-h-[300px] overflow-y-auto">
             {recentActivity.length > 0 ? (
@@ -203,7 +205,7 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
                   <div className="w-2 h-2 mt-2 rounded-full bg-blue-500 flex-shrink-0"></div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate text-gray-900 dark:text-white">
-                      {activity.admin?.full_name || 'System'}
+                      {activity.admin?.full_name || t('overviewSection.recentActivity.system')}
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                       {activity.reason || activity.action_type}
@@ -217,7 +219,7 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
             ) : (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 <Activity className="w-12 h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-                <p className="text-sm">No recent activity</p>
+                <p className="text-sm">{t('overviewSection.recentActivity.noActivity')}</p>
               </div>
             )}
           </div>
@@ -226,7 +228,7 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
               onClick={() => setShowAllActivity(true)}
               className="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
             >
-              View all activity →
+              {t('overviewSection.recentActivity.viewAll')}
             </button>
           )}
         </div>
@@ -234,12 +236,12 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
 
       {/* System Status */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-        <h3 className="text-lg font-bold mb-3 text-gray-900 dark:text-white">System Status</h3>
+        <h3 className="text-lg font-bold mb-3 text-gray-900 dark:text-white">{t('overviewSection.systemStatus.title')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded">
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${dataHealth.ok ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <span className="text-sm font-medium text-gray-900 dark:text-white">Database queries (last refresh)</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{t('overviewSection.systemStatus.dbQueries')}</span>
             </div>
             <span
               className={`text-xs px-2 py-1 rounded ${
@@ -249,20 +251,20 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
               }`}
               title={dataHealth.failedQueries.length > 0 ? `Failed: ${dataHealth.failedQueries.join(', ')}` : undefined}
             >
-              {dataHealth.ok ? 'All OK' : `${dataHealth.failedQueries.length} failed`}
+              {dataHealth.ok ? t('overviewSection.systemStatus.allOk') : t('overviewSection.systemStatus.failed', { count: dataHealth.failedQueries.length })}
             </span>
           </div>
           <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded">
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 ${stats.pendingEscrows > 0 ? 'bg-yellow-500' : 'bg-green-500'} rounded-full`}></div>
-              <span className="text-sm font-medium text-gray-900 dark:text-white">Escrow Queue</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{t('overviewSection.systemStatus.escrowQueue')}</span>
             </div>
             <span className={`text-xs px-2 py-1 rounded ${
               stats.pendingEscrows > 0
                 ? 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30'
                 : 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30'
             }`}>
-              {stats.pendingEscrows} pending
+              {t('overviewSection.systemStatus.pending', { count: stats.pendingEscrows })}
             </span>
           </div>
         </div>
