@@ -289,6 +289,13 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Confirmé par Ali :** email reçu après le passage à Vault. Le design/contenu du message (HTML) reste basique pour l'instant — à retravailler plus tard, ce n'est pas urgent.
 
+### 38. "Days in storage" : valeur figée saisie à la main, incohérente entre annonces
+**Constat (soulevé par Ali) :** sur le dashboard Warehouse, le badge "X days in storage" n'apparaissait que sur certaines annonces, pas toutes.
+
+**Erreur trouvée :** ce champ n'était pas calculé — c'était une valeur **optionnelle saisie manuellement** lors de l'import CSV (`ReturnedProductsImporter.jsx`). Si l'admin laissait la colonne vide dans le CSV, le badge disparaissait simplement (`product.days_in_storage != null`). Pire : même quand elle était remplie, c'était un chiffre figé au moment de l'import, qui ne progressait jamais (ex: "3 days in storage" affiché le lendemain de la création, alors que ça aurait dû dire "1 day").
+
+**Solution :** remplacé par un calcul automatique côté frontend (`daysInStorage()`, `Math.floor((Date.now() - created_at) / 86400000)`) dans `WarehouseDashboard.jsx` et `ReturnedProductsQueue.jsx` — toujours juste, toujours affiché, plus besoin de saisie manuelle. Retiré le champ "Days in Storage" de l'import CSV (`ReturnedProductsImporter.jsx` : colonne du template, mapper automatique, validation, payload d'insertion, colonne du tableau d'aperçu) puisqu'il est désormais entièrement obsolète.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).

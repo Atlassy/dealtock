@@ -11,6 +11,9 @@ import {
   AlertCircle, Truck, Calendar, Info
 } from "lucide-react";
 
+const daysInStorage = (createdAt) =>
+  Math.max(0, Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000));
+
 const DECLINE_REASONS = [
   "Product description insufficient",
   "Price too high for condition",
@@ -346,16 +349,14 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                       <Calendar className="w-3 h-3" />
                       <span>Listed {new Date(product.created_at).toLocaleDateString("fr-MA")}</span>
                     </div>
-                    {/* days_in_storage: ADMIN ONLY */}
-                    {product.days_in_storage != null && (
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3 h-3 text-amber-500 dark:text-amber-400" />
-                        <span className="text-amber-600 dark:text-amber-400 font-medium">
-                          {product.days_in_storage} days in storage
-                          <span className="text-gray-400 dark:text-gray-500 font-normal ml-1">(admin only)</span>
-                        </span>
-                      </div>
-                    )}
+                    {/* days_in_storage: ADMIN ONLY, calculated from listing date */}
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3 h-3 text-amber-500 dark:text-amber-400" />
+                      <span className="text-amber-600 dark:text-amber-400 font-medium">
+                        {daysInStorage(product.created_at)} days in storage
+                        <span className="text-gray-400 dark:text-gray-500 font-normal ml-1">(admin only)</span>
+                      </span>
+                    </div>
                     {product.decline_reason && (
                       <div className="flex items-start gap-1.5 mt-1 p-2 bg-red-50 dark:bg-red-900/30 rounded-lg">
                         <AlertCircle className="w-3 h-3 text-red-400 dark:text-red-500 mt-0.5 shrink-0" />

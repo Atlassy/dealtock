@@ -5,6 +5,9 @@ import { supabase } from "../../../lib/supabaseClient";
 import { Package, MapPin, Clock, DollarSign, RefreshCw, CheckCircle2, Tag } from "lucide-react";
 import { toast } from "sonner";
 
+const daysInStorage = (createdAt) =>
+  Math.max(0, Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000));
+
 const WarehouseDashboard = () => {
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
@@ -209,11 +212,9 @@ const WarehouseDashboard = () => {
                     <div className="flex items-center gap-1.5">
                       <MapPin className="w-3 h-3" /> {product.location || "No location set"}
                     </div>
-                    {product.days_in_storage != null && (
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3 h-3" /> {product.days_in_storage} days in storage
-                      </div>
-                    )}
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3 h-3" /> {daysInStorage(product.created_at)} days in storage
+                    </div>
                     {product.decline_reason && (
                       <div className="text-red-500 dark:text-red-400">{product.decline_reason}</div>
                     )}

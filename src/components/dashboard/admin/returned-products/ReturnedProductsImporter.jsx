@@ -13,7 +13,7 @@ import { supabase } from "../../../../lib/supabaseClient";
 import { toast } from "sonner";
 import {
   Upload, Download, FileText, X, Check, AlertCircle,
-  ChevronDown, RefreshCw, Package, MapPin, Clock,
+  ChevronDown, RefreshCw, Package, MapPin,
   Tag, ArrowRight, CheckCircle2, XCircle, Eye,
   RotateCcw, Truck, Warehouse
 } from "lucide-react";
@@ -25,7 +25,6 @@ const DEALTOCK_FIELDS = [
   { key: "asking_price",     label: "Asking Price (MAD)", required: true,  hint: "Delivery company's listing price" },
   { key: "quantity",         label: "Quantity",           required: false, hint: "Default: 1" },
   { key: "location",         label: "City",               required: true,  hint: "Storage city (e.g. Casablanca)" },
-  { key: "days_in_storage",  label: "Days in Storage",    required: false, hint: "Admin-only, never shown to buyers" },
   { key: "description",      label: "Description",        required: false, hint: "Additional product details" },
   { key: "ignore",           label: "— Ignore column —",  required: false, hint: "Skip this column" },
 ];
@@ -35,13 +34,13 @@ const REQUIRED_FIELDS = DEALTOCK_FIELDS.filter(f => f.required).map(f => f.key);
 // ── Standard CSV template ─────────────────────────────────────────
 const TEMPLATE_HEADERS = [
   "product_name", "category", "asking_price_mad",
-  "quantity", "city", "days_in_storage", "description"
+  "quantity", "city", "description"
 ];
 
 const TEMPLATE_EXAMPLE = [
-  ["Casque Bluetooth Sony WH-1000XM4", "Electronics", "450", "1", "Casablanca", "12", "Sealed box, never opened. Refused delivery."],
-  ["Robe d'été fleurie taille M", "Fashion", "180", "1", "Rabat", "8", ""],
-  ["Cafetière Delonghi EC260", "Home", "320", "2", "Marrakech", "21", "Original packaging intact"],
+  ["Casque Bluetooth Sony WH-1000XM4", "Electronics", "450", "1", "Casablanca", "Sealed box, never opened. Refused delivery."],
+  ["Robe d'été fleurie taille M", "Fashion", "180", "1", "Rabat", ""],
+  ["Cafetière Delonghi EC260", "Home", "320", "2", "Marrakech", "Original packaging intact"],
 ];
 
 // ── Validate a parsed row ─────────────────────────────────────────
@@ -51,10 +50,6 @@ function validateRow(row) {
   if (!row.location?.trim())     errors.push("City is required");
   const price = parseFloat(row.asking_price);
   if (isNaN(price) || price <= 0) errors.push("Valid asking price required (> 0 MAD)");
-  if (row.days_in_storage !== undefined && row.days_in_storage !== "") {
-    const days = parseInt(row.days_in_storage);
-    if (isNaN(days) || days < 0) errors.push("Days in storage must be a positive number");
-  }
   return errors;
 }
 
@@ -155,7 +150,6 @@ function autoMap(csvHeader) {
   if (/price|prix|montant|amount|asking/.test(h)) return "asking_price";
   if (/qty|quant|nombre|nbre/.test(h)) return "quantity";
   if (/city|ville|location|ville|depot/.test(h)) return "location";
-  if (/day|jour|storage|stockage|anciennete/.test(h)) return "days_in_storage";
   if (/desc|detail|note|comment|remark/.test(h)) return "description";
   return "ignore";
 }
@@ -301,7 +295,6 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
         sale_price:                 parseFloat(row.asking_price) || 0,
         quantity:                   parseInt(row.quantity) || 1,
         location:                   row.location?.trim() || null,
-        days_in_storage:            row.days_in_storage ? parseInt(row.days_in_storage) : null,
         source_type:                "returned",
         condition:                  "A",            // V1: sealed only
         listing_status:             "pending_review",
@@ -660,10 +653,6 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
                     <th className="text-left p-3 text-xs font-semibold text-gray-500 dark:text-gray-400">
                       <MapPin className="inline w-3 h-3 mr-0.5" />City
                     </th>
-                    <th className="text-left p-3 text-xs font-semibold text-gray-500 dark:text-gray-400">
-                      <Clock className="inline w-3 h-3 mr-0.5" />
-                      Days Stored <span className="text-kraft-500 dark:text-kraft-400">(admin)</span>
-                    </th>
                     <th className="text-left p-3 text-xs font-semibold text-gray-500 dark:text-gray-400">Status</th>
                   </tr>
                 </thead>
@@ -695,12 +684,6 @@ const ReturnedProductsImporter = ({ deliveryCompanies = [], onImportComplete }) 
                           {row.location
                             ? <span className="flex items-center gap-1 text-gray-700 dark:text-gray-300"><MapPin className="w-3 h-3 text-gray-400 dark:text-gray-500" />{row.location}</span>
                             : <span className="text-red-400 dark:text-red-400">!</span>
-                          }
-                        </td>
-                        <td className="p-3 text-gray-500 dark:text-gray-400 text-xs">
-                          {row.days_in_storage
-                            ? <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">{row.days_in_storage}d</span>
-                            : <span className="text-gray-300 dark:text-gray-600">—</span>
                           }
                         </td>
                         <td className="p-3">
