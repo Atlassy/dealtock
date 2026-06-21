@@ -22,6 +22,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "../../../../lib/supabaseClient";
 import { formatCurrency, formatDate, formatDateTime, downloadCSV } from '../utils/helpers';
+import { useTranslation } from 'react-i18next';
 
 // ✅ FIXED: Match your actual database statuses from orders table
 const ORDER_STATUSES = [
@@ -34,6 +35,7 @@ const PAYMENT_STATUSES = ['pending', 'collected', 'paid', 'failed', 'refunded'];
 const PAYMENT_METHODS = ['COD', 'card', 'bank_transfer', 'wallet'];
 
 const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExport }) => {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState(initialOrders || []);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -159,11 +161,11 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
 
   // ✅ FIXED: Use RPC function for status updates
   const handleStatusUpdate = async (orderId, newStatus) => {
-    if (!window.confirm(`Update order status to ${newStatus}?`)) return;
+    if (!window.confirm(t('orderOversight.confirmStatusUpdate', { status: newStatus }))) return;
 
     try {
       setLoading(true);
-      
+
         const { data, error } = await supabase
       .rpc('update_order_status', {
         p_order_id: orderId,
@@ -173,15 +175,15 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
 
       if (error) {
         console.error('RPC Error:', error);
-        toast.error(error.message || 'Failed to update order status');
+        toast.error(error.message || t('orderOversight.statusUpdateFailed'));
         return;
       }
 
-      toast.success('Order status updated successfully');
+      toast.success(t('orderOversight.statusUpdated'));
       onRefresh();
     } catch (error) {
       console.error('Error updating order:', error);
-      toast.error('Failed to update order status');
+      toast.error(t('orderOversight.statusUpdateFailed'));
     } finally {
       setLoading(false);
     }
@@ -189,14 +191,14 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
 
   // Handle payment status update
   const handlePaymentUpdate = async (orderId, newStatus) => {
-    if (!window.confirm(`Update payment status to ${newStatus}?`)) return;
+    if (!window.confirm(t('orderOversight.confirmPaymentUpdate', { status: newStatus }))) return;
 
     try {
       setLoading(true);
-      
+
       const { error } = await supabase
         .from('orders')
-        .update({ 
+        .update({
           payment_status: newStatus,
           updated_at: new Date().toISOString()
         })
@@ -204,11 +206,11 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
 
       if (error) throw error;
 
-      toast.success('Payment status updated');
+      toast.success(t('orderOversight.paymentUpdated'));
       onRefresh();
     } catch (error) {
       console.error('Error updating payment:', error);
-      toast.error('Failed to update payment status');
+      toast.error(t('orderOversight.paymentUpdateFailed'));
     } finally {
       setLoading(false);
     }
@@ -218,10 +220,10 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
   const handleAssignDelivery = async (orderId, companyId) => {
     try {
       setLoading(true);
-      
+
       const { error } = await supabase
         .from('orders')
-        .update({ 
+        .update({
           delivery_company_id: companyId,
           updated_at: new Date().toISOString()
         })
@@ -229,11 +231,11 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
 
       if (error) throw error;
 
-      toast.success('Delivery company assigned');
+      toast.success(t('orderOversight.deliveryAssigned'));
       onRefresh();
     } catch (error) {
       console.error('Error assigning delivery:', error);
-      toast.error('Failed to assign delivery company');
+      toast.error(t('orderOversight.deliveryAssignFailed'));
     } finally {
       setLoading(false);
     }
@@ -260,7 +262,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
     }));
     
     downloadCSV(exportData, 'orders');
-    toast.success('Orders exported');
+    toast.success(t('orderOversight.ordersExported'));
   };
 
   const handleSort = (key) => {
@@ -305,10 +307,10 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Eye className="w-6 h-6" />
-            Order Oversight
+            {t('orderOversight.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
-            Monitor and manage all platform orders
+            {t('orderOversight.subtitle')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -317,14 +319,14 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 flex items-center gap-2 text-sm"
           >
             <Download className="w-4 h-4" />
-            Export
+            {t('orderOversight.export')}
           </button>
           <button
             onClick={onRefresh}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 flex items-center gap-2 text-sm"
           >
             <RefreshCw className="w-4 h-4" />
-            Refresh
+            {t('orderOversight.refresh')}
           </button>
         </div>
       </div>
@@ -332,53 +334,53 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
       {/* Stats Cards - Updated with correct statuses */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Total Orders</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('orderOversight.cards.totalOrders')}</p>
           <p className="text-2xl font-bold text-gray-900 dark:text-white">{orderStats.total}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatCurrency(orderStats.totalValue)}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Pending</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('orderOversight.cards.pending')}</p>
           <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
             {orderStats.byStatus.ordered + orderStats.byStatus.approved}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Awaiting processing</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('orderOversight.cards.awaitingProcessing')}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-  <p className="text-sm text-gray-600 dark:text-gray-400">In Transit</p>
+  <p className="text-sm text-gray-600 dark:text-gray-400">{t('orderOversight.cards.inTransit')}</p>
   <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
     {(orderStats.byStatus.picked_up || 0) + (orderStats.byStatus.in_transit || 0)}
   </p>
-  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">On the way</p>
+  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('orderOversight.cards.onTheWay')}</p>
 </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Delivered</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('orderOversight.cards.delivered')}</p>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400">
             {orderStats.byStatus.delivered}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Completed orders</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('orderOversight.cards.completedOrders')}</p>
         </div>
       </div>
 
       {/* Secondary Stats - Updated */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">COD Orders</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('orderOversight.cards.codOrders')}</p>
           <p className="text-2xl font-bold text-gray-900 dark:text-white">{orderStats.totalCOD}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{orderStats.totalCollected} collected</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('orderOversight.cards.collected', { count: orderStats.totalCollected })}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Returns/Failed</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('orderOversight.cards.returnsFailed')}</p>
           <p className="text-2xl font-bold text-kraft-600 dark:text-kraft-400">
             {orderStats.byStatus.returned + orderStats.byStatus.failed}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Issues to resolve</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('orderOversight.cards.issuesToResolve')}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Cancelled/Refunded</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('orderOversight.cards.cancelledRefunded')}</p>
           <p className="text-2xl font-bold text-red-600 dark:text-red-400">
             {orderStats.byStatus.cancelled + orderStats.byStatus.refunded}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Closed orders</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('orderOversight.cards.closedOrders')}</p>
         </div>
       </div>
 
@@ -390,7 +392,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
               <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
-                placeholder="Search by order #, seller, customer, phone..."
+                placeholder={t('orderOversight.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg w-full text-sm"
@@ -405,7 +407,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg min-w-[150px] text-sm"
             >
-              <option value="all">All Status</option>
+              <option value="all">{t('orderOversight.allStatus')}</option>
               {ORDER_STATUSES.map(status => (
                 <option key={status} value={status}>
                   {status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
@@ -418,10 +420,10 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
               onChange={(e) => setPaymentFilter(e.target.value)}
               className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg min-w-[150px] text-sm"
             >
-              <option value="all">All Payments</option>
+              <option value="all">{t('orderOversight.allPayments')}</option>
               {PAYMENT_METHODS.map(method => (
                 <option key={method} value={method}>
-                  {method === 'COD' ? 'Cash on Delivery' : method.charAt(0).toUpperCase() + method.slice(1)}
+                  {method === 'COD' ? t('orderOversight.cashOnDelivery') : method.charAt(0).toUpperCase() + method.slice(1)}
                 </option>
               ))}
             </select>
@@ -430,14 +432,14 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
 
         {/* Date Range Filter */}
         <div className="flex flex-wrap items-center gap-4">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Date Range:</span>
+          <span className="text-sm text-gray-600 dark:text-gray-400">{t('orderOversight.dateRange')}</span>
           <input
             type="date"
             value={dateRange.start}
             onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm"
           />
-          <span className="text-gray-700 dark:text-gray-300">to</span>
+          <span className="text-gray-700 dark:text-gray-300">{t('orderOversight.to')}</span>
           <input
             type="date"
             value={dateRange.end}
@@ -449,7 +451,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
               onClick={() => setDateRange({ start: '', end: '' })}
               className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
             >
-              Clear
+              {t('orderOversight.clear')}
             </button>
           )}
         </div>
@@ -463,28 +465,28 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
               <tr>
                 <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => handleSort('order_number')}>
-                  Order # {getSortIcon('order_number')}
+                  {t('orderOversight.table.orderNumber')} {getSortIcon('order_number')}
                 </th>
                 <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => handleSort('seller')}>
-                  Seller {getSortIcon('seller')}
+                  {t('orderOversight.table.seller')} {getSortIcon('seller')}
                 </th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Customer</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('orderOversight.table.customer')}</th>
                 <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => handleSort('final_customer_price')}>
-                  Amount {getSortIcon('final_customer_price')}
+                  {t('orderOversight.table.amount')} {getSortIcon('final_customer_price')}
                 </th>
                 <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => handleSort('status')}>
-                  Status {getSortIcon('status')}
+                  {t('orderOversight.table.status')} {getSortIcon('status')}
                 </th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Payment</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Delivery</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('orderOversight.table.payment')}</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('orderOversight.table.delivery')}</th>
                 <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => handleSort('created_at')}>
-                  Date {getSortIcon('created_at')}
+                  {t('orderOversight.table.date')} {getSortIcon('created_at')}
                 </th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Actions</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('orderOversight.table.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -561,10 +563,10 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                     </div>
                   </td>
                   <td className="p-4">
-                    <div className="text-sm text-gray-700 dark:text-gray-300">{order.delivery_company?.name || 'Unassigned'}</div>
+                    <div className="text-sm text-gray-700 dark:text-gray-300">{order.delivery_company?.name || t('orderOversight.table.unassigned')}</div>
                     {order.delivery_tracking_number && (
                       <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Track: {order.delivery_tracking_number}
+                        {t('orderOversight.table.track', { number: order.delivery_tracking_number })}
                       </div>
                     )}
                   </td>
@@ -578,7 +580,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                     <button
                       onClick={() => setSelectedOrder(order)}
                       className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
-                      title="View Details"
+                      title={t('orderOversight.table.viewDetails')}
                     >
                       <Eye className="w-4 h-4" />
                     </button>
@@ -592,7 +594,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
         {filteredOrders.length === 0 && (
           <div className="text-center py-12">
             <Package className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">No orders found matching your filters.</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('orderOversight.noOrdersFound')}</p>
             <button
               onClick={() => {
                 setSearchTerm('');
@@ -602,14 +604,14 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
               }}
               className="mt-4 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
             >
-              Clear all filters
+              {t('orderOversight.clearAllFilters')}
             </button>
           </div>
         )}
 
         {filteredOrders.length > 0 && (
           <div className="p-4 border-t border-gray-200 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400 flex justify-between items-center">
-            <span>Showing {filteredOrders.length} of {orders.length} orders</span>
+            <span>{t('orderOversight.showing', { filtered: filteredOrders.length, total: orders.length })}</span>
             {filteredOrders.length < orders.length && (
               <button
                 onClick={() => {
@@ -620,7 +622,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                 }}
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
               >
-                Clear filters
+                {t('orderOversight.clearFilters')}
               </button>
             )}
           </div>
@@ -632,7 +634,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-auto">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Order Details</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('orderOversight.modal.orderDetails')}</h3>
               <button
                 onClick={() => setSelectedOrder(null)}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg dark:text-gray-300"
@@ -647,61 +649,61 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
               {/* Order Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Order Number</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.orderNumber')}</p>
                   <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.order_number || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Order ID</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.orderId')}</p>
                   <p className="text-sm font-mono text-gray-700 dark:text-gray-300">{selectedOrder.id}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Created At</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.createdAt')}</p>
                   <p className="text-sm text-gray-700 dark:text-gray-300">{formatDateTime(selectedOrder.created_at)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Last Updated</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.lastUpdated')}</p>
                   <p className="text-sm text-gray-700 dark:text-gray-300">{formatDateTime(selectedOrder.updated_at)}</p>
                 </div>
               </div>
 
               {/* Amount */}
               <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Order Amount</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('orderOversight.modal.orderAmount')}</p>
                 <p className="text-2xl font-bold text-green-700 dark:text-green-400">
                   {formatCurrency(selectedOrder.final_customer_price)}
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2 text-sm">
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Product Price</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.productPrice')}</p>
                     <p className="text-gray-700 dark:text-gray-300">{formatCurrency(selectedOrder.product_price || 0)}</p>
                   </div>
                   {(selectedOrder.dropshipper_markup > 0 || selectedOrder.b2c_markup > 0) && (
                     <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Markup</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.markup')}</p>
                       <p className="text-gray-700 dark:text-gray-300">{formatCurrency((selectedOrder.dropshipper_markup || 0) + (selectedOrder.b2c_markup || 0))}</p>
                     </div>
                   )}
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Delivery Fee</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.deliveryFee')}</p>
                     <p className="text-gray-700 dark:text-gray-300">{formatCurrency(selectedOrder.shipping_fee || 0)}</p>
                     {computedDeliveryFee && Math.abs(computedDeliveryFee.fee - (selectedOrder.shipping_fee || 0)) > 0.01 && (
                       <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
-                        Rule says {formatCurrency(computedDeliveryFee.fee)} ({computedDeliveryFee.rule.carrier || 'carrier'})
+                        {t('orderOversight.modal.ruleSays', { amount: formatCurrency(computedDeliveryFee.fee), carrier: computedDeliveryFee.rule.carrier || t('orderOversight.modal.carrier') })}
                       </p>
                     )}
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Dealtock Commission</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.dealtockCommission')}</p>
                     <p className="text-gray-700 dark:text-gray-300">{formatCurrency(selectedOrder.financials?.dealtock_commission || 0)}</p>
                   </div>
                   {selectedOrder.financials?.dropshipper_commission > 0 && (
                     <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Dropshipper Commission</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.dropshipperCommission')}</p>
                       <p className="text-gray-700 dark:text-gray-300">{formatCurrency(selectedOrder.financials.dropshipper_commission)}</p>
                     </div>
                   )}
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Seller Net</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.sellerNet')}</p>
                     <p className="text-gray-700 dark:text-gray-300">{formatCurrency(selectedOrder.financials?.seller_net || 0)}</p>
                   </div>
                 </div>
@@ -713,7 +715,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                   const gap = (selectedOrder.final_customer_price || 0) - accounted;
                   return Math.abs(gap) > 0.01 ? (
                     <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
-                      ⚠️ {formatCurrency(gap)} of the order amount isn't explained by product price + markup + delivery fee.
+                      {t('orderOversight.modal.unexplainedGap', { amount: formatCurrency(gap) })}
                     </p>
                   ) : null;
                 })()}
@@ -722,7 +724,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
               {/* Parties */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Seller Information</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('orderOversight.modal.sellerInformation')}</p>
                   <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded space-y-2">
                     <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.seller?.full_name || 'N/A'}</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">{selectedOrder.seller?.email || 'N/A'}</p>
@@ -732,7 +734,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Customer Information</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('orderOversight.modal.customerInformation')}</p>
                   <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded space-y-2">
                     <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.shipping_address?.name || 'N/A'}</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">{selectedOrder.customer_email || 'N/A'}</p>
@@ -749,22 +751,22 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
 
               {/* Delivery Info */}
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Delivery Information</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('orderOversight.modal.deliveryInformation')}</p>
                 <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Company</p>
-                    <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.delivery_company?.name || 'Not assigned'}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.company')}</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.delivery_company?.name || t('orderOversight.modal.notAssigned')}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Tracking Number</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.trackingNumber')}</p>
                     <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.delivery_tracking_number || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Delivery Status</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.deliveryStatus')}</p>
                     <p className="font-medium capitalize text-gray-900 dark:text-white">{selectedOrder.status?.replace('_', ' ')}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">COD Collection</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.codCollection')}</p>
                     <p className="font-medium capitalize text-gray-900 dark:text-white">{selectedOrder.cod_collection_status || 'pending'}</p>
                   </div>
                 </div>
@@ -772,14 +774,14 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
 
               {/* Payment Info */}
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Payment Information</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('orderOversight.modal.paymentInformation')}</p>
                 <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Method</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.method')}</p>
                     <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.payment_method || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Status</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('orderOversight.modal.status')}</p>
                     <p className="font-medium capitalize text-gray-900 dark:text-white">{selectedOrder.payment_status || 'pending'}</p>
                   </div>
                 </div>
@@ -791,7 +793,7 @@ const OrderOversightSection = ({ orders: initialOrders, stats, onRefresh, onExpo
                   onClick={() => setSelectedOrder(null)}
                   className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200"
                 >
-                  Close
+                  {t('orderOversight.modal.close')}
                 </button>
               </div>
             </div>

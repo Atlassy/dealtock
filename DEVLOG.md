@@ -360,9 +360,11 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Mise à jour : dashboard vendeur 100% traduit.** Suite de la même session — traduction complète de `ProductTable.jsx` (en-têtes de colonnes, badges stock/statut, tooltips de commission), de l'onglet Escrow (`EscrowTab`, cartes, tableaux commandes/versements), et de `SellerOrders.jsx` (badges de statut, boutons d'action, modale de détail commande, état vide). Le dashboard vendeur est désormais le 1er dashboard intégralement traduit en FR/AR/EN.
 
+**Mise à jour : Order Oversight traduit.** `OrderOversightSection.jsx` (804 lignes — le plus gros écran admin) entièrement traduit : cartes de stats, filtres (recherche/statut/paiement/dates), tableau des commandes, modale de détail complète (montant, parties, livraison, paiement).
+
 **Reste à faire (volontairement pas fait dans ce lot, pour rester fiable) :**
-- Le paragraphe "Business Insights" (texte dynamique avec logique conditionnelle intégrée) — le titre est traduit, le corps reste en anglais pour l'instant.
-- Dashboard admin : seulement le squelette (`AdminDashboard.jsx`, onglets) et "Vue d'ensemble" sont traduits pour l'instant. Restent en anglais : Order Oversight, Returned Products, Invoices, Escrow Management, Delivery Companies, Commission Rules (gros fichiers, ~6300 lignes au total sur ces sections) — prochaine étape.
+- Le paragraphe "Business Insights" du dashboard vendeur (texte dynamique avec logique conditionnelle intégrée) — le titre est traduit, le corps reste en anglais pour l'instant.
+- Dashboard admin : restent en anglais — Returned Products, Invoices, Escrow Management, Delivery Companies, Commission Rules.
 - Dashboards dropshipper, warehouse, delivery — aucun n'est encore traduit.
 - Formulaires d'authentification (login/signup/mot de passe oublié), page Profil, page Mes commandes, factures.
 
