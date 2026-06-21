@@ -27,8 +27,10 @@ import {
   MailIcon
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export default function ProfilePage() {
+  const { t } = useTranslation();
   const { user, profile: authProfile, signOut } = useAuth();
   const [profile, setProfile] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -78,7 +80,7 @@ export default function ProfilePage() {
 
     if (error) {
       console.error("Error loading profile:", error);
-      toast.error("Failed to load profile");
+      toast.error(t('profilePage.loadFailed'));
     } else {
       setProfile(data);
     }
@@ -91,7 +93,7 @@ export default function ProfilePage() {
 
   const validateForm = () => {
     if (profile.phone && !/^[0-9+\-\s]{10,15}$/.test(profile.phone)) {
-      toast.error("Please enter a valid phone number");
+      toast.error(t('profilePage.invalidPhone'));
       return false;
     }
     return true;
@@ -112,27 +114,27 @@ export default function ProfilePage() {
       if (editedFields.address) updates.address = profile.address;
       
       if (Object.keys(updates).length === 0) {
-        toast.info("No changes to save");
+        toast.info(t('profilePage.noChanges'));
         setSaving(false);
         return;
       }
-      
+
       updates.updated_at = new Date().toISOString();
-      
+
       const { error } = await supabase
         .from("profiles")
         .update(updates)
         .eq("id", user.id);
 
       if (error) throw error;
-      
-      toast.success("Profile updated successfully!");
+
+      toast.success(t('profilePage.profileUpdated'));
       setEditedFields({});
       loadProfile();
-      
+
     } catch (error) {
       console.error("Error saving profile:", error);
-      toast.error(error.message || "Failed to save changes");
+      toast.error(error.message || t('profilePage.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -143,12 +145,12 @@ export default function ProfilePage() {
     if (!file) return;
     
     if (!file.type.startsWith('image/')) {
-      toast.error('Please upload an image file');
+      toast.error(t('profilePage.uploadImageOnly'));
       return;
     }
-    
+
     if (file.size > 2 * 1024 * 1024) {
-      toast.error('Image must be less than 2MB');
+      toast.error(t('profilePage.imageTooLarge'));
       return;
     }
     
@@ -183,11 +185,11 @@ export default function ProfilePage() {
       if (updateError) throw updateError;
       
       setProfile({ ...profile, avatar_url: publicUrl });
-      toast.success('Avatar updated successfully!');
-      
+      toast.success(t('profilePage.avatarUpdated'));
+
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      toast.error(error.message || 'Failed to upload avatar');
+      toast.error(error.message || t('profilePage.avatarUploadFailed'));
     } finally {
       setUploadingAvatar(false);
       // Clear file input
@@ -197,15 +199,15 @@ export default function ProfilePage() {
 
   const handlePasswordChange = async () => {
     if (!passwordData.currentPassword) {
-      toast.error("Please enter your current password");
+      toast.error(t('profilePage.enterCurrentPassword'));
       return;
     }
     if (passwordData.newPassword.length < 6) {
-      toast.error("New password must be at least 6 characters");
+      toast.error(t('profilePage.passwordTooShort'));
       return;
     }
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error("New passwords do not match");
+      toast.error(t('profilePage.passwordsDontMatch'));
       return;
     }
     
@@ -218,7 +220,7 @@ export default function ProfilePage() {
       
       if (error) throw error;
       
-      toast.success("Password updated successfully!");
+      toast.success(t('profilePage.passwordUpdated'));
       setShowPasswordForm(false);
       setPasswordData({
         currentPassword: "",
@@ -227,7 +229,7 @@ export default function ProfilePage() {
       });
     } catch (error) {
       console.error("Error changing password:", error);
-      toast.error(error.message || "Failed to change password");
+      toast.error(error.message || t('profilePage.passwordChangeFailed'));
     } finally {
       setChangingPassword(false);
     }
@@ -235,11 +237,11 @@ export default function ProfilePage() {
 
   const handleEmailChange = async () => {
     if (!emailData.newEmail) {
-      toast.error("Please enter your new email");
+      toast.error(t('profilePage.enterNewEmail'));
       return;
     }
     if (emailData.newEmail !== emailData.confirmEmail) {
-      toast.error("Emails do not match");
+      toast.error(t('profilePage.emailsDontMatch'));
       return;
     }
     
@@ -252,7 +254,7 @@ export default function ProfilePage() {
       
       if (error) throw error;
       
-      toast.success("Email update request sent! Please check your new email for confirmation.");
+      toast.success(t('profilePage.emailUpdateSent'));
       setShowEmailForm(false);
       setEmailData({
         newEmail: "",
@@ -260,7 +262,7 @@ export default function ProfilePage() {
       });
     } catch (error) {
       console.error("Error changing email:", error);
-      toast.error(error.message || "Failed to change email");
+      toast.error(error.message || t('profilePage.emailChangeFailed'));
     } finally {
       setChangingEmail(false);
     }
@@ -284,7 +286,7 @@ export default function ProfilePage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600 dark:text-blue-400 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Loading profile...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('profilePage.loadingProfile')}</p>
         </div>
       </div>
     );
@@ -294,8 +296,8 @@ export default function ProfilePage() {
     <div className="max-w-6xl mx-auto p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Profile</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your personal information and account settings</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('profilePage.myProfile')}</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">{t('profilePage.subtitle')}</p>
       </div>
 
       {/* Profile Header with Avatar */}
@@ -340,7 +342,7 @@ export default function ProfilePage() {
               </span>
               <span className="text-white/80 text-sm flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
-                Member since {formatDate(profile.created_at)}
+                {t('profilePage.memberSince', { date: formatDate(profile.created_at) })}
               </span>
             </div>
             <p className="text-white/80 text-sm mt-2">{user.email}</p>
@@ -352,7 +354,7 @@ export default function ProfilePage() {
             className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition flex items-center gap-2"
           >
             <LogOut className="w-4 h-4" />
-            Sign Out
+            {t('profilePage.signOut')}
           </button>
         </div>
       </div>
@@ -368,7 +370,7 @@ export default function ProfilePage() {
           }`}
         >
           <User className="w-4 h-4" />
-          Profile
+          {t('profilePage.tabs.profile')}
         </button>
         <button
           onClick={() => setActiveTab('business')}
@@ -379,7 +381,7 @@ export default function ProfilePage() {
           }`}
         >
           <Building className="w-4 h-4" />
-          Business Info
+          {t('profilePage.tabs.business')}
         </button>
         <button
           onClick={() => setActiveTab('security')}
@@ -390,7 +392,7 @@ export default function ProfilePage() {
           }`}
         >
           <Shield className="w-4 h-4" />
-          Security
+          {t('profilePage.tabs.security')}
         </button>
       </div>
 
@@ -403,20 +405,20 @@ export default function ProfilePage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Mail className="w-4 h-4 inline mr-1" />
-                  Email Address
+                  {t('profilePage.profileTab.emailAddress')}
                 </label>
                 <input
                   disabled
                   value={profile.email || user?.email || ""}
                   className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400 cursor-not-allowed"
                 />
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Go to Security tab to change email</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('profilePage.profileTab.emailHint')}</p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <User className="w-4 h-4 inline mr-1" />
-                  Full Name
+                  {t('profilePage.profileTab.fullName')}
                 </label>
                 <input
                   disabled
@@ -428,7 +430,7 @@ export default function ProfilePage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Phone className="w-4 h-4 inline mr-1" />
-                  Phone Number
+                  {t('profilePage.profileTab.phoneNumber')}
                 </label>
                 <input
                   value={profile.phone || ""}
@@ -436,14 +438,14 @@ export default function ProfilePage() {
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white ${
                     editedFields.phone ? "border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-700"
                   }`}
-                  placeholder="+212 6XX XX XX XX"
+                  placeholder={t('profilePage.profileTab.phonePlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <MapPin className="w-4 h-4 inline mr-1" />
-                  City
+                  {t('profilePage.profileTab.city')}
                 </label>
                 <select
                   value={profile.city || ""}
@@ -452,7 +454,7 @@ export default function ProfilePage() {
                     editedFields.city ? "border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-700"
                   }`}
                 >
-                  <option value="">Select your city</option>
+                  <option value="">{t('profilePage.profileTab.selectCity')}</option>
                   {cities.map((city) => (
                     <option key={city} value={city}>{city}</option>
                   ))}
@@ -462,7 +464,7 @@ export default function ProfilePage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Home className="w-4 h-4 inline mr-1" />
-                  Address
+                  {t('profilePage.profileTab.address')}
                 </label>
                 <textarea
                   value={profile.address || ""}
@@ -471,7 +473,7 @@ export default function ProfilePage() {
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white ${
                     editedFields.address ? "border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-700"
                   }`}
-                  placeholder="Your street address"
+                  placeholder={t('profilePage.profileTab.addressPlaceholder')}
                 />
               </div>
 
@@ -487,12 +489,12 @@ export default function ProfilePage() {
                 {saving ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Saving...
+                    {t('profilePage.profileTab.saving')}
                   </>
                 ) : (
                   <>
                     <Save className="w-5 h-5" />
-                    Save Changes
+                    {t('profilePage.profileTab.saveChanges')}
                   </>
                 )}
               </button>
@@ -505,14 +507,14 @@ export default function ProfilePage() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-6 space-y-5">
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Business Details</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Information about your business or store</p>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('profilePage.businessTab.title')}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t('profilePage.businessTab.subtitle')}</p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Building className="w-4 h-4 inline mr-1" />
-                  Company Name
+                  {t('profilePage.businessTab.companyName')}
                 </label>
                 <input
                   value={profile.company || ""}
@@ -520,14 +522,14 @@ export default function ProfilePage() {
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white ${
                     editedFields.company ? "border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-700"
                   }`}
-                  placeholder="Your company name"
+                  placeholder={t('profilePage.businessTab.companyPlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Store className="w-4 h-4 inline mr-1" />
-                  Business Name
+                  {t('profilePage.businessTab.businessName')}
                 </label>
                 <input
                   value={profile.business_name || ""}
@@ -535,33 +537,33 @@ export default function ProfilePage() {
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white ${
                     editedFields.business_name ? "border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-700"
                   }`}
-                  placeholder="Your business name"
+                  placeholder={t('profilePage.businessTab.businessPlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <CreditCard className="w-4 h-4 inline mr-1" />
-                  Tax ID / VAT Number
+                  {t('profilePage.businessTab.taxId')}
                 </label>
                 <input
                   value={profile.tax_id || ""}
                   onChange={(e) => handleChange("tax_id", e.target.value)}
                   className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                  placeholder="Your tax identification number"
+                  placeholder={t('profilePage.businessTab.taxIdPlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Globe className="w-4 h-4 inline mr-1" />
-                  Website
+                  {t('profilePage.businessTab.website')}
                 </label>
                 <input
                   value={profile.website || ""}
                   onChange={(e) => handleChange("website", e.target.value)}
                   className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                  placeholder="https://your-store.com"
+                  placeholder={t('profilePage.businessTab.websitePlaceholder')}
                 />
               </div>
 
@@ -575,7 +577,7 @@ export default function ProfilePage() {
                 }`}
               >
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                {saving ? "Saving..." : "Save Business Info"}
+                {saving ? t('profilePage.profileTab.saving') : t('profilePage.businessTab.saveBusinessInfo')}
               </button>
             </div>
           </div>
@@ -586,8 +588,8 @@ export default function ProfilePage() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-6 space-y-5">
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Security Settings</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Manage your account security</p>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('profilePage.securityTab.title')}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t('profilePage.securityTab.subtitle')}</p>
               </div>
 
               {/* Change Email Section */}
@@ -596,22 +598,22 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-3">
                     <MailIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">Email Address</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Current: {user?.email}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{t('profilePage.securityTab.emailAddress')}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{t('profilePage.securityTab.current', { email: user?.email })}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setShowEmailForm(!showEmailForm)}
                     className="px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
                   >
-                    {showEmailForm ? "Cancel" : "Change Email"}
+                    {showEmailForm ? t('profilePage.securityTab.cancel') : t('profilePage.securityTab.changeEmail')}
                   </button>
                 </div>
 
                 {showEmailForm && (
                   <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Email Address</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('profilePage.securityTab.newEmailAddress')}</label>
                       <input
                         type="email"
                         value={emailData.newEmail}
@@ -621,13 +623,13 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm New Email</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('profilePage.securityTab.confirmNewEmail')}</label>
                       <input
                         type="email"
                         value={emailData.confirmEmail}
                         onChange={(e) => setEmailData({...emailData, confirmEmail: e.target.value})}
                         className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                        placeholder="Confirm new email"
+                        placeholder={t('profilePage.securityTab.confirmEmailPlaceholder')}
                       />
                     </div>
                     <button
@@ -636,7 +638,7 @@ export default function ProfilePage() {
                       className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
                     >
                       {changingEmail ? <Loader2 className="w-4 h-4 animate-spin inline mr-2" /> : <MailIcon className="w-4 h-4 inline mr-2" />}
-                      Update Email
+                      {t('profilePage.securityTab.updateEmail')}
                     </button>
                   </div>
                 )}
@@ -648,29 +650,29 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-3">
                     <Lock className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">Password</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Change your password</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{t('profilePage.securityTab.password')}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{t('profilePage.securityTab.changePasswordDesc')}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setShowPasswordForm(!showPasswordForm)}
                     className="px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
                   >
-                    {showPasswordForm ? "Cancel" : "Change Password"}
+                    {showPasswordForm ? t('profilePage.securityTab.cancel') : t('profilePage.securityTab.changePassword')}
                   </button>
                 </div>
 
                 {showPasswordForm && (
                   <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('profilePage.securityTab.currentPassword')}</label>
                       <div className="relative">
                         <input
                           type={showCurrentPassword ? "text" : "password"}
                           value={passwordData.currentPassword}
                           onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
                           className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 pr-10 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                          placeholder="Enter current password"
+                          placeholder={t('profilePage.securityTab.currentPasswordPlaceholder')}
                         />
                         <button
                           type="button"
@@ -682,14 +684,14 @@ export default function ProfilePage() {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('profilePage.securityTab.newPassword')}</label>
                       <div className="relative">
                         <input
                           type={showNewPassword ? "text" : "password"}
                           value={passwordData.newPassword}
                           onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
                           className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 pr-10 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                          placeholder="At least 6 characters"
+                          placeholder={t('profilePage.securityTab.newPasswordPlaceholder')}
                         />
                         <button
                           type="button"
@@ -701,13 +703,13 @@ export default function ProfilePage() {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm New Password</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('profilePage.securityTab.confirmNewPassword')}</label>
                       <input
                         type="password"
                         value={passwordData.confirmPassword}
                         onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
                         className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                        placeholder="Confirm new password"
+                        placeholder={t('profilePage.securityTab.confirmPasswordPlaceholder')}
                       />
                     </div>
                     <button
@@ -716,7 +718,7 @@ export default function ProfilePage() {
                       className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
                     >
                       {changingPassword ? <Loader2 className="w-4 h-4 animate-spin inline mr-2" /> : <Key className="w-4 h-4 inline mr-2" />}
-                      Update Password
+                      {t('profilePage.securityTab.updatePassword')}
                     </button>
                   </div>
                 )}
@@ -733,12 +735,12 @@ export default function ProfilePage() {
             <div className="flex items-center gap-3">
               <Award className="w-6 h-6" />
               <div>
-                <p className="font-semibold">Premium Member</p>
-                <p className="text-sm text-white/80">Enjoy exclusive benefits and lower commission rates</p>
+                <p className="font-semibold">{t('profilePage.premiumMember')}</p>
+                <p className="text-sm text-white/80">{t('profilePage.premiumBenefits')}</p>
               </div>
             </div>
             <button className="px-4 py-2 bg-white text-kraft-600 rounded-lg font-medium hover:bg-white/90 transition">
-              View Benefits
+              {t('profilePage.viewBenefits')}
             </button>
           </div>
         </div>

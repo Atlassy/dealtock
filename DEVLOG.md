@@ -364,12 +364,14 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Signalé par Ali :** la page "Inventory" (route `/inventory`, séparée des onglets du dashboard vendeur) était toujours en anglais. Traduite (`Inventory.jsx`) : en-tête, 4 cartes de stats, filtres (recherche/statut/catégorie), bascule tableau/grille, état vide, cartes produit en mode grille, titres des modales Ajouter/Modifier.
 
+**Mise à jour : page Profil traduite.** `ProfilePage.jsx` (747 lignes) — les 3 onglets (Profil, Infos entreprise, Sécurité), changement d'email/mot de passe, upload d'avatar, bannière Premium, tous les messages toast.
+
 **Reste à faire (volontairement pas fait dans ce lot, pour rester fiable) :**
 - Le paragraphe "Business Insights" du dashboard vendeur (texte dynamique avec logique conditionnelle intégrée) — le titre est traduit, le corps reste en anglais pour l'instant.
 - Les formulaires internes `AddProductForm`/`EditProductForm` (champs de saisie) — pas encore traduits.
 - Modales de config des sociétés de livraison (API/mappings de statuts) — peu utilisées, reportées.
 - Dashboards dropshipper, warehouse, delivery — aucun n'est encore traduit.
-- Formulaires d'authentification (login/signup/mot de passe oublié), page Profil, page Mes commandes.
+- Formulaires d'authentification (login/signup/mot de passe oublié), page Mes commandes.
 
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
