@@ -1022,7 +1022,9 @@
       "totalOrders": "إجمالي الطلبات:",
       "lastOrderLabel": "آخر طلب:",
       "close": "إغلاق",
-      "placeOrder": "إتمام الطلب"
+      "placeOrder": "إتمام الطلب",
+      "deliveryAddress": "عنوان التوصيل",
+      "adding": "جارٍ الإضافة..."
     },
     "nameRequired": "الاسم والهاتف مطلوبان",
     "customerAdded": "تمت إضافة العميل بنجاح",
@@ -1069,5 +1071,37 @@
     "fee": "الرسوم: -{{amount}}",
     "net": "الصافي:",
     "loadFailed": "فشل تحميل بيانات الأرباح"
+  },
+  "placeOrderModal": {
+    "placeB2BOrder": "إتمام طلب B2B",
+    "setMarkupSubtitle": "حدد هامشك لحساب أرباحك",
+    "basePriceSeller": "السعر الأساسي (البائع)",
+    "available": "متوفر",
+    "units": "{{count}} وحدة",
+    "yourMarkup": "هامشك",
+    "required": "مطلوب",
+    "markupPercentage": "نسبة الهامش:",
+    "calculatingCommission": "جارٍ حساب العمولة...",
+    "yourMarkupAmount": "مبلغ هامشك:",
+    "dealtockFee": "رسوم Dealtock ({{rate}}%):",
+    "yourNetProfit": "صافي ربحك:",
+    "customerPrice": "سعر العميل:",
+    "plusShipping": "+ التوصيل:",
+    "total": "الإجمالي:",
+    "customerInformation": "معلومات العميل",
+    "addNewCustomer": "+ إضافة عميل جديد",
+    "backToList": "← العودة إلى قائمة العملاء",
+    "fullNamePlaceholder": "الاسم الكامل *",
+    "phonePlaceholder": "الهاتف",
+    "cityPlaceholder": "المدينة",
+    "addressPlaceholder": "العنوان",
+    "notesPlaceholder": "ملاحظات التوصيل (اختياري)",
+    "processing": "جارٍ المعالجة...",
+    "selectOrAddCustomer": "يرجى تحديد أو إضافة عميل",
+    "fillCustomerDetails": "يرجى تعبئة معلومات العميل",
+    "markupRequired": "يرجى تحديد نسبة هامش أكبر من 0%",
+    "orderPlacedSuccess": "تم تأكيد الطلب! هامشك: {{markup}} درهم | صافي الربح: {{profit}} درهم",
+    "placeOrderFailed": "فشل تنفيذ الطلب",
+    "loadCustomersFailed": "فشل تحميل العملاء"
   }
 }

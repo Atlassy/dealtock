@@ -1022,7 +1022,9 @@
       "totalOrders": "Total Orders:",
       "lastOrderLabel": "Last Order:",
       "close": "Close",
-      "placeOrder": "Place Order"
+      "placeOrder": "Place Order",
+      "deliveryAddress": "Delivery Address",
+      "adding": "Adding..."
     },
     "nameRequired": "Name and phone are required",
     "customerAdded": "Customer added successfully",
@@ -1069,5 +1071,37 @@
     "fee": "Fee: -{{amount}}",
     "net": "Net:",
     "loadFailed": "Failed to load earnings data"
+  },
+  "placeOrderModal": {
+    "placeB2BOrder": "Place B2B Order",
+    "setMarkupSubtitle": "Set your markup to calculate earnings",
+    "basePriceSeller": "Base Price (Seller)",
+    "available": "Available",
+    "units": "{{count}} units",
+    "yourMarkup": "Your Markup",
+    "required": "Required",
+    "markupPercentage": "Markup percentage:",
+    "calculatingCommission": "Calculating commission...",
+    "yourMarkupAmount": "Your Markup Amount:",
+    "dealtockFee": "Dealtock Fee ({{rate}}%):",
+    "yourNetProfit": "Your Net Profit:",
+    "customerPrice": "Customer Price:",
+    "plusShipping": "+ Shipping:",
+    "total": "Total:",
+    "customerInformation": "Customer Information",
+    "addNewCustomer": "+ Add a new customer",
+    "backToList": "← Back to customer list",
+    "fullNamePlaceholder": "Full name *",
+    "phonePlaceholder": "Phone",
+    "cityPlaceholder": "City",
+    "addressPlaceholder": "Address",
+    "notesPlaceholder": "Delivery notes (optional)",
+    "processing": "Processing...",
+    "selectOrAddCustomer": "Please select or add a customer",
+    "fillCustomerDetails": "Please fill in customer details",
+    "markupRequired": "Please set a markup percentage greater than 0%",
+    "orderPlacedSuccess": "Order placed! Your markup: {{markup}} MAD | Net profit: {{profit}} MAD",
+    "placeOrderFailed": "Failed to place order",
+    "loadCustomersFailed": "Failed to load customers"
   }
 }

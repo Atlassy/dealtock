@@ -5,8 +5,10 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess }) => {
+  const { t } = useTranslation();
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [newCustomer, setNewCustomer] = useState(false);
@@ -52,7 +54,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
       setCustomers(data || []);
     } catch (error) {
       console.error('Error fetching customers:', error);
-      toast.error("Failed to load customers");
+      toast.error(t('placeOrderModal.loadCustomersFailed'));
     }
   };
 
@@ -111,19 +113,19 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
     
     // Validate customer selection
     if (!selectedCustomer && !newCustomer) {
-      toast.error("Please select or add a customer");
+      toast.error(t('placeOrderModal.selectOrAddCustomer'));
       return;
     }
 
     // Validate new customer form
     if (newCustomer && !formData.fullName) {
-      toast.error("Please fill in customer details");
+      toast.error(t('placeOrderModal.fillCustomerDetails'));
       return;
     }
 
     // ✅ Validate markup is positive (mandatory for B2B)
     if (markupPercent <= 0) {
-      toast.error("Please set a markup percentage greater than 0%");
+      toast.error(t('placeOrderModal.markupRequired'));
       return;
     }
 
@@ -170,7 +172,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
       if (error) throw error;
 
       if (data.success) {
-        toast.success(`Order placed! Your markup: ${prices.markupAmount.toFixed(2)} MAD | Net profit: ${prices.netProfit.toFixed(2)} MAD`);
+        toast.success(t('placeOrderModal.orderPlacedSuccess', { markup: prices.markupAmount.toFixed(2), profit: prices.netProfit.toFixed(2) }));
         onSuccess();
         onClose();
       } else {
@@ -178,7 +180,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
       }
     } catch (error) {
       console.error('Error placing order:', error);
-      toast.error(error.message || "Failed to place order");
+      toast.error(error.message || t('placeOrderModal.placeOrderFailed'));
     } finally {
       setLoading(false);
     }
@@ -192,12 +194,12 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
         {/* Header */}
         <div className="bg-gradient-to-r from-amber-50 to-kraft-50 dark:from-amber-900/30 dark:to-kraft-900/30 px-6 py-4 border-b border-amber-100 dark:border-amber-800/50 sticky top-0">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white">Place B2B Order</h2>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white">{t('placeOrderModal.placeB2BOrder')}</h2>
             <button onClick={onClose} className="p-1 hover:bg-amber-100 dark:hover:bg-amber-900/40 rounded-lg">
               <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             </button>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Set your markup to calculate earnings</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{t('placeOrderModal.setMarkupSubtitle')}</p>
         </div>
 
         <div className="p-6 space-y-6">
@@ -207,12 +209,12 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{product?.category}</p>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">Base Price (Seller)</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('placeOrderModal.basePriceSeller')}</span>
                 <p className="font-bold text-gray-900 dark:text-white">{product?.purchase_price} MAD</p>
               </div>
               <div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">Available</span>
-                <p className="font-bold text-gray-900 dark:text-white">{product?.quantity} units</p>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('placeOrderModal.available')}</span>
+                <p className="font-bold text-gray-900 dark:text-white">{t('placeOrderModal.units', { count: product?.quantity })}</p>
               </div>
             </div>
           </div>
@@ -221,17 +223,17 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
           <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800/50">
             <div className="flex items-center gap-2 mb-2">
               <Percent className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-              <h3 className="font-semibold text-gray-800 dark:text-white">Your Markup <span className="text-red-500 dark:text-red-400">*</span></h3>
+              <h3 className="font-semibold text-gray-800 dark:text-white">{t('placeOrderModal.yourMarkup')} <span className="text-red-500 dark:text-red-400">*</span></h3>
               {markupPercent <= 0 && (
                 <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 px-2 py-1 rounded-full flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" /> Required
+                  <AlertCircle className="w-3 h-3" /> {t('placeOrderModal.required')}
                 </span>
               )}
             </div>
 
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-gray-600 dark:text-gray-300">Markup percentage:</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">{t('placeOrderModal.markupPercentage')}</span>
                 <span className="text-lg font-bold text-amber-700 dark:text-amber-400">{markupPercent}%</span>
               </div>
               <input
@@ -255,33 +257,33 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
             {loadingCommission ? (
               <div className="text-center py-4">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-600 dark:border-amber-400 mx-auto"></div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Calculating commission...</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{t('placeOrderModal.calculatingCommission')}</p>
               </div>
             ) : (
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg space-y-2">
                 <div className="flex justify-between text-sm text-gray-900 dark:text-gray-100">
-                  <span>Your Markup Amount:</span>
+                  <span>{t('placeOrderModal.yourMarkupAmount')}</span>
                   <span className="font-bold text-green-600 dark:text-green-400">+{prices.markupAmount.toFixed(2)} MAD</span>
                 </div>
                 <div className="flex justify-between text-sm text-kraft-600 dark:text-kraft-400 border-t border-gray-200 dark:border-gray-700 pt-2">
-                  <span>Dealtock Fee ({prices.commissionRate}%):</span>
+                  <span>{t('placeOrderModal.dealtockFee', { rate: prices.commissionRate })}</span>
                   <span className="font-bold">-{prices.commissionAmount.toFixed(2)} MAD</span>
                 </div>
                 <div className="flex justify-between font-bold text-base bg-green-50 dark:bg-green-900/20 text-gray-900 dark:text-white p-2 rounded">
-                  <span>Your Net Profit:</span>
+                  <span>{t('placeOrderModal.yourNetProfit')}</span>
                   <span className="text-green-700 dark:text-green-400">{prices.netProfit.toFixed(2)} MAD</span>
                 </div>
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2 text-gray-900 dark:text-gray-100">
                   <div className="flex justify-between text-sm">
-                    <span>Customer Price:</span>
+                    <span>{t('placeOrderModal.customerPrice')}</span>
                     <span>{prices.subtotal.toFixed(2)} MAD</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>+ Shipping:</span>
+                    <span>{t('placeOrderModal.plusShipping')}</span>
                     <span>{prices.shippingFee.toFixed(2)} MAD</span>
                   </div>
                   <div className="flex justify-between font-bold text-base mt-2">
-                    <span>Total:</span>
+                    <span>{t('placeOrderModal.total')}</span>
                     <span>{prices.total.toFixed(2)} MAD</span>
                   </div>
                 </div>
@@ -293,7 +295,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
             <h3 className="font-semibold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
               <User className="w-4 h-4" />
-              Customer Information <span className="text-red-500 dark:text-red-400">*</span>
+              {t('placeOrderModal.customerInformation')} <span className="text-red-500 dark:text-red-400">*</span>
             </h3>
 
             {!newCustomer ? (
@@ -322,7 +324,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
                   onClick={() => { setNewCustomer(true); setSelectedCustomer(null); }}
                   className="text-sm text-amber-700 dark:text-amber-400 font-medium hover:underline"
                 >
-                  + Add a new customer
+                  {t('placeOrderModal.addNewCustomer')}
                 </button>
               </>
             ) : (
@@ -332,11 +334,11 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
                   onClick={() => setNewCustomer(false)}
                   className="text-sm text-gray-500 dark:text-gray-400 hover:underline"
                 >
-                  ← Back to customer list
+                  {t('placeOrderModal.backToList')}
                 </button>
                 <input
                   type="text"
-                  placeholder="Full name *"
+                  placeholder={t('placeOrderModal.fullNamePlaceholder')}
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
@@ -344,7 +346,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
                 <div className="grid grid-cols-2 gap-3">
                   <input
                     type="text"
-                    placeholder="Phone"
+                    placeholder={t('placeOrderModal.phonePlaceholder')}
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
@@ -354,7 +356,7 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                   >
-                    <option value="">City</option>
+                    <option value="">{t('placeOrderModal.cityPlaceholder')}</option>
                     {moroccanCities.map((city) => (
                       <option key={city} value={city}>{city}</option>
                     ))}
@@ -362,14 +364,14 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
                 </div>
                 <input
                   type="text"
-                  placeholder="Address"
+                  placeholder={t('placeOrderModal.addressPlaceholder')}
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 />
                 <input
                   type="text"
-                  placeholder="Delivery notes (optional)"
+                  placeholder={t('placeOrderModal.notesPlaceholder')}
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
@@ -388,11 +390,11 @@ const PlaceOrderModal = ({ isOpen, onClose, product, dropshipperId, onSuccess })
             {loading ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                Processing...
+                {t('placeOrderModal.processing')}
               </>
             ) : (
               <>
-                Place B2B Order
+                {t('placeOrderModal.placeB2BOrder')}
                 <ChevronRight className="w-5 h-5" />
               </>
             )}

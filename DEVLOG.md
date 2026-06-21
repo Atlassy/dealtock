@@ -366,11 +366,13 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Mise à jour : page Profil traduite.** `ProfilePage.jsx` (747 lignes) — les 3 onglets (Profil, Infos entreprise, Sécurité), changement d'email/mot de passe, upload d'avatar, bannière Premium, tous les messages toast.
 
+**Mise à jour : dashboard dropshipper entièrement traduit.** On a fait `DropshipperDashboard.jsx` (squelette + onglets), `DropshipperOrders.jsx`, `MarketplaceProducts.jsx` + `ProductCard.jsx` (calculateur de profit), `DropshipperCustomersPage.jsx` + `AddCustomerModal.jsx`, `DropshipperEarningsPage.jsx`, et `PlaceOrderModal.jsx` — tous les onglets et modales du dashboard dropshipper sont maintenant en FR/AR/EN.
+
 **Reste à faire (volontairement pas fait dans ce lot, pour rester fiable) :**
 - Le paragraphe "Business Insights" du dashboard vendeur (texte dynamique avec logique conditionnelle intégrée) — le titre est traduit, le corps reste en anglais pour l'instant.
 - Les formulaires internes `AddProductForm`/`EditProductForm` (champs de saisie) — pas encore traduits.
 - Modales de config des sociétés de livraison (API/mappings de statuts) — peu utilisées, reportées.
-- Dashboards dropshipper, warehouse, delivery — aucun n'est encore traduit.
+- Dashboards warehouse, delivery — aucun n'est encore traduit.
 - Formulaires d'authentification (login/signup/mot de passe oublié), page Mes commandes.
 
 ## En attente de décision

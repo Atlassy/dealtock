@@ -3,8 +3,10 @@ import { useState } from 'react';
 import { X, User, Phone, Mail, MapPin, Home } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -18,7 +20,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
     e.preventDefault();
     
     if (!formData.fullName || !formData.phone) {
-      toast.error("Name and phone are required");
+      toast.error(t('dropshipperCustomers.nameRequired'));
       return;
     }
 
@@ -57,7 +59,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
         customerId = newCustomerId;
       }
 
-      toast.success("Customer added successfully");
+      toast.success(t('dropshipperCustomers.customerAdded'));
 
       onSuccess();
       onClose();
@@ -70,7 +72,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
       });
     } catch (error) {
       console.error('Error adding customer:', error);
-      toast.error(error.message || "Failed to add customer");
+      toast.error(error.message || t('dropshipperCustomers.addFailed'));
     } finally {
       setLoading(false);
     }
@@ -83,7 +85,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
       <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full">
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Add New Customer</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('dropshipperCustomers.modal.addNewCustomer')}</h2>
           <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
             <X className="w-6 h-6" />
           </button>
@@ -93,7 +95,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Full Name *
+              {t('dropshipperCustomers.modal.fullName')}
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
@@ -110,7 +112,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Phone Number *
+              {t('dropshipperCustomers.modal.phoneNumber')}
             </label>
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
@@ -127,7 +129,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email Address
+              {t('dropshipperCustomers.modal.emailAddress')}
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
@@ -143,7 +145,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              City
+              {t('dropshipperCustomers.modal.city')}
             </label>
             <div className="relative">
               <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
@@ -159,7 +161,7 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Delivery Address
+              {t('dropshipperCustomers.modal.deliveryAddress')}
             </label>
             <div className="relative">
               <Home className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
@@ -180,14 +182,14 @@ const AddCustomerModal = ({ isOpen, onClose, onSuccess, dropshipperId }) => {
               onClick={onClose}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
-              Cancel
+              {t('dropshipperCustomers.modal.cancel')}
             </button>
             <button
               type="submit"
               disabled={loading}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? 'Adding...' : 'Add Customer'}
+              {loading ? t('dropshipperCustomers.modal.adding') : t('dropshipperCustomers.addCustomer')}
             </button>
           </div>
         </form>

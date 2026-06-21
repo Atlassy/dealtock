@@ -1022,7 +1022,9 @@
       "totalOrders": "Total des commandes :",
       "lastOrderLabel": "Dernière commande :",
       "close": "Fermer",
-      "placeOrder": "Passer la commande"
+      "placeOrder": "Passer la commande",
+      "deliveryAddress": "Adresse de livraison",
+      "adding": "Ajout..."
     },
     "nameRequired": "Le nom et le téléphone sont requis",
     "customerAdded": "Client ajouté avec succès",
@@ -1069,5 +1071,37 @@
     "fee": "Frais : -{{amount}}",
     "net": "Net :",
     "loadFailed": "Échec du chargement des revenus"
+  },
+  "placeOrderModal": {
+    "placeB2BOrder": "Passer une commande B2B",
+    "setMarkupSubtitle": "Définissez votre marge pour calculer vos revenus",
+    "basePriceSeller": "Prix de base (Vendeur)",
+    "available": "Disponible",
+    "units": "{{count}} unités",
+    "yourMarkup": "Votre marge",
+    "required": "Requis",
+    "markupPercentage": "Pourcentage de marge :",
+    "calculatingCommission": "Calcul de la commission...",
+    "yourMarkupAmount": "Montant de votre marge :",
+    "dealtockFee": "Frais Dealtock ({{rate}}%) :",
+    "yourNetProfit": "Votre profit net :",
+    "customerPrice": "Prix client :",
+    "plusShipping": "+ Livraison :",
+    "total": "Total :",
+    "customerInformation": "Informations client",
+    "addNewCustomer": "+ Ajouter un nouveau client",
+    "backToList": "← Retour à la liste des clients",
+    "fullNamePlaceholder": "Nom complet *",
+    "phonePlaceholder": "Téléphone",
+    "cityPlaceholder": "Ville",
+    "addressPlaceholder": "Adresse",
+    "notesPlaceholder": "Notes de livraison (optionnel)",
+    "processing": "Traitement...",
+    "selectOrAddCustomer": "Veuillez sélectionner ou ajouter un client",
+    "fillCustomerDetails": "Veuillez remplir les informations du client",
+    "markupRequired": "Veuillez définir un pourcentage de marge supérieur à 0%",
+    "orderPlacedSuccess": "Commande passée ! Votre marge : {{markup}} MAD | Profit net : {{profit}} MAD",
+    "placeOrderFailed": "Échec de la commande",
+    "loadCustomersFailed": "Échec du chargement des clients"
   }
 }
