@@ -358,9 +358,10 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Fait à cette étape :** traduction complète de l'onglet "Dashboard" du tableau de bord vendeur (`SellerDashboard.jsx`) — les 4 onglets, les 9 cartes de statistiques (Produits actifs, Valeur du stock, Total des commandes, Revenu net, Solde Escrow, Taux de conversion, Panier moyen, Réussite COD, Délai de traitement), le graphique de tendance des ventes, la répartition par appareil, le top produits par quantité/valeur, l'alerte stock faible, le top catégories, les produits les plus vendus, et l'en-tête de l'onglet Produits. Clés ajoutées sous `sellerDashboard` dans les 3 fichiers de langue.
 
+**Mise à jour : dashboard vendeur 100% traduit.** Suite de la même session — traduction complète de `ProductTable.jsx` (en-têtes de colonnes, badges stock/statut, tooltips de commission), de l'onglet Escrow (`EscrowTab`, cartes, tableaux commandes/versements), et de `SellerOrders.jsx` (badges de statut, boutons d'action, modale de détail commande, état vide). Le dashboard vendeur est désormais le 1er dashboard intégralement traduit en FR/AR/EN.
+
 **Reste à faire (volontairement pas fait dans ce lot, pour rester fiable) :**
 - Le paragraphe "Business Insights" (texte dynamique avec logique conditionnelle intégrée) — le titre est traduit, le corps reste en anglais pour l'instant.
-- Onglets Produits (tableau ProductTable), Escrow, Commandes (SellerOrders) du dashboard vendeur.
 - Dashboards admin, dropshipper, warehouse, delivery — aucun n'est encore traduit.
 - Formulaires d'authentification (login/signup/mot de passe oublié), page Profil, page Mes commandes, factures.
 
