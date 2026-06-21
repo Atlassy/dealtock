@@ -4,8 +4,10 @@ import { useInvoices } from '@/hooks/useInvoices'
 import { InvoiceDetailModal } from './InvoiceDetailModal'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { Download, Eye, Search, Filter, RefreshCw } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export function InvoicesList() {
+  const { t } = useTranslation()
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
   const [showDetailModal, setShowDetailModal] = useState(false)
   const [statusFilter, setStatusFilter] = useState<'all' | 'generated' | 'sent' | 'paid' | 'overdue' | 'cancelled'>('all')
@@ -54,13 +56,13 @@ export function InvoicesList() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Invoices</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('invoices.title')}</h2>
         <button
           onClick={() => refresh()}
           className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg flex items-center gap-2"
         >
           <RefreshCw size={16} />
-          Refresh
+          {t('invoices.refresh')}
         </button>
       </div>
 
@@ -70,7 +72,7 @@ export function InvoicesList() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
           <input
             type="text"
-            placeholder="Search by invoice #, order #, or customer..."
+            placeholder={t('invoices.searchPlaceholder')}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -82,19 +84,19 @@ export function InvoicesList() {
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
         >
-          <option value="all">All Status</option>
-          <option value="generated">Generated</option>
-          <option value="sent">Sent</option>
-          <option value="paid">Paid</option>
-          <option value="overdue">Overdue</option>
-          <option value="cancelled">Cancelled</option>
+          <option value="all">{t('invoices.allStatus')}</option>
+          <option value="generated">{t('invoices.generated')}</option>
+          <option value="sent">{t('invoices.sent')}</option>
+          <option value="paid">{t('invoices.paid')}</option>
+          <option value="overdue">{t('invoices.overdue')}</option>
+          <option value="cancelled">{t('invoices.cancelled')}</option>
         </select>
       </div>
 
       {/* Error Message */}
       {error && (
         <div className="bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-400 p-4 rounded-lg">
-          Error: {error}
+          {t('invoices.error', { error })}
         </div>
       )}
 
@@ -104,25 +106,25 @@ export function InvoicesList() {
           <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Invoice #
+                {t('invoices.table.invoiceNumber')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Order #
+                {t('invoices.table.orderNumber')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Customer
+                {t('invoices.table.customer')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Date
+                {t('invoices.table.date')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Total
+                {t('invoices.table.total')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Status
+                {t('invoices.table.status')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Actions
+                {t('invoices.table.actions')}
               </th>
             </tr>
           </thead>
@@ -138,7 +140,7 @@ export function InvoicesList() {
             ) : invoices.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                  No invoices found
+                  {t('invoices.noInvoicesFound')}
                 </td>
               </tr>
             ) : (
@@ -160,7 +162,7 @@ export function InvoicesList() {
                     {formatDate(invoice.invoice_date)}
                     {invoice.days_old > 0 && (
                       <div className="text-xs text-gray-500 dark:text-gray-400">
-                        {invoice.days_old} days ago
+                        {t('invoices.table.daysAgo', { count: invoice.days_old })}
                       </div>
                     )}
                   </td>
@@ -177,14 +179,14 @@ export function InvoicesList() {
                       <button
                         onClick={() => handleViewInvoice(invoice.invoice_id)}
                         className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 p-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30"
-                        title="View Invoice"
+                        title={t('invoices.table.viewInvoice')}
                       >
                         <Eye size={18} />
                       </button>
                       <button
                         onClick={() => handleDownloadPDF(invoice.invoice_id)}
                         className="p-1 rounded text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/30"
-                        title="Download PDF"
+                        title={t('invoices.table.downloadPdf')}
                       >
                         <Download size={18} />
                       </button>
@@ -201,9 +203,11 @@ export function InvoicesList() {
       {pagination.totalPages > 1 && (
         <div className="flex justify-between items-center">
           <div className="text-sm text-gray-700 dark:text-gray-300">
-            Showing {((pagination.page - 1) * pagination.pageSize) + 1} to{' '}
-            {Math.min(pagination.page * pagination.pageSize, pagination.total)} of{' '}
-            {pagination.total} results
+            {t('invoices.showingResults', {
+              from: ((pagination.page - 1) * pagination.pageSize) + 1,
+              to: Math.min(pagination.page * pagination.pageSize, pagination.total),
+              total: pagination.total
+            })}
           </div>
           <div className="flex gap-2">
             <button
@@ -211,17 +215,17 @@ export function InvoicesList() {
               disabled={pagination.page === 1}
               className="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-200 rounded disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
-              Previous
+              {t('invoices.previous')}
             </button>
             <span className="px-3 py-1 text-gray-700 dark:text-gray-300">
-              Page {pagination.page} of {pagination.totalPages}
+              {t('invoices.pageOf', { page: pagination.page, totalPages: pagination.totalPages })}
             </span>
             <button
               onClick={() => goToPage(pagination.page + 1)}
               disabled={pagination.page === pagination.totalPages}
               className="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-200 rounded disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
-              Next
+              {t('invoices.next')}
             </button>
           </div>
         </div>

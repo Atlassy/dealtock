@@ -360,13 +360,13 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Mise à jour : dashboard vendeur 100% traduit.** Suite de la même session — traduction complète de `ProductTable.jsx` (en-têtes de colonnes, badges stock/statut, tooltips de commission), de l'onglet Escrow (`EscrowTab`, cartes, tableaux commandes/versements), et de `SellerOrders.jsx` (badges de statut, boutons d'action, modale de détail commande, état vide). Le dashboard vendeur est désormais le 1er dashboard intégralement traduit en FR/AR/EN.
 
-**Mise à jour : + Delivery Companies traduit.** `DeliveryCompaniesSection.jsx` traduit (tableau des partenaires, filtres, actions). Les modales associées (`DeliveryCompanyModal`, `ApiKeysModal`, `StatusMappingTab`) restent en anglais pour l'instant — gros fichiers (~950 lignes à eux trois), reportés à un prochain lot.
+**Mise à jour : + Delivery Companies + Invoices traduits.** `DeliveryCompaniesSection.jsx`, `InvoicesList.tsx` et `InvoiceDetailModal.tsx` (liste + détail complet : parties, escrow, détail financier, lignes de facture, registre comptable) traduits.
 
 **Reste à faire (volontairement pas fait dans ce lot, pour rester fiable) :**
 - Le paragraphe "Business Insights" du dashboard vendeur (texte dynamique avec logique conditionnelle intégrée) — le titre est traduit, le corps reste en anglais pour l'instant.
-- Dashboard admin : restent en anglais — Returned Products, Invoices, et les modales de configuration des sociétés de livraison (API/mappings de statuts).
+- Dashboard admin : reste en anglais — Returned Products, et les modales de configuration des sociétés de livraison (API/mappings de statuts).
 - Dashboards dropshipper, warehouse, delivery — aucun n'est encore traduit.
-- Formulaires d'authentification (login/signup/mot de passe oublié), page Profil, page Mes commandes, factures.
+- Formulaires d'authentification (login/signup/mot de passe oublié), page Profil, page Mes commandes.
 
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
