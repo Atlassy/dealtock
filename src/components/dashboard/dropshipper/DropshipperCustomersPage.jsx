@@ -3,8 +3,10 @@ import { useState, useEffect } from 'react';
 import { Users, Phone, MapPin, Package, Plus, Search, Mail } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const DropshipperCustomersPage = ({ dropshipperId }) => {
+  const { t } = useTranslation();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -68,7 +70,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
       setCustomers(Array.from(customerMap.values()));
     } catch (error) {
       console.error('Error fetching customers:', error);
-      toast.error('Failed to load customers');
+      toast.error(t('dropshipperCustomers.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -78,7 +80,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
     e.preventDefault();
     
     if (!newCustomer.fullName || !newCustomer.phone) {
-      toast.error('Name and phone are required');
+      toast.error(t('dropshipperCustomers.nameRequired'));
       return;
     }
 
@@ -112,7 +114,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
         customerId = newCustomerId;
       }
 
-      toast.success('Customer added successfully');
+      toast.success(t('dropshipperCustomers.customerAdded'));
       setShowAddCustomer(false);
       setNewCustomer({
         fullName: '',
@@ -124,7 +126,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
       fetchCustomers();
     } catch (error) {
       console.error('Error adding customer:', error);
-      toast.error(error.message || 'Failed to add customer');
+      toast.error(error.message || t('dropshipperCustomers.addFailed'));
     }
   };
 
@@ -147,15 +149,15 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Customers</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage your customers and their orders</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('dropshipperCustomers.myCustomers')}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('dropshipperCustomers.subtitle')}</p>
         </div>
         <button
           onClick={() => setShowAddCustomer(true)}
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Plus className="w-5 h-5 mr-2" />
-          Add Customer
+          {t('dropshipperCustomers.addCustomer')}
         </button>
       </div>
 
@@ -164,7 +166,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
         <input
           type="text"
-          placeholder="Search customers by name, email or phone..."
+          placeholder={t('dropshipperCustomers.searchPlaceholder')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-9 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500"
@@ -175,9 +177,9 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
       {filteredCustomers.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
           <Users className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No customers yet</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('dropshipperCustomers.noCustomersYet')}</h3>
           <p className="text-gray-500 dark:text-gray-400 mb-4">
-            {searchTerm ? 'No customers match your search' : 'Start adding customers to place orders for them'}
+            {searchTerm ? t('dropshipperCustomers.noMatchSearch') : t('dropshipperCustomers.startAdding')}
           </p>
           {!searchTerm && (
             <button
@@ -185,7 +187,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Add Your First Customer
+              {t('dropshipperCustomers.addFirstCustomer')}
             </button>
           )}
         </div>
@@ -199,7 +201,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{customer.full_name || 'Unnamed'}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{customer.full_name || t('dropshipperCustomers.unnamed')}</h3>
                   <div className="space-y-1 mt-2">
                     {customer.email && (
                       <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center">
@@ -224,13 +226,13 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
                 <div className="text-right">
                   <span className="inline-flex items-center px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full text-sm">
                     <Package className="w-4 h-4 mr-1" />
-                    {customer.totalOrders} {customer.totalOrders === 1 ? 'order' : 'orders'}
+                    {t('dropshipperCustomers.order', { count: customer.totalOrders })}
                   </span>
                 </div>
               </div>
               {customer.lastOrder && (
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
-                  Last order: {new Date(customer.lastOrder).toLocaleDateString()}
+                  {t('dropshipperCustomers.lastOrder', { date: new Date(customer.lastOrder).toLocaleDateString() })}
                 </p>
               )}
             </div>
@@ -243,11 +245,11 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Add New Customer</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('dropshipperCustomers.modal.addNewCustomer')}</h3>
             </div>
             <form onSubmit={handleAddCustomer} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('dropshipperCustomers.modal.fullName')}</label>
                 <input
                   type="text"
                   required
@@ -258,7 +260,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('dropshipperCustomers.modal.phoneNumber')}</label>
                 <input
                   type="tel"
                   required
@@ -269,7 +271,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('dropshipperCustomers.modal.emailAddress')}</label>
                 <input
                   type="email"
                   value={newCustomer.email}
@@ -279,7 +281,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('dropshipperCustomers.modal.city')}</label>
                 <input
                   type="text"
                   value={newCustomer.city}
@@ -289,7 +291,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('dropshipperCustomers.modal.address')}</label>
                 <textarea
                   value={newCustomer.address}
                   onChange={(e) => setNewCustomer({...newCustomer, address: e.target.value})}
@@ -304,13 +306,13 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
                   onClick={() => setShowAddCustomer(false)}
                   className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  Cancel
+                  {t('dropshipperCustomers.modal.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  Add Customer
+                  {t('dropshipperCustomers.addCustomer')}
                 </button>
               </div>
             </form>
@@ -323,17 +325,17 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl max-w-lg w-full">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Customer Details</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('dropshipperCustomers.modal.customerDetails')}</h3>
             </div>
             <div className="p-6 space-y-3 text-gray-900 dark:text-gray-100">
-              <p><span className="font-medium text-gray-700 dark:text-gray-300">Name:</span> {selectedCustomer.full_name || 'N/A'}</p>
-              <p><span className="font-medium text-gray-700 dark:text-gray-300">Email:</span> {selectedCustomer.email || 'N/A'}</p>
-              <p><span className="font-medium text-gray-700 dark:text-gray-300">Phone:</span> {selectedCustomer.phone || 'N/A'}</p>
-              <p><span className="font-medium text-gray-700 dark:text-gray-300">City:</span> {selectedCustomer.city || 'N/A'}</p>
-              <p><span className="font-medium text-gray-700 dark:text-gray-300">Address:</span> {selectedCustomer.address || 'N/A'}</p>
-              <p><span className="font-medium text-gray-700 dark:text-gray-300">Total Orders:</span> {selectedCustomer.totalOrders}</p>
+              <p><span className="font-medium text-gray-700 dark:text-gray-300">{t('dropshipperCustomers.modal.name')}</span> {selectedCustomer.full_name || 'N/A'}</p>
+              <p><span className="font-medium text-gray-700 dark:text-gray-300">{t('dropshipperCustomers.modal.email')}</span> {selectedCustomer.email || 'N/A'}</p>
+              <p><span className="font-medium text-gray-700 dark:text-gray-300">{t('dropshipperCustomers.modal.phone')}</span> {selectedCustomer.phone || 'N/A'}</p>
+              <p><span className="font-medium text-gray-700 dark:text-gray-300">{t('dropshipperCustomers.modal.cityLabel')}</span> {selectedCustomer.city || 'N/A'}</p>
+              <p><span className="font-medium text-gray-700 dark:text-gray-300">{t('dropshipperCustomers.modal.addressLabel')}</span> {selectedCustomer.address || 'N/A'}</p>
+              <p><span className="font-medium text-gray-700 dark:text-gray-300">{t('dropshipperCustomers.modal.totalOrders')}</span> {selectedCustomer.totalOrders}</p>
               {selectedCustomer.lastOrder && (
-                <p><span className="font-medium text-gray-700 dark:text-gray-300">Last Order:</span> {new Date(selectedCustomer.lastOrder).toLocaleDateString()}</p>
+                <p><span className="font-medium text-gray-700 dark:text-gray-300">{t('dropshipperCustomers.modal.lastOrderLabel')}</span> {new Date(selectedCustomer.lastOrder).toLocaleDateString()}</p>
               )}
             </div>
             <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
@@ -341,7 +343,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
                 onClick={() => setSelectedCustomer(null)}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                Close
+                {t('dropshipperCustomers.modal.close')}
               </button>
               <button
                 onClick={() => {
@@ -351,7 +353,7 @@ const DropshipperCustomersPage = ({ dropshipperId }) => {
                 }}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                Place Order
+                {t('dropshipperCustomers.modal.placeOrder')}
               </button>
             </div>
           </div>

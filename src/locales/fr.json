@@ -991,5 +991,42 @@
     "stock": "Stock : {{count}}",
     "deliveryEstimate": "Livraison : 2-4 jours",
     "commissionLoadFailed": "Impossible de charger le taux de commission"
+  },
+  "dropshipperCustomers": {
+    "myCustomers": "Mes clients",
+    "subtitle": "Gérez vos clients et leurs commandes",
+    "addCustomer": "Ajouter un client",
+    "searchPlaceholder": "Rechercher des clients par nom, e-mail ou téléphone...",
+    "noCustomersYet": "Aucun client pour l'instant",
+    "noMatchSearch": "Aucun client ne correspond à votre recherche",
+    "startAdding": "Commencez à ajouter des clients pour passer des commandes pour eux",
+    "addFirstCustomer": "Ajouter votre premier client",
+    "unnamed": "Sans nom",
+    "order_one": "{{count}} commande",
+    "order_other": "{{count}} commandes",
+    "lastOrder": "Dernière commande : {{date}}",
+    "modal": {
+      "addNewCustomer": "Ajouter un nouveau client",
+      "fullName": "Nom complet *",
+      "phoneNumber": "Numéro de téléphone *",
+      "emailAddress": "Adresse e-mail",
+      "city": "Ville",
+      "address": "Adresse",
+      "cancel": "Annuler",
+      "customerDetails": "Détails du client",
+      "name": "Nom :",
+      "email": "E-mail :",
+      "phone": "Téléphone :",
+      "cityLabel": "Ville :",
+      "addressLabel": "Adresse :",
+      "totalOrders": "Total des commandes :",
+      "lastOrderLabel": "Dernière commande :",
+      "close": "Fermer",
+      "placeOrder": "Passer la commande"
+    },
+    "nameRequired": "Le nom et le téléphone sont requis",
+    "customerAdded": "Client ajouté avec succès",
+    "addFailed": "Échec de l'ajout du client",
+    "loadFailed": "Échec du chargement des clients"
   }
 }

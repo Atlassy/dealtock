@@ -991,5 +991,42 @@
     "stock": "Stock: {{count}}",
     "deliveryEstimate": "Delivery: 2-4 days",
     "commissionLoadFailed": "Could not load commission rate"
+  },
+  "dropshipperCustomers": {
+    "myCustomers": "My Customers",
+    "subtitle": "Manage your customers and their orders",
+    "addCustomer": "Add Customer",
+    "searchPlaceholder": "Search customers by name, email or phone...",
+    "noCustomersYet": "No customers yet",
+    "noMatchSearch": "No customers match your search",
+    "startAdding": "Start adding customers to place orders for them",
+    "addFirstCustomer": "Add Your First Customer",
+    "unnamed": "Unnamed",
+    "order_one": "{{count}} order",
+    "order_other": "{{count}} orders",
+    "lastOrder": "Last order: {{date}}",
+    "modal": {
+      "addNewCustomer": "Add New Customer",
+      "fullName": "Full Name *",
+      "phoneNumber": "Phone Number *",
+      "emailAddress": "Email Address",
+      "city": "City",
+      "address": "Address",
+      "cancel": "Cancel",
+      "customerDetails": "Customer Details",
+      "name": "Name:",
+      "email": "Email:",
+      "phone": "Phone:",
+      "cityLabel": "City:",
+      "addressLabel": "Address:",
+      "totalOrders": "Total Orders:",
+      "lastOrderLabel": "Last Order:",
+      "close": "Close",
+      "placeOrder": "Place Order"
+    },
+    "nameRequired": "Name and phone are required",
+    "customerAdded": "Customer added successfully",
+    "addFailed": "Failed to add customer",
+    "loadFailed": "Failed to load customers"
   }
 }

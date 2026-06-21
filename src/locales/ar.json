@@ -991,5 +991,42 @@
     "stock": "المخزون: {{count}}",
     "deliveryEstimate": "التوصيل: 2-4 أيام",
     "commissionLoadFailed": "تعذر تحميل نسبة العمولة"
+  },
+  "dropshipperCustomers": {
+    "myCustomers": "عملائي",
+    "subtitle": "أدر عملاءك وطلباتهم",
+    "addCustomer": "إضافة عميل",
+    "searchPlaceholder": "البحث عن عملاء بالاسم أو البريد أو الهاتف...",
+    "noCustomersYet": "لا يوجد عملاء بعد",
+    "noMatchSearch": "لا يوجد عملاء يطابقون بحثك",
+    "startAdding": "ابدأ بإضافة عملاء لتقديم طلبات لهم",
+    "addFirstCustomer": "أضف عميلك الأول",
+    "unnamed": "بدون اسم",
+    "order_one": "{{count}} طلب",
+    "order_other": "{{count}} طلبات",
+    "lastOrder": "آخر طلب: {{date}}",
+    "modal": {
+      "addNewCustomer": "إضافة عميل جديد",
+      "fullName": "الاسم الكامل *",
+      "phoneNumber": "رقم الهاتف *",
+      "emailAddress": "البريد الإلكتروني",
+      "city": "المدينة",
+      "address": "العنوان",
+      "cancel": "إلغاء",
+      "customerDetails": "تفاصيل العميل",
+      "name": "الاسم:",
+      "email": "البريد الإلكتروني:",
+      "phone": "الهاتف:",
+      "cityLabel": "المدينة:",
+      "addressLabel": "العنوان:",
+      "totalOrders": "إجمالي الطلبات:",
+      "lastOrderLabel": "آخر طلب:",
+      "close": "إغلاق",
+      "placeOrder": "إتمام الطلب"
+    },
+    "nameRequired": "الاسم والهاتف مطلوبان",
+    "customerAdded": "تمت إضافة العميل بنجاح",
+    "addFailed": "فشلت إضافة العميل",
+    "loadFailed": "فشل تحميل العملاء"
   }
 }
