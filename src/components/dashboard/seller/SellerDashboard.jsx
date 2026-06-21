@@ -476,6 +476,12 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
 const SellerDashboard = () => {
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('view') === 'orders' ? 'orders' : 'dashboard');
+
+  useEffect(() => {
+    if (searchParams.get('view') === 'orders') {
+      setActiveTab('orders');
+    }
+  }, [searchParams]);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
