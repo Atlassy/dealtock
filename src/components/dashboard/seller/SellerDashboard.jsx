@@ -36,6 +36,7 @@ import {
   Plus
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 // Import components
 import SellerOrders from './SellerOrders';
@@ -95,12 +96,13 @@ const StatCard = ({ title, value, icon: Icon, color = "blue", trend, trendValue,
 );
 
 const SalesTrendChart = ({ data }) => {
+  const { t } = useTranslation();
   if (!data || data.length === 0) {
     return (
       <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-3 sm:p-5 shadow-sm dark:shadow-none">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📈 Sales Trend (Last 30 Days)</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📈 {t('sellerDashboard.salesTrend')}</h3>
         <div className="h-40 flex items-center justify-center">
-          <p className="text-gray-500 dark:text-gray-400">No sales data available</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('sellerDashboard.noSalesData')}</p>
         </div>
       </div>
     );
@@ -110,7 +112,7 @@ const SalesTrendChart = ({ data }) => {
 
   return (
     <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-3 sm:p-5 shadow-sm dark:shadow-none">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📈 Sales Trend (Last 30 Days)</h3>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📈 {t('sellerDashboard.salesTrend')}</h3>
       <div className="h-40 flex items-end gap-1">
         {data.map((day, i) => (
           <div key={i} className="flex-1 flex flex-col items-center group">
@@ -120,7 +122,7 @@ const SalesTrendChart = ({ data }) => {
                 style={{ height: `${Math.max((day.sales / maxSales) * 100, 2)}px` }}
               >
                 <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">
-                  {day.date}: {day.sales.toFixed(0)} MAD ({day.orders} orders)
+                  {t('sellerDashboard.tooltipOrders', { date: day.date, sales: day.sales.toFixed(0), count: day.orders })}
                 </div>
               </div>
             </div>
@@ -134,20 +136,23 @@ const SalesTrendChart = ({ data }) => {
   );
 };
 
-const CategoryProgressBar = ({ category, percentage, count, color = "blue" }) => (
-  <div className="mb-3">
-    <div className="flex justify-between text-sm mb-1">
-      <span className="text-gray-700 dark:text-gray-300">{category}</span>
-      <span className="text-gray-500 dark:text-gray-400">{count} products</span>
+const CategoryProgressBar = ({ category, percentage, count, color = "blue" }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="mb-3">
+      <div className="flex justify-between text-sm mb-1">
+        <span className="text-gray-700 dark:text-gray-300">{category}</span>
+        <span className="text-gray-500 dark:text-gray-400">{t('sellerDashboard.productsUnit', { count })}</span>
+      </div>
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+        <div
+          className={`bg-gradient-to-r from-${color}-500 to-${color}-400 h-2 rounded-full`}
+          style={{ width: `${percentage}%` }}
+        ></div>
+      </div>
     </div>
-    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-      <div
-        className={`bg-gradient-to-r from-${color}-500 to-${color}-400 h-2 rounded-full`}
-        style={{ width: `${percentage}%` }}
-      ></div>
-    </div>
-  </div>
-);
+  );
+};
 
 const TopListItem = ({ rank, name, value, unit, color = "blue" }) => (
   <div className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
@@ -162,21 +167,22 @@ const TopListItem = ({ rank, name, value, unit, color = "blue" }) => (
 );
 
 const DeviceBreakdown = ({ mobile, desktop }) => {
+  const { t } = useTranslation();
   const total = mobile + desktop;
   const mobilePercent = total > 0 ? Math.round((mobile / total) * 100) : 0;
   const desktopPercent = total > 0 ? Math.round((desktop / total) * 100) : 0;
 
   return (
     <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-3 sm:p-5 shadow-sm dark:shadow-none">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📱 Device Breakdown</h3>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📱 {t('sellerDashboard.deviceBreakdown')}</h3>
       <div className="space-y-4">
         <div className="flex items-center gap-4">
           <div className="flex-1">
             <div className="flex justify-between text-sm mb-1">
               <span className="text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                <Smartphone className="w-4 h-4" /> Mobile
+                <Smartphone className="w-4 h-4" /> {t('sellerDashboard.mobile')}
               </span>
-              <span className="text-gray-500 dark:text-gray-400">{mobile} orders</span>
+              <span className="text-gray-500 dark:text-gray-400">{t('sellerDashboard.ordersUnit', { count: mobile })}</span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
               <div
@@ -191,9 +197,9 @@ const DeviceBreakdown = ({ mobile, desktop }) => {
           <div className="flex-1">
             <div className="flex justify-between text-sm mb-1">
               <span className="text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                <Monitor className="w-4 h-4" /> Desktop
+                <Monitor className="w-4 h-4" /> {t('sellerDashboard.desktop')}
               </span>
-              <span className="text-gray-500 dark:text-gray-400">{desktop} orders</span>
+              <span className="text-gray-500 dark:text-gray-400">{t('sellerDashboard.ordersUnit', { count: desktop })}</span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
               <div
@@ -474,6 +480,7 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
 // MAIN SELLER DASHBOARD COMPONENT
 // ============================================
 const SellerDashboard = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('view') === 'orders' ? 'orders' : 'dashboard');
 
@@ -1000,8 +1007,8 @@ const SellerDashboard = () => {
       <div className="h-screen flex items-center justify-center text-gray-600 dark:text-gray-300 bg-white dark:bg-slate-900">
         <div className="text-center">
           <Package className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2 dark:text-white">Please Log In</h2>
-          <p className="text-gray-500 dark:text-gray-400">You need to be authenticated to access your seller dashboard.</p>
+          <h2 className="text-2xl font-bold mb-2 dark:text-white">{t('sellerDashboard.pleaseLogIn')}</h2>
+          <p className="text-gray-500 dark:text-gray-400">{t('sellerDashboard.needAuth')}</p>
         </div>
       </div>
     );
@@ -1021,7 +1028,7 @@ const SellerDashboard = () => {
             }`}
           >
             <BarChart3 className="w-4 h-4" />
-            Dashboard
+            {t('sellerDashboard.tabs.dashboard')}
           </button>
 
           <button
@@ -1033,7 +1040,7 @@ const SellerDashboard = () => {
             }`}
           >
             <Package className="w-4 h-4" />
-            Products
+            {t('sellerDashboard.tabs.products')}
           </button>
 
           <button
@@ -1045,7 +1052,7 @@ const SellerDashboard = () => {
             }`}
           >
             <Shield className="w-4 h-4" />
-            Escrow
+            {t('sellerDashboard.tabs.escrow')}
             {dashboardData.pendingEscrowCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 {dashboardData.pendingEscrowCount}
@@ -1062,7 +1069,7 @@ const SellerDashboard = () => {
             }`}
           >
             <ShoppingBag className="w-4 h-4" />
-            Orders
+            {t('sellerDashboard.tabs.orders')}
             {dashboardData.orderCounts.pendingApproval > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 {dashboardData.orderCounts.pendingApproval}
@@ -1083,40 +1090,40 @@ const SellerDashboard = () => {
               transition={{ delay: 0.1 }}
               className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-4"
             >
-              <StatCard 
-                title="Active Products" 
-                value={formatNumber(dashboardData.totalActiveProducts)} 
-                icon={Package} 
+              <StatCard
+                title={t('sellerDashboard.stats.activeProducts')}
+                value={formatNumber(dashboardData.totalActiveProducts)}
+                icon={Package}
                 color="blue"
-                subtext={`${products.length} total products`}
+                subtext={t('sellerDashboard.stats.totalProductsSub', { count: products.length })}
               />
-              <StatCard 
-                title="Inventory Value" 
-                value={formatCurrency(dashboardData.totalInventoryValue)} 
-                icon={DollarSign} 
+              <StatCard
+                title={t('sellerDashboard.stats.inventoryValue')}
+                value={formatCurrency(dashboardData.totalInventoryValue)}
+                icon={DollarSign}
                 color="green"
-                subtext="Based on your price"
+                subtext={t('sellerDashboard.stats.basedOnPrice')}
               />
-              <StatCard 
-                title="Total Orders" 
-                value={formatNumber(dashboardData.orderCounts.total)} 
-                icon={ShoppingBag} 
+              <StatCard
+                title={t('sellerDashboard.stats.totalOrders')}
+                value={formatNumber(dashboardData.orderCounts.total)}
+                icon={ShoppingBag}
                 color="purple"
-                subtext={`${dashboardData.orderCounts.delivered} delivered`}
+                subtext={t('sellerDashboard.stats.deliveredSub', { count: dashboardData.orderCounts.delivered })}
               />
-              <StatCard 
-                title="Net Revenue" 
-                value={formatCurrency(dashboardData.netAmount)} 
-                icon={TrendingUp} 
+              <StatCard
+                title={t('sellerDashboard.stats.netRevenue')}
+                value={formatCurrency(dashboardData.netAmount)}
+                icon={TrendingUp}
                 color="orange"
-                subtext={`${formatCurrency(dashboardData.totalCommission)} commission`}
+                subtext={t('sellerDashboard.stats.commissionSub', { amount: formatCurrency(dashboardData.totalCommission) })}
               />
-              <StatCard 
-                title="Escrow Balance" 
-                value={formatCurrency(dashboardData.escrowBalance)} 
-                icon={Shield} 
+              <StatCard
+                title={t('sellerDashboard.stats.escrowBalance')}
+                value={formatCurrency(dashboardData.escrowBalance)}
+                icon={Shield}
                 color="teal"
-                subtext={`${dashboardData.pendingEscrowCount} orders`}
+                subtext={t('sellerDashboard.stats.ordersSub', { count: dashboardData.pendingEscrowCount })}
               />
             </motion.div>
 
@@ -1127,33 +1134,33 @@ const SellerDashboard = () => {
               transition={{ delay: 0.15 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
             >
-              <StatCard 
-                title="Conversion Rate" 
-                value={`${dashboardData.conversionRate}%`} 
-                icon={Target} 
+              <StatCard
+                title={t('sellerDashboard.stats.conversionRate')}
+                value={`${dashboardData.conversionRate}%`}
+                icon={Target}
                 color="pink"
-                subtext={`${formatNumber(dashboardData.totalProductViews)} views`}
+                subtext={t('sellerDashboard.stats.viewsSub', { count: formatNumber(dashboardData.totalProductViews) })}
               />
-              <StatCard 
-                title="Avg Order Value" 
-                value={formatCurrency(dashboardData.averageOrderValue)} 
-                icon={Zap} 
+              <StatCard
+                title={t('sellerDashboard.stats.avgOrderValue')}
+                value={formatCurrency(dashboardData.averageOrderValue)}
+                icon={Zap}
                 color="yellow"
-                subtext="Per order"
+                subtext={t('sellerDashboard.stats.perOrder')}
               />
-              <StatCard 
-                title="COD Success" 
-                value={`${dashboardData.codSuccessRate}%`} 
-                icon={CheckCircle} 
+              <StatCard
+                title={t('sellerDashboard.stats.codSuccess')}
+                value={`${dashboardData.codSuccessRate}%`}
+                icon={CheckCircle}
                 color="green"
-                subtext="Cash on delivery"
+                subtext={t('sellerDashboard.stats.cashOnDelivery')}
               />
-              <StatCard 
-                title="Fulfillment Time" 
-                value={`${dashboardData.averageFulfillmentTime}h`} 
-                icon={Clock} 
+              <StatCard
+                title={t('sellerDashboard.stats.fulfillmentTime')}
+                value={`${dashboardData.averageFulfillmentTime}h`}
+                icon={Clock}
                 color="cyan"
-                subtext="Order to shipped"
+                subtext={t('sellerDashboard.stats.orderToShipped')}
               />
             </motion.div>
 
@@ -1178,7 +1185,7 @@ const SellerDashboard = () => {
               >
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <Package className="w-5 h-5 text-blue-500 dark:text-blue-400" />
-                  Top Products by Quantity
+                  {t('sellerDashboard.topProductsByQuantity')}
                 </h3>
                 <div className="space-y-1">
                   {dashboardData.topQuantityProducts.length > 0 ? (
@@ -1188,12 +1195,12 @@ const SellerDashboard = () => {
                         rank={index + 1}
                         name={product.name}
                         value={product.quantity}
-                        unit="units"
+                        unit={t('sellerDashboard.units')}
                         color="blue"
                       />
                     ))
                   ) : (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">No products found</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('sellerDashboard.noProductsFound')}</p>
                   )}
                 </div>
               </motion.div>
@@ -1207,7 +1214,7 @@ const SellerDashboard = () => {
               >
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <DollarSign className="w-5 h-5 text-green-500 dark:text-green-400" />
-                  Top by Inventory Value
+                  {t('sellerDashboard.topByInventoryValue')}
                 </h3>
                 <div className="space-y-1">
                   {dashboardData.topInventoryProducts.length > 0 ? (
@@ -1222,7 +1229,7 @@ const SellerDashboard = () => {
                       />
                     ))
                   ) : (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">No products found</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('sellerDashboard.noProductsFound')}</p>
                   )}
                 </div>
               </motion.div>
@@ -1236,7 +1243,7 @@ const SellerDashboard = () => {
               >
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
-                  Low Stock Alert
+                  {t('sellerDashboard.lowStockAlert')}
                 </h3>
                 <div className="space-y-1">
                   {dashboardData.lowStockProducts.length > 0 ? (
@@ -1248,11 +1255,11 @@ const SellerDashboard = () => {
                           </div>
                           <span className="text-gray-700 dark:text-gray-300">{product.name}</span>
                         </div>
-                        <span className="text-red-600 dark:text-red-400 font-medium">{product.quantity} left</span>
+                        <span className="text-red-600 dark:text-red-400 font-medium">{t('sellerDashboard.leftLabel', { count: product.quantity })}</span>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">All stock levels are healthy</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('sellerDashboard.allStockHealthy')}</p>
                   )}
                 </div>
               </motion.div>
@@ -1269,7 +1276,7 @@ const SellerDashboard = () => {
               >
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <Award className="w-5 h-5 text-yellow-500 dark:text-yellow-400" />
-                  Top Categories
+                  {t('sellerDashboard.topCategories')}
                 </h3>
                 <div className="space-y-3">
                   {dashboardData.topCategories.length > 0 ? (
@@ -1286,7 +1293,7 @@ const SellerDashboard = () => {
                       );
                     })
                   ) : (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">No categories found</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('sellerDashboard.noCategoriesFound')}</p>
                   )}
                 </div>
               </motion.div>
@@ -1313,7 +1320,7 @@ const SellerDashboard = () => {
             >
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-green-500 dark:text-green-400" />
-                Best Selling Products
+                {t('sellerDashboard.bestSellingProducts')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {dashboardData.topSoldProducts.length > 0 ? (
@@ -1322,15 +1329,15 @@ const SellerDashboard = () => {
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-medium text-gray-500 dark:text-gray-400">#{index + 1}</span>
                         <span className="text-xs bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400 px-2 py-1 rounded-full">
-                          {product.quantity} sold
+                          {t('sellerDashboard.sold', { count: product.quantity })}
                         </span>
                       </div>
                       <p className="text-gray-900 dark:text-white font-medium mb-1">{product.name}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Revenue: {formatCurrency(product.revenue)}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{t('sellerDashboard.revenue', { amount: formatCurrency(product.revenue) })}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 dark:text-gray-400 text-center col-span-3 py-4">No sales data yet</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-center col-span-3 py-4">{t('sellerDashboard.noSalesYet')}</p>
                 )}
               </div>
             </motion.div>
@@ -1347,7 +1354,7 @@ const SellerDashboard = () => {
                   <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-2">Business Insights</h4>
+                  <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-2">{t('sellerDashboard.businessInsights')}</h4>
                   <p className="text-sm text-gray-700 dark:text-gray-300">
                     • Your conversion rate of <strong>{dashboardData.conversionRate}%</strong> means {dashboardData.totalProductViews} product views led to {dashboardData.orderCounts.delivered} sales.<br/>
                     • Average order value is <strong>{formatCurrency(dashboardData.averageOrderValue)}</strong> - {dashboardData.averageOrderValue > 500 ? 'great!' : 'consider bundling products to increase this.'}<br/>
@@ -1364,12 +1371,12 @@ const SellerDashboard = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
             <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Your Products</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">{t('sellerDashboard.yourProducts')}</h2>
                 <button
                   onClick={() => setShowAddForm(true)}
                   className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition flex items-center gap-2 text-sm font-medium"
                 >
-                  <span className="text-lg leading-none">+</span> Add Product
+                  <span className="text-lg leading-none">+</span> {t('sellerDashboard.addProduct')}
                 </button>
               </div>
             </div>
