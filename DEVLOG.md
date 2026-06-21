@@ -408,5 +408,12 @@ Pour structurer la suite du travail, on classe ce qui reste à faire par priorit
 - Automatisation du suivi de livraison par webhook transporteur — n'a aucun sens tant qu'aucun vrai transporteur n'est intégré (dépend du Must have ci-dessus).
 - Application mobile — décidé de reporter, pas de date fixée.
 
+### 42. Mode sombre jamais appliqué aux pages d'authentification
+**Signalé par l'associé (capture d'écran) :** la page "Reset Password" restait entièrement en clair même en mode sombre activé.
+
+**Erreur trouvée :** malgré le point 3 (passe "site-wide" sur le mode sombre), les pages d'authentification (`login.jsx`, `SignUpForm.jsx`, `ForgotPassword.jsx`, `ResetPassword.jsx`, `CheckEmail.jsx`, `EmailConfirmation.jsx`, `PasswordUpdated.jsx`, `PasswordStrength.jsx`) n'avaient en réalité jamais reçu de classes `dark:` — seule la lisibilité du texte dans les champs avait été corrigée à l'époque (point 4), pas le reste de la page (fonds, cartes, bordures, liens).
+
+**Solution :** ajout systématique des classes `dark:` sur les 8 fichiers (fond de page, carte blanche, champs de saisie, boutons, liens, messages d'erreur, indicateur de force du mot de passe), suivant la même convention que le reste du site.
+
 ## En attente de décision
 - Aucune société de livraison de test (`Test Delivery Co`) ne doit traîner en base une fois les vraies sociétés en place — à nettoyer avant la mise en production.

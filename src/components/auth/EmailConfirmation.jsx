@@ -26,20 +26,20 @@ export default function EmailConfirmation() {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center px-6">
-      <div className="bg-white shadow border p-8 max-w-md w-full rounded">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-3">
+    <div className="h-screen flex items-center justify-center px-6 bg-gray-50 dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-800 shadow border border-gray-200 dark:border-gray-700 p-8 max-w-md w-full rounded">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-3">
           {t('auth.emailConfirmation.title')}
         </h2>
 
-        <p className="text-gray-700 mb-4 leading-relaxed">
+        <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
           {t('auth.emailConfirmation.body')}
           <br />
           {t('auth.emailConfirmation.clickToActivate')}
         </p>
 
         {resent ? (
-          <p className="text-green-600 mb-4">{t('auth.emailConfirmation.resent')}</p>
+          <p className="text-green-600 dark:text-green-400 mb-4">{t('auth.emailConfirmation.resent')}</p>
         ) : (
           <button
             onClick={resendEmail}
@@ -49,7 +49,7 @@ export default function EmailConfirmation() {
           </button>
         )}
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
       </div>
     </div>
   );

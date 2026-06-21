@@ -26,36 +26,36 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
-      <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-8">
+      <div className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
 
         <div className="flex justify-center mb-5">
-          <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center">
-            <Mail className="w-7 h-7 text-blue-600" />
+          <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center">
+            <Mail className="w-7 h-7 text-blue-600 dark:text-blue-400" />
           </div>
         </div>
 
-        <h2 className="text-xl font-bold text-gray-900 text-center mb-1">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-1">
           {t('auth.forgotPassword.title')}
         </h2>
-        <p className="text-sm text-gray-500 text-center mb-6">
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
           {t('auth.forgotPassword.subtitle')}
         </p>
 
         {errorMsg && (
-          <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-4 text-center">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm px-4 py-3 rounded-xl mb-4 text-center">
             {errorMsg}
           </div>
         )}
 
         <form onSubmit={handleReset} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               {t('auth.forgotPassword.emailAddress')}
             </label>
             <input
               type="email"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -78,10 +78,10 @@ export default function ForgotPassword() {
           </button>
         </form>
 
-        <div className="mt-5 pt-5 border-t border-gray-100 text-center">
+        <div className="mt-5 pt-5 border-t border-gray-100 dark:border-gray-700 text-center">
           <Link
             to="/login"
-            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
           >
             <ArrowLeft className="w-4 h-4" /> {t('auth.forgotPassword.backToLogin')}
           </Link>

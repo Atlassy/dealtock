@@ -87,19 +87,19 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white p-8 shadow rounded">
-        <h2 className="text-2xl font-bold mb-6 text-center">{t('auth.signup.createAccount')}</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 p-8 shadow rounded">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">{t('auth.signup.createAccount')}</h2>
 
         {errorMsg && (
-          <p className="text-red-600 mb-4 text-center">{errorMsg}</p>
+          <p className="text-red-600 dark:text-red-400 mb-4 text-center">{errorMsg}</p>
         )}
 
         <form onSubmit={handleSignUp} className="space-y-5">
 
           <input
             type="email"
-            className="w-full p-3 border rounded bg-white text-gray-900"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
             placeholder={t('auth.signup.emailPlaceholder')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -110,14 +110,14 @@ export default function SignUpForm() {
             <input
               type={showPwd ? "text" : "password"}
               placeholder={t('auth.signup.passwordPlaceholder')}
-              className="w-full p-3 border rounded pr-10 bg-white text-gray-900"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded pr-10 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
             <button
               type="button"
-              className="absolute right-3 top-3 text-gray-600"
+              className="absolute right-3 top-3 text-gray-600 dark:text-gray-400"
               onClick={() => setShowPwd(!showPwd)}
             >
               {showPwd ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -130,14 +130,14 @@ export default function SignUpForm() {
             <input
               type={showConfirmPwd ? "text" : "password"}
               placeholder={t('auth.signup.confirmPasswordPlaceholder')}
-              className="w-full p-3 border rounded pr-10 bg-white text-gray-900"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded pr-10 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
               value={confirmPwd}
               onChange={(e) => setConfirmPwd(e.target.value)}
               required
             />
             <button
               type="button"
-              className="absolute right-3 top-3 text-gray-600"
+              className="absolute right-3 top-3 text-gray-600 dark:text-gray-400"
               onClick={() => setShowConfirmPwd(!showConfirmPwd)}
             >
               {showConfirmPwd ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -145,7 +145,7 @@ export default function SignUpForm() {
           </div>
 
           <select
-            className="w-full p-3 border rounded bg-white text-gray-900"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
             value={city}
             onChange={(e) => setCity(e.target.value)}
           >
@@ -159,15 +159,15 @@ export default function SignUpForm() {
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-3 rounded hover:bg-gray-800"
+            className="w-full bg-black dark:bg-blue-600 text-white py-3 rounded hover:bg-gray-800 dark:hover:bg-blue-700"
           >
             {t('auth.signup.register')}
           </button>
         </form>
 
-        <p className="mt-4 text-center">
+        <p className="mt-4 text-center text-gray-700 dark:text-gray-300">
           {t('auth.signup.alreadyHaveAccount')}{" "}
-          <Link to="/login" className="text-blue-600 underline">
+          <Link to="/login" className="text-blue-600 dark:text-blue-400 underline">
             {t('auth.signup.login')}
           </Link>
         </p>

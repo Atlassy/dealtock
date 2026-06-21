@@ -71,21 +71,21 @@ export default function PasswordStrength({ password, onStrengthChange }) {
 
   const getColor = () => {
     switch(strength) {
-      case "Very Weak": return "text-red-700";
-      case "Weak": return "text-red-600";
-      case "Medium": return "text-yellow-600";
-      case "Strong": return "text-green-600";
-      default: return "text-gray-500";
+      case "Very Weak": return "text-red-700 dark:text-red-400";
+      case "Weak": return "text-red-600 dark:text-red-400";
+      case "Medium": return "text-yellow-600 dark:text-yellow-400";
+      case "Strong": return "text-green-600 dark:text-green-400";
+      default: return "text-gray-500 dark:text-gray-400";
     }
   };
 
   const getBgColor = () => {
     switch(strength) {
-      case "Very Weak": return "bg-red-100";
-      case "Weak": return "bg-red-50";
-      case "Medium": return "bg-yellow-50";
-      case "Strong": return "bg-green-50";
-      default: return "bg-gray-50";
+      case "Very Weak": return "bg-red-100 dark:bg-red-900/30";
+      case "Weak": return "bg-red-50 dark:bg-red-900/20";
+      case "Medium": return "bg-yellow-50 dark:bg-yellow-900/20";
+      case "Strong": return "bg-green-50 dark:bg-green-900/20";
+      default: return "bg-gray-50 dark:bg-gray-900/40";
     }
   };
 
@@ -106,7 +106,7 @@ export default function PasswordStrength({ password, onStrengthChange }) {
       </p>
       
       {/* Progress bar */}
-      <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-3">
         <div 
           className={`h-2 rounded-full ${
             strength === "Very Weak" ? "w-1/4 bg-red-500" :
@@ -119,23 +119,23 @@ export default function PasswordStrength({ password, onStrengthChange }) {
 
       {/* Requirements checklist */}
       <div className="text-xs space-y-1">
-        <div className={`flex items-center ${checks.length ? "text-green-600" : "text-red-500"}`}>
+        <div className={`flex items-center ${checks.length ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}`}>
           <span className="mr-2">{checks.length ? "✓" : "✗"}</span>
           {t('auth.passwordStrength.atLeast8')} {password.length >= 12 && t('auth.passwordStrength.bonus12')}
         </div>
-        <div className={`flex items-center ${checks.uppercase ? "text-green-600" : "text-red-500"}`}>
+        <div className={`flex items-center ${checks.uppercase ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}`}>
           <span className="mr-2">{checks.uppercase ? "✓" : "✗"}</span>
           {t('auth.passwordStrength.uppercase')}
         </div>
-        <div className={`flex items-center ${checks.number ? "text-green-600" : "text-red-500"}`}>
+        <div className={`flex items-center ${checks.number ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}`}>
           <span className="mr-2">{checks.number ? "✓" : "✗"}</span>
           {t('auth.passwordStrength.number')}
         </div>
-        <div className={`flex items-center ${checks.special ? "text-green-600" : "text-red-500"}`}>
+        <div className={`flex items-center ${checks.special ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}`}>
           <span className="mr-2">{checks.special ? "✓" : "✗"}</span>
           {t('auth.passwordStrength.special')}
         </div>
-        <div className={`flex items-center ${checks.notCommon ? "text-green-600" : "text-red-500"}`}>
+        <div className={`flex items-center ${checks.notCommon ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}`}>
           <span className="mr-2">{checks.notCommon ? "✓" : "✗"}</span>
           {t('auth.passwordStrength.notCommon')}
         </div>
