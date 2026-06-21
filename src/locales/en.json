@@ -740,5 +740,60 @@
         "other": "Other (see notes)"
       }
     }
+  },
+  "inventory": {
+    "pleaseLogIn": "Please Log In",
+    "needAuth": "You need to be authenticated to access your inventory.",
+    "title": "Inventory Management",
+    "subtitle": "Manage your products and stock levels",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing...",
+    "addProduct": "Add Product",
+    "stats": {
+      "totalProducts": "Total Products",
+      "activeSub": "{{count}} active",
+      "inventoryValue": "Inventory Value",
+      "basedOnPrice": "Based on your price",
+      "lowStockItems": "Low Stock Items",
+      "quantityLte3": "Quantity ≤ 3",
+      "categories": "Categories",
+      "productCategories": "Product categories"
+    },
+    "searchPlaceholder": "Search products by name or SKU...",
+    "allStatus": "All Status",
+    "allCategories": "All Categories",
+    "statuses": {
+      "available": "Available",
+      "pending": "Pending",
+      "sold": "Sold",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "returned": "Returned"
+    },
+    "table": "Table",
+    "grid": "Grid",
+    "showingResults": "Showing {{filtered}} of {{total}} products",
+    "noProductsFound": "No products found",
+    "tryAdjustingFilters": "Try adjusting your filters",
+    "startAdding": "Start by adding your first product!",
+    "addFirstProduct": "Add Your First Product",
+    "uncategorized": "Uncategorized",
+    "yourPrice": "Your Price",
+    "quantity": "Quantity",
+    "sku": "SKU: {{sku}}",
+    "addNewProduct": "Add New Product",
+    "editProduct": "Edit Product",
+    "confirmDelete": "Are you sure you want to delete this product? This action cannot be undone.",
+    "hasOrdersCannotDelete": "This product has orders and cannot be deleted. You can mark it as \"unavailable\" instead to hide it from new buyers.",
+    "productAdded": "Product added successfully",
+    "addFailed": "Failed to add product",
+    "productUpdated": "Product updated successfully",
+    "updateFailed": "Failed to update product",
+    "productDeleted": "Product deleted successfully",
+    "deleteFailed": "Failed to delete product",
+    "loadFailed": "Failed to load products",
+    "nowVisible": "Product is now visible",
+    "nowHidden": "Product is now hidden",
+    "toggleFailed": "Failed to update product status"
   }
 }

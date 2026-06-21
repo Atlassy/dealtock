@@ -740,5 +740,60 @@
         "other": "أخرى (انظر الملاحظات)"
       }
     }
+  },
+  "inventory": {
+    "pleaseLogIn": "يرجى تسجيل الدخول",
+    "needAuth": "يجب تسجيل الدخول للوصول إلى مخزونك.",
+    "title": "إدارة المخزون",
+    "subtitle": "أدر منتجاتك ومستويات المخزون",
+    "refresh": "تحديث",
+    "refreshing": "جارٍ التحديث...",
+    "addProduct": "إضافة منتج",
+    "stats": {
+      "totalProducts": "إجمالي المنتجات",
+      "activeSub": "{{count}} نشط",
+      "inventoryValue": "قيمة المخزون",
+      "basedOnPrice": "بناءً على سعرك",
+      "lowStockItems": "عناصر منخفضة المخزون",
+      "quantityLte3": "الكمية ≤ 3",
+      "categories": "الفئات",
+      "productCategories": "فئات المنتجات"
+    },
+    "searchPlaceholder": "البحث عن منتجات بالاسم أو SKU...",
+    "allStatus": "جميع الحالات",
+    "allCategories": "جميع الفئات",
+    "statuses": {
+      "available": "متوفر",
+      "pending": "معلّق",
+      "sold": "مباع",
+      "shipped": "تم الشحن",
+      "delivered": "تم التسليم",
+      "returned": "مرتجع"
+    },
+    "table": "جدول",
+    "grid": "شبكة",
+    "showingResults": "عرض {{filtered}} من {{total}} منتج",
+    "noProductsFound": "لم يتم العثور على منتجات",
+    "tryAdjustingFilters": "حاول تعديل الفلاتر",
+    "startAdding": "ابدأ بإضافة أول منتج لك!",
+    "addFirstProduct": "أضف منتجك الأول",
+    "uncategorized": "بدون فئة",
+    "yourPrice": "سعرك",
+    "quantity": "الكمية",
+    "sku": "SKU: {{sku}}",
+    "addNewProduct": "إضافة منتج جديد",
+    "editProduct": "تعديل المنتج",
+    "confirmDelete": "هل تريد بالتأكيد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
+    "hasOrdersCannotDelete": "هذا المنتج لديه طلبات ولا يمكن حذفه. يمكنك وضع علامة \"غير متوفر\" عليه لإخفائه عن المشترين الجدد.",
+    "productAdded": "تمت إضافة المنتج بنجاح",
+    "addFailed": "فشلت إضافة المنتج",
+    "productUpdated": "تم تحديث المنتج بنجاح",
+    "updateFailed": "فشل تحديث المنتج",
+    "productDeleted": "تم حذف المنتج بنجاح",
+    "deleteFailed": "فشل حذف المنتج",
+    "loadFailed": "فشل تحميل المنتجات",
+    "nowVisible": "المنتج مرئي الآن",
+    "nowHidden": "المنتج مخفي الآن",
+    "toggleFailed": "فشل تحديث حالة المنتج"
   }
 }

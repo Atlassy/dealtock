@@ -20,6 +20,7 @@ import {
   List
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 // Import components
 import ProductTable from '../ProductTable';
@@ -30,24 +31,17 @@ import EditProductForm from '../EditProductForm';
 // CONSTANTS
 // ============================================
 const CATEGORIES = [
-  "Electronics", 
-  "Fashion", 
-  "Home", 
-  "Beauty", 
-  "Sports", 
-  "Books", 
-  "Automotive", 
+  "Electronics",
+  "Fashion",
+  "Home",
+  "Beauty",
+  "Sports",
+  "Books",
+  "Automotive",
   "Other"
 ];
 
-const STATUSES = [
-  { value: "available", label: "Available", color: "green" },
-  { value: "pending", label: "Pending", color: "yellow" },
-  { value: "sold", label: "Sold", color: "purple" },
-  { value: "shipped", label: "Shipped", color: "blue" },
-  { value: "delivered", label: "Delivered", color: "indigo" },
-  { value: "returned", label: "Returned", color: "red" }
-];
+const STATUS_KEYS = ["available", "pending", "sold", "shipped", "delivered", "returned"];
 
 // ============================================
 // INVENTORY SKELETON
@@ -88,6 +82,7 @@ const StatCard = ({ title, value, icon: Icon, color = "blue", subtext }) => (
 // MAIN INVENTORY COMPONENT
 // ============================================
 const Inventory = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -128,7 +123,7 @@ const Inventory = () => {
       
     } catch (err) {
       console.error('Error fetching products:', err);
-      toast.error('Failed to load products');
+      toast.error(t('inventory.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -174,10 +169,10 @@ const Inventory = () => {
 
       await fetchProducts();
       setShowAddForm(false);
-      toast.success('Product added successfully');
+      toast.success(t('inventory.productAdded'));
     } catch (err) {
       console.error('Error adding product:', err);
-      toast.error(err.message || 'Failed to add product');
+      toast.error(err.message || t('inventory.addFailed'));
     }
   };
 
@@ -198,10 +193,10 @@ const Inventory = () => {
 
       await fetchProducts();
       setEditingProduct(null);
-      toast.success('Product updated successfully');
+      toast.success(t('inventory.productUpdated'));
     } catch (err) {
       console.error('Error updating product:', err);
-      toast.error(err.message || 'Failed to update product');
+      toast.error(err.message || t('inventory.updateFailed'));
     }
   };
 
@@ -217,15 +212,11 @@ const Inventory = () => {
       if (ordersError) throw ordersError;
 
       if (orders && orders.length > 0) {
-        toast.error(
-          'This product has orders and cannot be deleted. ' +
-          'You can mark it as "unavailable" instead to hide it from new buyers.',
-          { duration: 6000 }
-        );
+        toast.error(t('inventory.hasOrdersCannotDelete'), { duration: 6000 });
         return;
       }
 
-      if (!window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+      if (!window.confirm(t('inventory.confirmDelete'))) {
         return;
       }
 
@@ -238,10 +229,10 @@ const Inventory = () => {
       if (error) throw error;
 
       await fetchProducts();
-      toast.success('Product deleted successfully');
+      toast.success(t('inventory.productDeleted'));
     } catch (error) {
       console.error('Error deleting product:', error);
-      toast.error(error.message || 'Failed to delete product');
+      toast.error(error.message || t('inventory.deleteFailed'));
     }
   };
 
@@ -259,10 +250,10 @@ const Inventory = () => {
       if (error) throw error;
 
       await fetchProducts();
-      toast.success(available ? 'Product is now visible' : 'Product is now hidden');
+      toast.success(available ? t('inventory.nowVisible') : t('inventory.nowHidden'));
     } catch (err) {
       console.error('Error toggling availability:', err);
-      toast.error('Failed to update product status');
+      toast.error(t('inventory.toggleFailed'));
     }
   };
 
@@ -293,8 +284,8 @@ const Inventory = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <Package className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Please Log In</h2>
-          <p className="text-gray-500 dark:text-gray-400">You need to be authenticated to access your inventory.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('inventory.pleaseLogIn')}</h2>
+          <p className="text-gray-500 dark:text-gray-400">{t('inventory.needAuth')}</p>
         </div>
       </div>
     );
@@ -313,9 +304,9 @@ const Inventory = () => {
         >
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
-              Inventory Management
+              {t('inventory.title')}
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your products and stock levels</p>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">{t('inventory.subtitle')}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -326,7 +317,7 @@ const Inventory = () => {
               className="px-4 py-2 bg-gray-100 dark:bg-white/10 dark:backdrop-blur-sm rounded-lg hover:bg-gray-200 dark:hover:bg-white/20 transition-all flex items-center gap-2 text-gray-700 dark:text-white"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              {loading ? 'Refreshing...' : 'Refresh'}
+              {loading ? t('inventory.refreshing') : t('inventory.refresh')}
             </button>
 
             {/* Add Product Button */}
@@ -335,7 +326,7 @@ const Inventory = () => {
               className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg font-medium hover:from-purple-600 hover:to-blue-600 transition-all text-white shadow-lg hover:shadow-xl flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              Add Product
+              {t('inventory.addProduct')}
             </button>
           </div>
         </motion.div>
@@ -347,33 +338,33 @@ const Inventory = () => {
           transition={{ delay: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
         >
-          <StatCard 
-            title="Total Products" 
-            value={stats.totalProducts} 
-            icon={Package} 
+          <StatCard
+            title={t('inventory.stats.totalProducts')}
+            value={stats.totalProducts}
+            icon={Package}
             color="blue"
-            subtext={`${stats.activeProducts} active`}
+            subtext={t('inventory.stats.activeSub', { count: stats.activeProducts })}
           />
-          <StatCard 
-            title="Inventory Value" 
-            value={formatCurrency(stats.totalValue)} 
-            icon={DollarSign} 
+          <StatCard
+            title={t('inventory.stats.inventoryValue')}
+            value={formatCurrency(stats.totalValue)}
+            icon={DollarSign}
             color="green"
-            subtext="Based on your price"
+            subtext={t('inventory.stats.basedOnPrice')}
           />
-          <StatCard 
-            title="Low Stock Items" 
-            value={stats.lowStockCount} 
-            icon={AlertCircle} 
+          <StatCard
+            title={t('inventory.stats.lowStockItems')}
+            value={stats.lowStockCount}
+            icon={AlertCircle}
             color="red"
-            subtext="Quantity ≤ 3"
+            subtext={t('inventory.stats.quantityLte3')}
           />
-          <StatCard 
-            title="Categories" 
-            value={categories.length} 
-            icon={BarChart3} 
+          <StatCard
+            title={t('inventory.stats.categories')}
+            value={categories.length}
+            icon={BarChart3}
             color="purple"
-            subtext="Product categories"
+            subtext={t('inventory.stats.productCategories')}
           />
         </motion.div>
 
@@ -390,7 +381,7 @@ const Inventory = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search products by name or SKU..."
+                placeholder={t('inventory.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-200 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
@@ -404,9 +395,9 @@ const Inventory = () => {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-200 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
               >
-                <option value="all" className="bg-white dark:bg-gray-800">All Status</option>
-                {STATUSES.map(s => (
-                  <option key={s.value} value={s.value} className="bg-white dark:bg-gray-800">{s.label}</option>
+                <option value="all" className="bg-white dark:bg-gray-800">{t('inventory.allStatus')}</option>
+                {STATUS_KEYS.map(key => (
+                  <option key={key} value={key} className="bg-white dark:bg-gray-800">{t(`inventory.statuses.${key}`)}</option>
                 ))}
               </select>
             </div>
@@ -418,7 +409,7 @@ const Inventory = () => {
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-200 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
               >
-                <option value="all" className="bg-white dark:bg-gray-800">All Categories</option>
+                <option value="all" className="bg-white dark:bg-gray-800">{t('inventory.allCategories')}</option>
                 {categories.map(cat => (
                   <option key={cat} value={cat} className="bg-white dark:bg-gray-800">{cat}</option>
                 ))}
@@ -436,7 +427,7 @@ const Inventory = () => {
                 }`}
               >
                 <List className="w-4 h-4" />
-                <span className="hidden md:inline">Table</span>
+                <span className="hidden md:inline">{t('inventory.table')}</span>
               </button>
               <button
                 onClick={() => setViewMode('grid')}
@@ -447,14 +438,14 @@ const Inventory = () => {
                 }`}
               >
                 <Grid className="w-4 h-4" />
-                <span className="hidden md:inline">Grid</span>
+                <span className="hidden md:inline">{t('inventory.grid')}</span>
               </button>
             </div>
           </div>
 
           {/* Results count */}
           <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-            Showing {filteredProducts.length} of {products.length} products
+            {t('inventory.showingResults', { filtered: filteredProducts.length, total: products.length })}
           </div>
         </motion.div>
 
@@ -468,18 +459,18 @@ const Inventory = () => {
           {filteredProducts.length === 0 ? (
             <div className="text-center py-16">
               <Package className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No products found</h3>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('inventory.noProductsFound')}</h3>
               <p className="text-gray-500 dark:text-gray-400 mb-6">
                 {searchTerm || statusFilter !== 'all' || categoryFilter !== 'all'
-                  ? 'Try adjusting your filters'
-                  : 'Start by adding your first product!'}
+                  ? t('inventory.tryAdjustingFilters')
+                  : t('inventory.startAdding')}
               </p>
               <button
                 onClick={() => setShowAddForm(true)}
                 className="px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg font-medium hover:from-purple-600 hover:to-blue-600 transition shadow-lg"
               >
                 <Plus className="w-4 h-4 inline mr-2" />
-                Add Your First Product
+                {t('inventory.addFirstProduct')}
               </button>
             </div>
           ) : viewMode === 'table' ? (
@@ -537,14 +528,14 @@ const Inventory = () => {
                     </div>
                   </div>
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-1">{product.name}</h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{product.category || 'Uncategorized'}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{product.category || t('inventory.uncategorized')}</p>
                   <div className="flex justify-between items-center">
                     <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Your Price</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{t('inventory.yourPrice')}</p>
                       <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{formatCurrency(product.purchase_price || 0)}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Quantity</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{t('inventory.quantity')}</p>
                       <p className={`text-lg font-bold ${
                         product.quantity <= 3 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
                       }`}>
@@ -558,10 +549,10 @@ const Inventory = () => {
                       product.status === 'sold' ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400' :
                       'bg-gray-200 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400'
                     }`}>
-                      {product.status || 'available'}
+                      {product.status ? t(`inventory.statuses.${product.status}`, { defaultValue: product.status }) : t('inventory.statuses.available')}
                     </span>
                     <span className="text-gray-500 dark:text-gray-400">
-                      SKU: {product.sku || 'N/A'}
+                      {t('inventory.sku', { sku: product.sku || 'N/A' })}
                     </span>
                   </div>
                 </div>
@@ -580,7 +571,7 @@ const Inventory = () => {
             className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl"
           >
             <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Add New Product</h2>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{t('inventory.addNewProduct')}</h2>
               <button
                 className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition"
                 onClick={() => setShowAddForm(false)}
@@ -609,7 +600,7 @@ const Inventory = () => {
             className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl"
           >
             <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Edit Product</h2>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{t('inventory.editProduct')}</h2>
               <button
                 className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition"
                 onClick={() => setEditingProduct(null)}

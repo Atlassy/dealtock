@@ -362,8 +362,11 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Mise à jour : + Delivery Companies + Invoices + Returned Products traduits → dashboard admin terminé.** `DeliveryCompaniesSection.jsx`, `InvoicesList.tsx`/`InvoiceDetailModal.tsx`, et `ReturnedProductsSection.jsx`/`ReturnedProductsQueue.jsx` (file de révision, actions groupées, modale de refus avec motifs traduits) traduits. **Le dashboard admin est maintenant 100% traduit**, à l'exception des modales de configuration des sociétés de livraison (API/mappings de statuts — `DeliveryCompanyModal`, `ApiKeysModal`, `StatusMappingTab`), reportées car peu utilisées au quotidien.
 
+**Signalé par Ali :** la page "Inventory" (route `/inventory`, séparée des onglets du dashboard vendeur) était toujours en anglais. Traduite (`Inventory.jsx`) : en-tête, 4 cartes de stats, filtres (recherche/statut/catégorie), bascule tableau/grille, état vide, cartes produit en mode grille, titres des modales Ajouter/Modifier.
+
 **Reste à faire (volontairement pas fait dans ce lot, pour rester fiable) :**
 - Le paragraphe "Business Insights" du dashboard vendeur (texte dynamique avec logique conditionnelle intégrée) — le titre est traduit, le corps reste en anglais pour l'instant.
+- Les formulaires internes `AddProductForm`/`EditProductForm` (champs de saisie) — pas encore traduits.
 - Modales de config des sociétés de livraison (API/mappings de statuts) — peu utilisées, reportées.
 - Dashboards dropshipper, warehouse, delivery — aucun n'est encore traduit.
 - Formulaires d'authentification (login/signup/mot de passe oublié), page Profil, page Mes commandes.

@@ -740,5 +740,60 @@
         "other": "Autre (voir notes)"
       }
     }
+  },
+  "inventory": {
+    "pleaseLogIn": "Veuillez vous connecter",
+    "needAuth": "Vous devez être authentifié pour accéder à votre inventaire.",
+    "title": "Gestion de l'inventaire",
+    "subtitle": "Gérez vos produits et niveaux de stock",
+    "refresh": "Actualiser",
+    "refreshing": "Actualisation...",
+    "addProduct": "Ajouter un produit",
+    "stats": {
+      "totalProducts": "Total des produits",
+      "activeSub": "{{count}} actifs",
+      "inventoryValue": "Valeur du stock",
+      "basedOnPrice": "Basé sur votre prix",
+      "lowStockItems": "Articles en stock faible",
+      "quantityLte3": "Quantité ≤ 3",
+      "categories": "Catégories",
+      "productCategories": "Catégories de produits"
+    },
+    "searchPlaceholder": "Rechercher des produits par nom ou SKU...",
+    "allStatus": "Tous les statuts",
+    "allCategories": "Toutes les catégories",
+    "statuses": {
+      "available": "Disponible",
+      "pending": "En attente",
+      "sold": "Vendu",
+      "shipped": "Expédié",
+      "delivered": "Livré",
+      "returned": "Retourné"
+    },
+    "table": "Tableau",
+    "grid": "Grille",
+    "showingResults": "Affichage de {{filtered}} sur {{total}} produits",
+    "noProductsFound": "Aucun produit trouvé",
+    "tryAdjustingFilters": "Essayez d'ajuster vos filtres",
+    "startAdding": "Commencez par ajouter votre premier produit !",
+    "addFirstProduct": "Ajouter votre premier produit",
+    "uncategorized": "Sans catégorie",
+    "yourPrice": "Votre prix",
+    "quantity": "Quantité",
+    "sku": "SKU : {{sku}}",
+    "addNewProduct": "Ajouter un nouveau produit",
+    "editProduct": "Modifier le produit",
+    "confirmDelete": "Voulez-vous vraiment supprimer ce produit ? Cette action est irréversible.",
+    "hasOrdersCannotDelete": "Ce produit a des commandes et ne peut pas être supprimé. Vous pouvez le marquer comme \"indisponible\" pour le masquer aux nouveaux acheteurs.",
+    "productAdded": "Produit ajouté avec succès",
+    "addFailed": "Échec de l'ajout du produit",
+    "productUpdated": "Produit mis à jour avec succès",
+    "updateFailed": "Échec de la mise à jour du produit",
+    "productDeleted": "Produit supprimé avec succès",
+    "deleteFailed": "Échec de la suppression du produit",
+    "loadFailed": "Échec du chargement des produits",
+    "nowVisible": "Le produit est maintenant visible",
+    "nowHidden": "Le produit est maintenant masqué",
+    "toggleFailed": "Échec de la mise à jour du statut du produit"
   }
 }
