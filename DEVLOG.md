@@ -393,11 +393,16 @@ Pour structurer la suite du travail, on classe ce qui reste à faire par priorit
 - Traduire les dashboards Warehouse et Delivery (comptes internes, peu nombreux, mais utilisés au quotidien par ceux qui les ont).
 - Retravailler le contenu/design de l'email de confirmation de commande (actuellement un HTML basique, fonctionnel mais pas soigné).
 - Traduire les formulaires internes `AddProductForm`/`EditProductForm`.
+- **Notification SMS/WhatsApp en complément de l'email** — au Maroc, le taux d'ouverture email est faible comparé au SMS/WhatsApp pour des achats en COD. S'inspirer de Jumia (gros acteur e-commerce africain) qui privilégie le SMS pour les confirmations. Probablement plus impactant pour les clients que peaufiner le design de l'email.
+- **Vérification photo de la condition du produit** avant mise en ligne — actuellement "Condition A (Sealed)" est une simple déclaration texte côté warehouse/admin, sans preuve. Les plateformes de liquidation sérieuses (B-Stock, Liquidation.com) exigent une photo horodatée. Réduit le risque de litige client.
 
 **Could have (utile, sans urgence) :**
 - Traduire les modales de configuration des sociétés de livraison (API/mappings de statuts) — peu utilisées au quotidien.
 - Traduire le paragraphe dynamique "Business Insights" du dashboard vendeur.
 - Construire une vraie modélisation warehouse (table dédiée, capacité, plusieurs entrepôts par partenaire) si le MVP actuel (réutilisant `products.user_id` + rôle `warehouse`) devient limitant.
+- **Vente par lot/palette** (façon B-Stock/Liquidation.com/BULQ) — permettre à un warehouse partner de regrouper plusieurs produits retournés en un seul lot à acheter d'un coup, plutôt qu'à l'unité uniquement.
+- **Avis/notation vendeur et transporteur** — le champ `seller_rating` existe déjà dans le code mais aucune interface ne permet à un client de réellement laisser un avis. Renforcerait la confiance, comme sur la plupart des marketplaces (Vinted, ThredUp, AliExpress).
+- **Export de rapports pour les vendeurs** (évolution du revenu dans le temps, pas juste un instantané) — utile une fois qu'il y a du volume réel.
 
 **Won't have (pas pour l'instant, décidé ensemble) :**
 - Automatisation du suivi de livraison par webhook transporteur — n'a aucun sens tant qu'aucun vrai transporteur n'est intégré (dépend du Must have ci-dessus).
