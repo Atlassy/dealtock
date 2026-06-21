@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/SupabaseAuthContext';
+import { useNotifications } from '../hooks/useNotifications';
+import NotificationBell from './notifications/NotificationBell';
 import { 
   Menu, ShoppingBag, Package, LayoutDashboard, User, LogOut,
   Search, Globe, ChevronDown, ChevronLeft, ChevronRight,
@@ -169,6 +171,14 @@ const PromoBanner = ({ userRole }) => {
 // ✅ Main Navbar Component (unchanged from your original)
 const Navbar = () => {
   const { user, profile, signOut } = useAuth();
+  const {
+    notifications,
+    unreadCount,
+    open: notifOpen,
+    setOpen: setNotifOpen,
+    markAsRead,
+    markAllAsRead,
+  } = useNotifications(user);
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -359,6 +369,18 @@ const Navbar = () => {
               >
                 {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
+
+              {/* Notifications */}
+              {user && (
+                <NotificationBell
+                  notifications={notifications}
+                  unreadCount={unreadCount}
+                  isOpen={notifOpen}
+                  setIsOpen={setNotifOpen}
+                  onRead={markAsRead}
+                  onMarkAllRead={markAllAsRead}
+                />
+              )}
 
               {/* Cart */}
               <Link to="/cart" className="relative p-1.5 text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] rounded-lg transition">

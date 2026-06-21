@@ -296,6 +296,25 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Solution :** remplacé par un calcul automatique côté frontend (`daysInStorage()`, `Math.floor((Date.now() - created_at) / 86400000)`) dans `WarehouseDashboard.jsx` et `ReturnedProductsQueue.jsx` — toujours juste, toujours affiché, plus besoin de saisie manuelle. Retiré le champ "Days in Storage" de l'import CSV (`ReturnedProductsImporter.jsx` : colonne du template, mapper automatique, validation, payload d'insertion, colonne du tableau d'aperçu) puisqu'il est désormais entièrement obsolète.
 
+### 39. Cloche de notifications branchée dans la navbar (tous rôles)
+**Demande d'Ali :** un bouton cloche de notifications dans la navbar, fonctionnel pour tout le monde (client, vendeur, admin, dropshipper...), pas juste visuel.
+
+**Découverte en creusant :** l'infrastructure existait déjà à 90%, jamais branchée — encore le même schéma que tout le reste de l'audit (fonctionnalité construite puis oubliée) :
+- Table `notifications` (avec RLS correcte : chacun lit/marque ses propres notifs).
+- `src/hooks/useNotifications.js` — souscription temps réel Supabase déjà fonctionnelle.
+- `src/components/notifications/NotificationBell.jsx` — composant complet, mais **importé nulle part**, sans classes `dark:`.
+- Un trigger `notify_order_update()` qui alimentait déjà la table, mais avec 2 bugs : (1) se déclenchait sur **toute** mise à jour de commande, pas seulement un changement de statut (donc notifications trompeuses "status changed to X" même quand le statut n'avait pas changé), et (2) ne notifiait **que le vendeur**, jamais le client ni le dropshipper, et jamais à la création de la commande (le trigger ne tournait qu'en `UPDATE`).
+
+**Solution :**
+- Migration `supabase/migrations/20260621000000_fix_and_extend_order_notifications.sql` : `notify_order_update()` ne se déclenche plus que si le statut a réellement changé (`IF NEW.status IS DISTINCT FROM OLD.status`), et notifie désormais le vendeur **et** le client **et** le dropshipper (selon qui est renseigné sur la commande). Nouveau trigger `tr_notify_new_order` (`AFTER INSERT`) qui notifie vendeur/dropshipper dès qu'une commande est passée.
+- `useNotifications.js` : ajout de `markAllAsRead` (manquant alors que le composant l'attendait déjà).
+- `NotificationBell.jsx` : ajout des classes `dark:` (oubliées comme partout ailleurs lors de la 1ère passe mode sombre, puisque ce composant n'était pas encore branché à ce moment-là), état d'ouverture maintenant contrôlé par le hook plutôt que dupliqué localement.
+- Branché dans `Navbar.jsx` (icônes partagées mobile/desktop) : visible uniquement si connecté, entre le sélecteur de langue/mode sombre et le panier — donc actif pour tous les rôles (client, vendeur, admin, dropshipper, warehouse, delivery) puisque c'est le même composant Navbar pour tout le monde.
+
+**Limite connue, pas corrigée :** la policy `notif_insert_any` autorise n'importe quel utilisateur connecté à insérer une notification pour **n'importe quel** `user_id` (pas seulement les `SECURITY DEFINER` functions) — risque de spam, pas de fuite de données. À durcir plus tard si besoin (restreindre l'insertion aux fonctions `SECURITY DEFINER` seulement).
+
+**Non testé visuellement par moi** (pas d'outil de navigateur disponible dans cet environnement) — à valider par Ali : se connecter, passer une commande de test ou changer son statut, vérifier que la cloche affiche bien la notification en temps réel.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).

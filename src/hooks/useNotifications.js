@@ -56,11 +56,24 @@ export function useNotifications(user) {
     setUnreadCount(c => Math.max(c - 1, 0));
   }
 
+  async function markAllAsRead() {
+    if (!user) return;
+    await supabase
+      .from("notifications")
+      .update({ is_read: true })
+      .eq("user_id", user.id)
+      .eq("is_read", false);
+
+    setNotifications((prev) => prev.map(n => ({ ...n, is_read: true })));
+    setUnreadCount(0);
+  }
+
   return {
     notifications,
     unreadCount,
     open,
     setOpen,
-    markAsRead
+    markAsRead,
+    markAllAsRead
   };
 }
