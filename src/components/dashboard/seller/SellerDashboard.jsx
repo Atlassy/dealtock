@@ -1,6 +1,7 @@
 // src/components/dashboard/seller/SellerDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/SupabaseAuthContext";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "../../../lib/supabaseClient";
 import { motion } from "framer-motion";
 import { 
@@ -473,7 +474,8 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
 // MAIN SELLER DASHBOARD COMPONENT
 // ============================================
 const SellerDashboard = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('view') === 'orders' ? 'orders' : 'dashboard');
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);

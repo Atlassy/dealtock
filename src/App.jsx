@@ -11,6 +11,7 @@ import Login from "./components/auth/login";
 import SignUpForm from "./components/auth/SignUpForm";
 import Dashboard from "./components/dashboard/Dashboard";
 import ProfilePage from "./components/ProfilePage";
+import MyOrders from "./components/MyOrders";
 import Navbar from "./components/Navbar";
 import MarketplacePage from "./components/marketplace/MarketplacePage";
 import CartPage from "./components/marketplace/CartPage";
@@ -84,6 +85,16 @@ export default function App() {
               <ProtectedRoute>
                 <div className="pl-16">
                   <ProfilePage />
+                </div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-orders"
+            element={
+              <ProtectedRoute>
+                <div className="pl-16">
+                  <MyOrders />
                 </div>
               </ProtectedRoute>
             }

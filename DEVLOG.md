@@ -315,6 +315,19 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Non testé visuellement par moi** (pas d'outil de navigateur disponible dans cet environnement) — à valider par Ali : se connecter, passer une commande de test ou changer son statut, vérifier que la cloche affiche bien la notification en temps réel.
 
+### 40. Clic sur une notification : redirection vers le détail de la commande
+**Demande d'Ali (suite du point 39) :** cliquer sur une notification doit rediriger vers ce qu'elle concerne, comme une notif bancaire qui ouvre le détail du paiement — pas juste marquer comme lu.
+
+**Découverte en construisant ça :** il n'existait **aucune page "Mes commandes"** pour un client connecté — un client n'avait nulle part où voir l'historique de ses commandes (seul `OrderConfirmation.jsx` juste après l'achat). Sans ça, une notification "votre commande a changé de statut" n'aurait eu aucun endroit valable où rediriger.
+
+**Solution :**
+- Nouvelle page `src/components/MyOrders.jsx` (route `/my-orders`) : liste les commandes du client connecté (`customer_id = auth.uid()`), avec badges de statut cohérents avec le reste du site. Lien ajouté dans le menu utilisateur de la navbar.
+- `SellerOrders.jsx` et `DropshipperOrders.jsx` : lisent désormais `?orderId=` dans l'URL, scrollent automatiquement jusqu'à la commande concernée et l'entourent d'un anneau de surbrillance.
+- `SellerDashboard.jsx` : lit `?view=orders` pour ouvrir directement l'onglet Commandes au chargement.
+- `Navbar.jsx` : au clic sur une notification de type "order", redirige selon le rôle de l'utilisateur — `/dashboard?view=orders&orderId=X` (seller/warehouse), `/dropshipper/orders?orderId=X` (dropshipper), ou `/my-orders?orderId=X` (client) — et ferme le menu déroulant.
+
+**Non testé visuellement par moi** (toujours pas d'outil de navigateur ici) — à valider par Ali sur chaque rôle.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).

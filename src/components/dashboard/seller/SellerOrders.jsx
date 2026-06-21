@@ -16,18 +16,27 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
 import { toast } from 'sonner';
+import { useSearchParams } from 'react-router-dom';
 
 const SellerOrders = ({ sellerId }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [processingId, setProcessingId] = useState(null);
+  const [searchParams] = useSearchParams();
+  const highlightOrderId = searchParams.get('orderId');
 
   useEffect(() => {
     if (sellerId) {
       fetchOrders();
     }
   }, [sellerId]);
+
+  useEffect(() => {
+    if (!highlightOrderId || loading) return;
+    const el = document.getElementById(`order-${highlightOrderId}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [highlightOrderId, loading]);
 
   const fetchOrders = async () => {
     try {
@@ -314,7 +323,15 @@ const handleMarkReady = async (orderId) => {
       ) : (
         <div className="grid gap-4">
           {orders.map((order) => (
-            <div key={order.id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition">
+            <div
+              key={order.id}
+              id={`order-${order.id}`}
+              className={`bg-white dark:bg-gray-800 rounded-lg border p-4 hover:shadow-md transition ${
+                highlightOrderId === order.id
+                  ? 'border-kraft-500 ring-2 ring-kraft-300 dark:ring-kraft-700'
+                  : 'border-gray-200 dark:border-gray-700'
+              }`}
+            >
               {/* Order Header */}
               <div className="flex flex-wrap gap-4 justify-between items-start mb-3">
                 <div>

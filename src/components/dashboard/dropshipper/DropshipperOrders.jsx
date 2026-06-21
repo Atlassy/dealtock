@@ -16,18 +16,27 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
 import { toast } from 'sonner';
+import { useSearchParams } from 'react-router-dom';
 
 const DropshipperOrders = ({ dropshipperId, onUpdate }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [searchParams] = useSearchParams();
+  const highlightOrderId = searchParams.get('orderId');
 
   useEffect(() => {
     if (dropshipperId) {
       fetchOrders();
     }
   }, [dropshipperId]);
+
+  useEffect(() => {
+    if (!highlightOrderId || loading) return;
+    const el = document.getElementById(`order-${highlightOrderId}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [highlightOrderId, loading]);
 
   const fetchOrders = async () => {
     try {
@@ -234,7 +243,13 @@ const DropshipperOrders = ({ dropshipperId, onUpdate }) => {
       ) : (
         <div className="grid gap-4">
           {filteredOrders.map((order) => (
-            <div key={order.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-md transition">
+            <div
+              key={order.id}
+              id={`order-${order.id}`}
+              className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-md transition ${
+                highlightOrderId === order.id ? 'ring-2 ring-kraft-400 dark:ring-kraft-600' : ''
+              }`}
+            >
               {/* Order Header */}
               <div className="flex flex-wrap justify-between items-start mb-4">
                 <div>

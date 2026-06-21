@@ -377,7 +377,20 @@ const Navbar = () => {
                   unreadCount={unreadCount}
                   isOpen={notifOpen}
                   setIsOpen={setNotifOpen}
-                  onRead={markAsRead}
+                  onRead={(id) => {
+                    const n = notifications.find((x) => x.id === id);
+                    markAsRead(id);
+                    setNotifOpen(false);
+                    if (n?.entity_type === 'order' && n.entity_id) {
+                      const destination =
+                        profile?.role === 'seller' || profile?.role === 'pro_seller' || profile?.role === 'warehouse'
+                          ? `/dashboard?view=orders&orderId=${n.entity_id}`
+                          : profile?.role === 'dropshipper'
+                          ? `/dropshipper/orders?orderId=${n.entity_id}`
+                          : `/my-orders?orderId=${n.entity_id}`;
+                      navigate(destination);
+                    }
+                  }}
                   onMarkAllRead={markAllAsRead}
                 />
               )}
@@ -412,6 +425,9 @@ const Navbar = () => {
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
                       </div>
                       <Link to="/dashboard" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"><LayoutDashboard className="w-4 h-4" /> Dashboard</Link>
+                      {(!profile?.role || profile.role === 'customer') && (
+                        <Link to="/my-orders" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"><Package className="w-4 h-4" /> My Orders</Link>
+                      )}
                       <Link to="/profile" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"><User className="w-4 h-4" /> Profile</Link>
                       <button onClick={() => { signOut(); setShowUserMenu(false); }} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700"><LogOut className="w-4 h-4" /> Sign Out</button>
                     </div>
