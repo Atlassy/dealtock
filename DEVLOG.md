@@ -380,8 +380,28 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 - Modales de config des sociétés de livraison (API/mappings de statuts).
 - Dashboards warehouse, delivery — comptes internes, peu nombreux.
 
+## Priorités (méthode MoSCoW)
+
+Pour structurer la suite du travail, on classe ce qui reste à faire par priorité réelle plutôt que par ordre d'idée.
+
+**Must have (bloquant avant tout vrai lancement) :**
+- Intégrer un vrai transporteur de livraison (API réelle) — actuellement aucun partenaire réel n'est connecté, seulement des sociétés de test/manuelles. Sans ça, le suivi de commande reste manuel et peu fiable.
+- Vérifier un domaine sur Resend (`dealtock.ma` ou équivalent) pour que l'email de confirmation de commande parte vers de vrais clients, pas seulement vers l'adresse de test du compte gratuit.
+- S'assurer que `delivery_companies` contient uniquement de vraies sociétés (Amana, EcoDelivery, DHL, BENEXPEDITION, Sendit...) et plus la société de test ("Test Delivery Co") avant tout passage en production.
+
+**Should have (important, mais pas bloquant) :**
+- Traduire les dashboards Warehouse et Delivery (comptes internes, peu nombreux, mais utilisés au quotidien par ceux qui les ont).
+- Retravailler le contenu/design de l'email de confirmation de commande (actuellement un HTML basique, fonctionnel mais pas soigné).
+- Traduire les formulaires internes `AddProductForm`/`EditProductForm`.
+
+**Could have (utile, sans urgence) :**
+- Traduire les modales de configuration des sociétés de livraison (API/mappings de statuts) — peu utilisées au quotidien.
+- Traduire le paragraphe dynamique "Business Insights" du dashboard vendeur.
+- Construire une vraie modélisation warehouse (table dédiée, capacité, plusieurs entrepôts par partenaire) si le MVP actuel (réutilisant `products.user_id` + rôle `warehouse`) devient limitant.
+
+**Won't have (pas pour l'instant, décidé ensemble) :**
+- Automatisation du suivi de livraison par webhook transporteur — n'a aucun sens tant qu'aucun vrai transporteur n'est intégré (dépend du Must have ci-dessus).
+- Application mobile — décidé de reporter, pas de date fixée.
+
 ## En attente de décision
-- Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
-- Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).
-- Warehouse MVP en place (pas de table dédiée — réutilise `products.user_id` + rôle `warehouse`). Une vraie modélisation (table `warehouses`, capacité, plusieurs entrepôts par partenaire...) pourra être envisagée plus tard si besoin.
-- Automatisation du suivi de livraison (webhook transporteur) : à construire quand un vrai partenaire transporteur sera intégré, pas avant.
+- Aucune société de livraison de test (`Test Delivery Co`) ne doit traîner en base une fois les vraies sociétés en place — à nettoyer avant la mise en production.
