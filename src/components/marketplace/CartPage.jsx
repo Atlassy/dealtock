@@ -9,9 +9,11 @@ import {
 import { useAuth } from '../../contexts/SupabaseAuthContext';
 import { useCart } from '../../hooks/useCart';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import OrderConfirmation from './components/OrderConfirmation';
 
 const CartPage = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
 
@@ -114,7 +116,7 @@ const CartPage = () => {
   // -----------------------------
   const handleCheckout = () => {
     if (!cartItems.length) {
-      toast.error('Your cart is empty');
+      toast.error(t('cart.cartEmptyToast'));
       return;
     }
 
@@ -127,16 +129,16 @@ const CartPage = () => {
   };
 
   const handleClearCart = async () => {
-    if (!window.confirm('Are you sure you want to clear your cart? This action cannot be undone.')) return;
+    if (!window.confirm(t('cart.confirmClearCart'))) return;
 
     await clearCart();
-    toast.success('Cart cleared');
+    toast.success(t('cart.cartCleared'));
   };
 
   const manualRefresh = async () => {
-    toast.info('Refreshing...');
+    toast.info(t('cart.refreshing'));
     await loadCart();
-    toast.success('Cart updated');
+    toast.success(t('cart.cartUpdatedToast'));
   };
 
   // -----------------------------
@@ -160,18 +162,18 @@ const CartPage = () => {
           <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShoppingCart className="w-12 h-12 text-gray-400 dark:text-gray-500" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Your Cart is Empty</h1>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">Looks like you haven't added any items to your cart yet.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('cart.emptyTitle')}</h1>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">{t('cart.emptyBody')}</p>
           <Link
             to="/marketplace"
             className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            Continue Shopping
+            {t('cart.continueShopping')}
           </Link>
           {user && profile?.role && profile.role !== 'customer' && (
             <p className="text-sm text-green-600 dark:text-green-400 mt-4">
-              You're logged in as {profile.role}. Your cart will use B2B pricing when you add items.
+              {t('cart.loggedInAs', { role: profile.role })}
             </p>
           )}
         </div>
@@ -194,13 +196,13 @@ const CartPage = () => {
               <div className="flex-1">
                 <h4 className="text-sm font-bold text-green-800 dark:text-green-300 flex items-center gap-2">
                   <TrendingUp className="w-4 h-4" />
-                  Business Pricing Applied!
+                  {t('cart.businessPricingApplied')}
                 </h4>
                 <p className="text-sm text-green-700 dark:text-green-400 mt-1">
-                  Your cart has been updated with {profile?.role || 'business'} pricing.
+                  {t('cart.cartUpdatedWithPricing', { role: profile?.role || 'business' })}
                 </p>
                 <p className="text-xs font-semibold text-green-800 dark:text-green-300 mt-2">
-                  You saved {formatPrice(totalSavings)} on your current items
+                  {t('cart.youSaved', { amount: formatPrice(totalSavings) })}
                 </p>
               </div>
               <button onClick={() => setShowPriceUpdateNotification(false)} className="flex-shrink-0 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition">
@@ -216,29 +218,29 @@ const CartPage = () => {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <ShoppingCart className="w-6 h-6" />
-              Shopping Cart ({cartItems.length} {cartItems.length === 1 ? 'item' : 'items'})
+              {t('cart.title')} ({cartItems.length} {t('cart.item', { count: cartItems.length })})
             </h1>
             {user && profile?.role && profile.role !== 'customer' && (
               <p className="text-sm text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
-                {profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} pricing applied
+                {t('cart.pricingApplied', { role: profile.role.charAt(0).toUpperCase() + profile.role.slice(1) })}
               </p>
             )}
             {!user && (
               <p className="text-sm text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
                 <ShoppingBag className="w-3 h-3" />
-                Guest checkout - Login for business pricing
+                {t('cart.guestCheckout')}
               </p>
             )}
             {user && profile?.role === 'customer' && (
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Regular customer pricing
+                {t('cart.regularPricing')}
               </p>
             )}
           </div>
           <button onClick={manualRefresh} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center gap-1">
             <RefreshCw className="w-4 h-4" />
-            Refresh
+            {t('cart.refresh')}
           </button>
         </div>
 
@@ -265,7 +267,7 @@ const CartPage = () => {
                       <div className="flex justify-between">
                         <div>
                           <h3 className="font-medium text-gray-900 dark:text-white">{item.name}</h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{item.category || 'Uncategorized'}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{item.category || t('cart.uncategorized')}</p>
                           <div className="mt-1">
                             {hasPriceDrop ? (
                               <div className="flex items-center gap-2">
@@ -299,7 +301,7 @@ const CartPage = () => {
                             <Plus className="w-4 h-4 text-gray-700 dark:text-gray-300" />
                           </button>
                           {item.stock && (
-                            <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">{item.stock} available</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">{item.stock} {t('cart.available')}</span>
                           )}
                         </div>
                         <p className="font-semibold text-gray-900 dark:text-white">{formatPrice(item.price * item.quantity)}</p>
@@ -314,35 +316,35 @@ const CartPage = () => {
               className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 flex items-center gap-1 transition-colors"
             >
               <Trash2 className="w-4 h-4" />
-              Clear Cart
+              {t('cart.clearCart')}
             </button>
           </div>
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sticky top-24">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Order Summary</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t('cart.orderSummary')}</h2>
               <div className="space-y-3 text-gray-700 dark:text-gray-300">
                 <div className="flex justify-between text-sm">
-                  <span>Subtotal ({cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0)} items)</span>
+                  <span>{t('cart.subtotal', { count: cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0) })}</span>
                   <span className="font-medium text-gray-900 dark:text-white">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Shipping</span>
+                  <span>{t('cart.shipping')}</span>
                   <span>{formatPrice(shipping)}</span>
                 </div>
                 {hasSavings && (
                   <div className="flex justify-between text-sm bg-green-50 dark:bg-green-900/30 p-2 rounded-lg">
-                    <span className="text-green-700 dark:text-green-400">Business Discount</span>
+                    <span className="text-green-700 dark:text-green-400">{t('cart.businessDiscount')}</span>
                     <span className="text-green-700 dark:text-green-400">-{formatPrice(originalSubtotal - subtotal)}</span>
                   </div>
                 )}
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
                   <div className="flex justify-between font-bold text-gray-900 dark:text-white">
-                    <span>Total</span>
+                    <span>{t('cart.total')}</span>
                     <span className="text-lg text-blue-600 dark:text-blue-400">{formatPrice(total)}</span>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Cash on delivery</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('cart.cashOnDelivery')}</p>
                 </div>
               </div>
               <div className="mt-6 space-y-3">
@@ -351,7 +353,7 @@ const CartPage = () => {
                   className="w-full py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-700 dark:hover:bg-blue-600 transition flex items-center justify-center gap-2"
                 >
                   <CreditCard className="w-4 h-4" />
-                  Proceed to Checkout
+                  {t('cart.proceedToCheckout')}
                 </button>
 
                 {/* Continue Shopping Button */}
@@ -360,11 +362,11 @@ const CartPage = () => {
                   className="w-full py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600"
                 >
                   <ShoppingBag className="w-4 h-4" />
-                  Continue Shopping
+                  {t('cart.continueShopping')}
                 </button>
               </div>
               <div className="mt-4 text-center text-xs text-gray-400 dark:text-gray-500">
-                <p>Your cart is saved securely to your account</p>
+                <p>{t('cart.savedSecurely')}</p>
               </div>
             </div>
           </div>
@@ -381,12 +383,12 @@ const CartPage = () => {
             if (numbers.length > 0) {
               toast.success(
                 numbers.length === 1
-                  ? `Order placed! Your order number is ${numbers[0]} — save it to track your delivery.`
-                  : `Order placed! Your order numbers: ${numbers.join(', ')} — save them to track your delivery.`,
+                  ? t('cart.orderPlacedSingle', { number: numbers[0] })
+                  : t('cart.orderPlacedMultiple', { numbers: numbers.join(', ') }),
                 { duration: 10000 }
               );
             } else {
-              toast.success('Order placed!');
+              toast.success(t('cart.orderPlaced'));
             }
           }}
         />

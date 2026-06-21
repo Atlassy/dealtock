@@ -193,7 +193,7 @@ const Navbar = () => {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [cartCount, setCartCount] = useState(0);
-  const [language, setLanguage] = useState(i18n.language || 'en');
+  const [language, setLanguage] = useState(i18n.language || 'fr');
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true');

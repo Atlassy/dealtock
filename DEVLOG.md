@@ -346,6 +346,12 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Non testé visuellement par moi** (pas d'outil de navigateur ici) — à valider par Ali : changer de langue et vérifier que la marketplace et la navbar changent réellement de texte, y compris le sens d'écriture en arabe (RTL).
 
+**Confirmé par Ali :** la navbar change bien de langue (testé en français). Remarque pertinente d'Ali : au Maroc, tout le monde ne comprend pas l'anglais, et tout le monde ne comprend pas le français non plus — le site ne devrait pas avoir l'anglais comme langue par défaut.
+
+**Suite donnée :**
+- Langue par défaut changée de l'anglais vers le français (`src/lib/i18n.js`, `Navbar.jsx`) pour les nouveaux visiteurs sans préférence enregistrée — l'arabe et l'anglais restent sélectionnables.
+- Traduction de `CartPage.jsx` (panier, résumé de commande, messages de succès/erreur) ajoutée à la même étape, vu que c'est la page la plus utilisée par les clients après la marketplace.
+
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.
 - Vérifier le rôle du compte de l'associé pour l'erreur "access denied" sur les règles de commission (voir point 29).
