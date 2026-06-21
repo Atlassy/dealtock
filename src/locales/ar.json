@@ -955,5 +955,41 @@
       "settled": "تمت التسوية",
       "unknown": "غير معروف"
     }
+  },
+  "marketplaceProducts": {
+    "searchPlaceholder": "البحث عن منتجات...",
+    "allCategories": "جميع الفئات",
+    "allCities": "جميع المدن",
+    "minPrice": "الحد الأدنى (درهم)",
+    "maxPrice": "الحد الأقصى (درهم)",
+    "applyFilters": "تطبيق الفلاتر",
+    "clear": "مسح",
+    "noProductsFound": "لم يتم العثور على منتجات",
+    "tryAdjusting": "حاول تعديل الفلاتر أو مصطلحات البحث",
+    "clearAllFilters": "مسح جميع الفلاتر",
+    "unknownSeller": "بائع غير معروف",
+    "loadFailed": "فشل تحميل المنتجات"
+  },
+  "dropshipperProductCard": {
+    "seller": "البائع",
+    "basePrice": "السعر الأساسي:",
+    "yourMarkup": "هامشك",
+    "calculatingCommission": "جارٍ حساب العمولة...",
+    "usingDefaultRate": "استخدام النسبة الافتراضية 5%",
+    "profitCalculator": "حاسبة الربح",
+    "grossMarkup": "الهامش الإجمالي:",
+    "dealtockFee": "رسوم Dealtock:",
+    "yourNetProfit": "صافي ربحك:",
+    "customerPays": "يدفع العميل:",
+    "plusShipping": "+ التوصيل:",
+    "shippingEstimate": "~25-35 درهم",
+    "cancel": "إلغاء",
+    "calculating": "جارٍ الحساب...",
+    "placeOrder": "إتمام الطلب",
+    "feeHelpText": "💡 يتم خصم رسوم Dealtock ({{rate}}%) من هامشك. اضبط هامشك لتحقيق أقصى ربح.",
+    "calculateYourProfit": "احسب ربحك",
+    "stock": "المخزون: {{count}}",
+    "deliveryEstimate": "التوصيل: 2-4 أيام",
+    "commissionLoadFailed": "تعذر تحميل نسبة العمولة"
   }
 }

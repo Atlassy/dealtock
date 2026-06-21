@@ -11,8 +11,10 @@ import {
 import { supabase } from '../../../lib/supabaseClient';
 import { toast } from 'sonner';
 import ProductCard from './ProductCard';
+import { useTranslation } from 'react-i18next';
 
 const MarketplaceProducts = ({ onPlaceOrder }) => {
+  const { t } = useTranslation();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -73,7 +75,7 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
       setProducts(data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
-      toast.error("Failed to load products");
+      toast.error(t('marketplaceProducts.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -134,7 +136,7 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder={t('marketplaceProducts.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -148,7 +150,7 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
             >
-              <option value="all">All Categories</option>
+              <option value="all">{t('marketplaceProducts.allCategories')}</option>
               {categories.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
@@ -159,7 +161,7 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
               onChange={(e) => setSelectedCity(e.target.value)}
               className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
             >
-              <option value="all">All Cities</option>
+              <option value="all">{t('marketplaceProducts.allCities')}</option>
               {cities.map(city => (
                 <option key={city} value={city}>{city}</option>
               ))}
@@ -168,14 +170,14 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
             <div className="flex gap-2">
               <input
                 type="number"
-                placeholder="Min (MAD)"
+                placeholder={t('marketplaceProducts.minPrice')}
                 value={priceRange.min}
                 onChange={(e) => setPriceRange({...priceRange, min: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="number"
-                placeholder="Max (MAD)"
+                placeholder={t('marketplaceProducts.maxPrice')}
                 value={priceRange.max}
                 onChange={(e) => setPriceRange({...priceRange, max: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
@@ -188,14 +190,14 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Filter className="w-4 h-4 inline mr-2" />
-                Apply Filters
+                {t('marketplaceProducts.applyFilters')}
               </button>
               <button
                 type="button"
                 onClick={clearFilters}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                Clear
+                {t('marketplaceProducts.clear')}
               </button>
             </div>
           </div>
@@ -216,13 +218,13 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
       ) : products.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
           <Package className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No products found</h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-4">Try adjusting your filters or search terms</p>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('marketplaceProducts.noProductsFound')}</h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">{t('marketplaceProducts.tryAdjusting')}</p>
           <button
             onClick={clearFilters}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            Clear All Filters
+            {t('marketplaceProducts.clearAllFilters')}
           </button>
         </div>
       ) : (
@@ -232,7 +234,7 @@ const MarketplaceProducts = ({ onPlaceOrder }) => {
               key={product.id}
               product={{
                 ...product,
-                seller_name: product.seller?.full_name || 'Unknown Seller',
+                seller_name: product.seller?.full_name || t('marketplaceProducts.unknownSeller'),
                 seller_rating: product.seller?.average_rating || 0,
                 category_id: product.category_id, // Pass category_id for commission
                 seller_id: product.user_id // Pass seller_id for commission

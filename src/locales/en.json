@@ -955,5 +955,41 @@
       "settled": "Settled",
       "unknown": "Unknown"
     }
+  },
+  "marketplaceProducts": {
+    "searchPlaceholder": "Search products...",
+    "allCategories": "All Categories",
+    "allCities": "All Cities",
+    "minPrice": "Min (MAD)",
+    "maxPrice": "Max (MAD)",
+    "applyFilters": "Apply Filters",
+    "clear": "Clear",
+    "noProductsFound": "No products found",
+    "tryAdjusting": "Try adjusting your filters or search terms",
+    "clearAllFilters": "Clear All Filters",
+    "unknownSeller": "Unknown Seller",
+    "loadFailed": "Failed to load products"
+  },
+  "dropshipperProductCard": {
+    "seller": "Seller",
+    "basePrice": "Base Price:",
+    "yourMarkup": "Your Markup",
+    "calculatingCommission": "Calculating commission...",
+    "usingDefaultRate": "Using default 5% rate",
+    "profitCalculator": "Profit Calculator",
+    "grossMarkup": "Gross Markup:",
+    "dealtockFee": "Dealtock Fee:",
+    "yourNetProfit": "Your Net Profit:",
+    "customerPays": "Customer pays:",
+    "plusShipping": "+ Shipping:",
+    "shippingEstimate": "~25-35 MAD",
+    "cancel": "Cancel",
+    "calculating": "Calculating...",
+    "placeOrder": "Place Order",
+    "feeHelpText": "💡 Dealtock fee ({{rate}}%) is deducted from your markup. Adjust your markup to maximize profit.",
+    "calculateYourProfit": "Calculate Your Profit",
+    "stock": "Stock: {{count}}",
+    "deliveryEstimate": "Delivery: 2-4 days",
+    "commissionLoadFailed": "Could not load commission rate"
   }
 }

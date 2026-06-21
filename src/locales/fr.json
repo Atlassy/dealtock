@@ -955,5 +955,41 @@
       "settled": "Réglée",
       "unknown": "Inconnu"
     }
+  },
+  "marketplaceProducts": {
+    "searchPlaceholder": "Rechercher des produits...",
+    "allCategories": "Toutes les catégories",
+    "allCities": "Toutes les villes",
+    "minPrice": "Min (MAD)",
+    "maxPrice": "Max (MAD)",
+    "applyFilters": "Appliquer les filtres",
+    "clear": "Effacer",
+    "noProductsFound": "Aucun produit trouvé",
+    "tryAdjusting": "Essayez d'ajuster vos filtres ou termes de recherche",
+    "clearAllFilters": "Effacer tous les filtres",
+    "unknownSeller": "Vendeur inconnu",
+    "loadFailed": "Échec du chargement des produits"
+  },
+  "dropshipperProductCard": {
+    "seller": "Vendeur",
+    "basePrice": "Prix de base :",
+    "yourMarkup": "Votre marge",
+    "calculatingCommission": "Calcul de la commission...",
+    "usingDefaultRate": "Utilisation du taux par défaut de 5%",
+    "profitCalculator": "Calculateur de profit",
+    "grossMarkup": "Marge brute :",
+    "dealtockFee": "Frais Dealtock :",
+    "yourNetProfit": "Votre profit net :",
+    "customerPays": "Le client paie :",
+    "plusShipping": "+ Livraison :",
+    "shippingEstimate": "~25-35 MAD",
+    "cancel": "Annuler",
+    "calculating": "Calcul en cours...",
+    "placeOrder": "Passer la commande",
+    "feeHelpText": "💡 Les frais Dealtock ({{rate}}%) sont déduits de votre marge. Ajustez votre marge pour maximiser le profit.",
+    "calculateYourProfit": "Calculer votre profit",
+    "stock": "Stock : {{count}}",
+    "deliveryEstimate": "Livraison : 2-4 jours",
+    "commissionLoadFailed": "Impossible de charger le taux de commission"
   }
 }
