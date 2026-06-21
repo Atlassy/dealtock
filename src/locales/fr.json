@@ -1028,5 +1028,46 @@
     "customerAdded": "Client ajouté avec succès",
     "addFailed": "Échec de l'ajout du client",
     "loadFailed": "Échec du chargement des clients"
+  },
+  "dropshipperEarnings": {
+    "myEarnings": "Mes revenus",
+    "subtitle": "Suivez vos commissions et versements",
+    "ranges": {
+      "week": "7 derniers jours",
+      "month": "Ce mois-ci",
+      "year": "Cette année",
+      "all": "Toutes les périodes"
+    },
+    "timeframes": {
+      "week": "semaine",
+      "month": "mois",
+      "year": "année",
+      "all": "tout"
+    },
+    "cards": {
+      "grossRevenue": "Revenu brut (marge)",
+      "totalMarkupBeforeFees": "Marge totale avant frais",
+      "dealtockFees": "Frais Dealtock",
+      "avgCommission": "{{rate}}% commission moyenne",
+      "netEarnings": "Revenu net",
+      "afterFees": "Après frais Dealtock",
+      "growth": "Croissance",
+      "vsLastMonth": "vs le mois dernier (net)"
+    },
+    "pendingEarnings": "Revenus en attente",
+    "paidEarnings": "Revenus versés",
+    "grossPending": "Brut en attente :",
+    "grossPaid": "Brut versé :",
+    "dealtockFeesLabel": "Frais Dealtock :",
+    "yourNet": "Votre net :",
+    "export": "Exporter",
+    "exported": "Revenus exportés",
+    "recentTransactions": "Transactions récentes",
+    "noTransactionsYet": "Aucune transaction pour l'instant",
+    "orderNumber": "Commande n°{{number}}",
+    "gross": "Brut :",
+    "fee": "Frais : -{{amount}}",
+    "net": "Net :",
+    "loadFailed": "Échec du chargement des revenus"
   }
 }

@@ -1028,5 +1028,46 @@
     "customerAdded": "Customer added successfully",
     "addFailed": "Failed to add customer",
     "loadFailed": "Failed to load customers"
+  },
+  "dropshipperEarnings": {
+    "myEarnings": "My Earnings",
+    "subtitle": "Track your commissions and payouts",
+    "ranges": {
+      "week": "Last 7 days",
+      "month": "This month",
+      "year": "This year",
+      "all": "All time"
+    },
+    "timeframes": {
+      "week": "week",
+      "month": "month",
+      "year": "year",
+      "all": "all"
+    },
+    "cards": {
+      "grossRevenue": "Gross Revenue (Markup)",
+      "totalMarkupBeforeFees": "Total markup before fees",
+      "dealtockFees": "Dealtock Fees",
+      "avgCommission": "{{rate}}% avg commission",
+      "netEarnings": "Net Earnings",
+      "afterFees": "After Dealtock fees",
+      "growth": "Growth",
+      "vsLastMonth": "vs last month (net)"
+    },
+    "pendingEarnings": "Pending Earnings",
+    "paidEarnings": "Paid Earnings",
+    "grossPending": "Gross Pending:",
+    "grossPaid": "Gross Paid:",
+    "dealtockFeesLabel": "Dealtock Fees:",
+    "yourNet": "Your Net:",
+    "export": "Export",
+    "exported": "Earnings exported",
+    "recentTransactions": "Recent Transactions",
+    "noTransactionsYet": "No transactions yet",
+    "orderNumber": "Order #{{number}}",
+    "gross": "Gross:",
+    "fee": "Fee: -{{amount}}",
+    "net": "Net:",
+    "loadFailed": "Failed to load earnings data"
   }
 }

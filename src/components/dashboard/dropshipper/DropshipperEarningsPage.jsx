@@ -3,8 +3,10 @@ import { useState, useEffect } from 'react';
 import { TrendingUp, Calendar, Download, ArrowUp, ArrowDown, Info } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const DropshipperEarningsPage = ({ dropshipperId }) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState('month');
   const [earnings, setEarnings] = useState({
@@ -143,7 +145,7 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
 
     } catch (error) {
       console.error('Error fetching earnings:', error);
-      toast.error('Failed to load earnings data');
+      toast.error(t('dropshipperEarnings.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -178,10 +180,10 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
 
   const getDateRangeText = () => {
     switch (timeframe) {
-      case 'week': return 'Last 7 days';
-      case 'month': return 'This month';
-      case 'year': return 'This year';
-      default: return 'All time';
+      case 'week': return t('dropshipperEarnings.ranges.week');
+      case 'month': return t('dropshipperEarnings.ranges.month');
+      case 'year': return t('dropshipperEarnings.ranges.year');
+      default: return t('dropshipperEarnings.ranges.all');
     }
   };
 
@@ -201,25 +203,25 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Earnings</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Track your commissions and payouts</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('dropshipperEarnings.myEarnings')}</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('dropshipperEarnings.subtitle')}</p>
       </div>
 
       {/* Timeframe Selector */}
       <div className="flex justify-between items-center">
         <p className="text-sm text-gray-500 dark:text-gray-400">{getDateRangeText()}</p>
         <div className="flex space-x-2">
-          {['week', 'month', 'year', 'all'].map((t) => (
+          {['week', 'month', 'year', 'all'].map((tf) => (
             <button
-              key={t}
-              onClick={() => setTimeframe(t)}
+              key={tf}
+              onClick={() => setTimeframe(tf)}
               className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${
-                timeframe === t
+                timeframe === tf
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
-              {t}
+              {t(`dropshipperEarnings.timeframes.${tf}`)}
             </button>
           ))}
         </div>
@@ -228,25 +230,25 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
       {/* Main Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Gross Revenue (Markup)</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('dropshipperEarnings.cards.grossRevenue')}</p>
           <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(earnings.grossCommission)}</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Total markup before fees</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{t('dropshipperEarnings.cards.totalMarkupBeforeFees')}</p>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Dealtock Fees</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('dropshipperEarnings.cards.dealtockFees')}</p>
           <p className="text-2xl font-bold text-kraft-600 dark:text-kraft-400">{formatCurrency(earnings.dealtockFees)}</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{earnings.averageCommission.toFixed(1)}% avg commission</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{t('dropshipperEarnings.cards.avgCommission', { rate: earnings.averageCommission.toFixed(1) })}</p>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-green-100 dark:border-green-900/40 p-5">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Net Earnings</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('dropshipperEarnings.cards.netEarnings')}</p>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(earnings.netEarnings)}</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">After Dealtock fees</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{t('dropshipperEarnings.cards.afterFees')}</p>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Growth</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('dropshipperEarnings.cards.growth')}</p>
           <div className="flex items-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{Math.abs(earnings.growth).toFixed(1)}%</p>
             {earnings.growth >= 0 ? (
@@ -255,43 +257,43 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
               <ArrowDown className="w-5 h-5 text-red-600 dark:text-red-400 ml-2" />
             )}
           </div>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">vs last month (net)</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{t('dropshipperEarnings.cards.vsLastMonth')}</p>
         </div>
       </div>
 
       {/* Pending vs Paid Breakdown */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
-          <h3 className="font-medium mb-3 text-gray-900 dark:text-white">Pending Earnings</h3>
+          <h3 className="font-medium mb-3 text-gray-900 dark:text-white">{t('dropshipperEarnings.pendingEarnings')}</h3>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Gross Pending:</span>
+              <span className="text-gray-600 dark:text-gray-400">{t('dropshipperEarnings.grossPending')}</span>
               <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(earnings.pendingGross)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Dealtock Fees:</span>
+              <span className="text-gray-600 dark:text-gray-400">{t('dropshipperEarnings.dealtockFeesLabel')}</span>
               <span className="text-kraft-600 dark:text-kraft-400">-{formatCurrency(earnings.pendingGross - earnings.pendingNet)}</span>
             </div>
             <div className="flex justify-between font-bold pt-2 border-t border-gray-200 dark:border-gray-700">
-              <span className="text-gray-900 dark:text-white">Your Net:</span>
+              <span className="text-gray-900 dark:text-white">{t('dropshipperEarnings.yourNet')}</span>
               <span className="text-yellow-600 dark:text-yellow-400">{formatCurrency(earnings.pendingNet)}</span>
             </div>
           </div>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
-          <h3 className="font-medium mb-3 text-gray-900 dark:text-white">Paid Earnings</h3>
+          <h3 className="font-medium mb-3 text-gray-900 dark:text-white">{t('dropshipperEarnings.paidEarnings')}</h3>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Gross Paid:</span>
+              <span className="text-gray-600 dark:text-gray-400">{t('dropshipperEarnings.grossPaid')}</span>
               <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(earnings.paidGross)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Dealtock Fees:</span>
+              <span className="text-gray-600 dark:text-gray-400">{t('dropshipperEarnings.dealtockFeesLabel')}</span>
               <span className="text-kraft-600 dark:text-kraft-400">-{formatCurrency(earnings.paidGross - earnings.paidNet)}</span>
             </div>
             <div className="flex justify-between font-bold pt-2 border-t border-gray-200 dark:border-gray-700">
-              <span className="text-gray-900 dark:text-white">Your Net:</span>
+              <span className="text-gray-900 dark:text-white">{t('dropshipperEarnings.yourNet')}</span>
               <span className="text-green-600 dark:text-green-400">{formatCurrency(earnings.paidNet)}</span>
             </div>
           </div>
@@ -322,25 +324,25 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
             a.download = `earnings-${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
             URL.revokeObjectURL(url);
-            toast.success('Earnings exported');
+            toast.success(t('dropshipperEarnings.exported'));
           }}
           className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
         >
           <Download className="w-4 h-4 mr-2" />
-          Export
+          {t('dropshipperEarnings.export')}
         </button>
       </div>
 
       {/* Recent Transactions */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="p-5 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="font-semibold text-gray-900 dark:text-white">Recent Transactions</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white">{t('dropshipperEarnings.recentTransactions')}</h3>
         </div>
         <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-96 overflow-auto">
           {transactions.length === 0 ? (
             <div className="p-12 text-center text-gray-500 dark:text-gray-400">
               <TrendingUp className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-              <p>No transactions yet</p>
+              <p>{t('dropshipperEarnings.noTransactionsYet')}</p>
             </div>
           ) : (
             transactions.map((transaction) => (
@@ -348,7 +350,7 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900 dark:text-white">Order #{transaction.order_number}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{t('dropshipperEarnings.orderNumber', { number: transaction.order_number })}</p>
                       <span className={`text-xs px-2 py-1 rounded-full ${
                         transaction.status === 'delivered' || transaction.status === 'settled'
                           ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
@@ -366,13 +368,13 @@ const DropshipperEarningsPage = ({ dropshipperId }) => {
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Gross: <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(transaction.dropshipper_markup)}</span>
+                      {t('dropshipperEarnings.gross')} <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(transaction.dropshipper_markup)}</span>
                     </p>
                     <p className="text-xs text-kraft-600 dark:text-kraft-400">
-                      Fee: -{formatCurrency(transaction.dropshipper_commission_amount)}
+                      {t('dropshipperEarnings.fee', { amount: formatCurrency(transaction.dropshipper_commission_amount) })}
                     </p>
                     <p className="font-bold text-green-600 dark:text-green-400">
-                      Net: {formatCurrency(transaction.dropshipper_net_earnings)}
+                      {t('dropshipperEarnings.net')} {formatCurrency(transaction.dropshipper_net_earnings)}
                     </p>
                   </div>
                 </div>

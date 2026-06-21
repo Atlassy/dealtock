@@ -1028,5 +1028,46 @@
     "customerAdded": "تمت إضافة العميل بنجاح",
     "addFailed": "فشلت إضافة العميل",
     "loadFailed": "فشل تحميل العملاء"
+  },
+  "dropshipperEarnings": {
+    "myEarnings": "أرباحي",
+    "subtitle": "تتبع عمولاتك ومدفوعاتك",
+    "ranges": {
+      "week": "آخر 7 أيام",
+      "month": "هذا الشهر",
+      "year": "هذه السنة",
+      "all": "كل الفترات"
+    },
+    "timeframes": {
+      "week": "أسبوع",
+      "month": "شهر",
+      "year": "سنة",
+      "all": "الكل"
+    },
+    "cards": {
+      "grossRevenue": "الإيراد الإجمالي (الهامش)",
+      "totalMarkupBeforeFees": "إجمالي الهامش قبل الرسوم",
+      "dealtockFees": "رسوم Dealtock",
+      "avgCommission": "{{rate}}% متوسط العمولة",
+      "netEarnings": "الإيراد الصافي",
+      "afterFees": "بعد رسوم Dealtock",
+      "growth": "النمو",
+      "vsLastMonth": "مقارنة بالشهر الماضي (صافي)"
+    },
+    "pendingEarnings": "أرباح معلّقة",
+    "paidEarnings": "أرباح مدفوعة",
+    "grossPending": "إجمالي معلّق:",
+    "grossPaid": "إجمالي مدفوع:",
+    "dealtockFeesLabel": "رسوم Dealtock:",
+    "yourNet": "صافيك:",
+    "export": "تصدير",
+    "exported": "تم تصدير الأرباح",
+    "recentTransactions": "المعاملات الأخيرة",
+    "noTransactionsYet": "لا توجد معاملات بعد",
+    "orderNumber": "طلب رقم {{number}}",
+    "gross": "الإجمالي:",
+    "fee": "الرسوم: -{{amount}}",
+    "net": "الصافي:",
+    "loadFailed": "فشل تحميل بيانات الأرباح"
   }
 }
