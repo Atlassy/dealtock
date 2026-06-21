@@ -16,8 +16,10 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const CommissionRulesManager = () => {
+  const { t } = useTranslation();
   const [rules, setRules] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +68,7 @@ const CommissionRulesManager = () => {
 
       if (rulesError) {
         console.error('❌ Rules fetch error:', rulesError);
-        toast.error('Failed to load commission rules');
+        toast.error(t('commissionRules.loadFailed'));
         setRules([]);
       } else {
         setRules(rulesData || []);
@@ -88,7 +90,7 @@ const CommissionRulesManager = () => {
 
     } catch (error) {
       console.error('❌ Error loading commission data:', error);
-      toast.error('Failed to load commission data');
+      toast.error(t('commissionRules.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -98,12 +100,12 @@ const CommissionRulesManager = () => {
     try {
       // Validate form
       if (!ruleForm.applies_to) {
-        toast.error('Please select who this rule applies to');
+        toast.error(t('commissionRules.selectAppliesTo'));
         return;
       }
 
       if (!ruleForm.percentage || parseFloat(ruleForm.percentage) < 0) {
-        toast.error('Please enter a valid percentage');
+        toast.error(t('commissionRules.invalidPercentage'));
         return;
       }
 
@@ -151,15 +153,15 @@ const CommissionRulesManager = () => {
 
       if (result.error) throw result.error;
 
-      toast.success(editingRule ? 'Rule updated successfully' : 'Rule created successfully');
+      toast.success(editingRule ? t('commissionRules.ruleUpdated') : t('commissionRules.ruleCreated'));
       setShowAddRule(false);
       setEditingRule(null);
       resetForm();
       loadCommissionData();
-      
+
     } catch (error) {
       console.error('Error saving rule:', error);
-      toast.error('Failed to save commission rule: ' + error.message);
+      toast.error(t('commissionRules.saveFailed', { error: error.message }));
     }
   };
 
@@ -179,7 +181,7 @@ const CommissionRulesManager = () => {
   };
 
   const handleDeleteRule = async (ruleId) => {
-    if (!window.confirm('Are you sure you want to delete this commission rule?')) return;
+    if (!window.confirm(t('commissionRules.confirmDelete'))) return;
 
     try {
       const { error } = await supabase
@@ -189,11 +191,11 @@ const CommissionRulesManager = () => {
 
       if (error) throw error;
 
-      toast.success('Rule deleted successfully');
+      toast.success(t('commissionRules.ruleDeleted'));
       loadCommissionData();
     } catch (error) {
       console.error('Error deleting rule:', error);
-      toast.error('Failed to delete rule');
+      toast.error(t('commissionRules.deleteFailed'));
     }
   };
 
@@ -206,11 +208,11 @@ const CommissionRulesManager = () => {
 
       if (error) throw error;
 
-      toast.success(`Rule ${rule.is_active ? 'deactivated' : 'activated'}`);
+      toast.success(rule.is_active ? t('commissionRules.ruleDeactivated') : t('commissionRules.ruleActivated'));
       loadCommissionData();
     } catch (error) {
       console.error('Error toggling rule:', error);
-      toast.error('Failed to update rule status');
+      toast.error(t('commissionRules.toggleFailed'));
     }
   };
 
@@ -293,7 +295,7 @@ const CommissionRulesManager = () => {
     if (rule.category) {
       return rule.category;
     }
-    return 'All Categories';
+    return t('commissionRules.table.allCategories');
   };
 
   const getAppliesToIcon = (appliesTo) => {
@@ -337,10 +339,10 @@ const CommissionRulesManager = () => {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Percent className="w-6 h-6" />
-            Commission Rules Management
+            {t('commissionRules.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
-            Configure platform fees for B2C, Sellers, Dropshippers, and Premium users
+            {t('commissionRules.subtitle')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -349,7 +351,7 @@ const CommissionRulesManager = () => {
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 flex items-center gap-2 text-sm"
           >
             <RefreshCw className="w-4 h-4" />
-            Refresh
+            {t('commissionRules.refresh')}
           </button>
           <button
             onClick={() => {
@@ -359,7 +361,7 @@ const CommissionRulesManager = () => {
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm"
           >
             <Plus className="w-4 h-4" />
-            Add Commission Rule
+            {t('commissionRules.addRule')}
           </button>
         </div>
       </div>
@@ -367,27 +369,27 @@ const CommissionRulesManager = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Total Rules</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('commissionRules.stats.totalRules')}</p>
           <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Active Rules</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('commissionRules.stats.activeRules')}</p>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.active}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600 dark:text-gray-400">B2C Rules</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('commissionRules.stats.b2cRules')}</p>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.b2c}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Seller Rules</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('commissionRules.stats.sellerRules')}</p>
           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.seller}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Dropshipper Rules</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('commissionRules.stats.dropshipperRules')}</p>
           <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.dropshipper}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Premium Rules</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('commissionRules.stats.premiumRules')}</p>
           <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.proSeller + stats.proDropshipper}</p>
         </div>
       </div>
@@ -396,7 +398,7 @@ const CommissionRulesManager = () => {
       {loading ? (
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading commission rules...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">{t('commissionRules.loadingRules')}</p>
         </div>
       ) : (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
@@ -404,13 +406,13 @@ const CommissionRulesManager = () => {
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
-                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Applies To</th>
-                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Category</th>
-                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Commission %</th>
-                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Order Range (MAD)</th>
-                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Valid Period</th>
-                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Status</th>
-                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Actions</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('commissionRules.table.appliesTo')}</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('commissionRules.table.category')}</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('commissionRules.table.commissionPercent')}</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('commissionRules.table.orderRange')}</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('commissionRules.table.validPeriod')}</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('commissionRules.table.status')}</th>
+                  <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('commissionRules.table.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -421,8 +423,8 @@ const CommissionRulesManager = () => {
                     <td className="p-4">
                       <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getAppliesToColor(rule.applies_to)}`}>
                         {getAppliesToIcon(rule.applies_to)}
-                        {rule.applies_to === 'Pro_Seller' ? 'Pro Seller' :
-                         rule.applies_to === 'Pro_dropshipper' ? 'Pro Dropshipper' :
+                        {rule.applies_to === 'Pro_Seller' ? t('commissionRules.table.proSeller') :
+                         rule.applies_to === 'Pro_dropshipper' ? t('commissionRules.table.proDropshipper') :
                          rule.applies_to}
                       </span>
                       {conflicts.length > 0 && (
@@ -431,7 +433,7 @@ const CommissionRulesManager = () => {
                           title={`Overlaps with ${conflicts.length} other active rule(s): ${conflicts.map(c => `${c.percentage}% (${c.min_amount ?? 0}-${c.max_amount ?? '∞'} MAD)`).join(', ')}`}
                         >
                           <AlertTriangle className="w-3 h-3" />
-                          Conflict
+                          {t('commissionRules.table.conflict')}
                         </span>
                       )}
                     </td>
@@ -448,7 +450,7 @@ const CommissionRulesManager = () => {
                       <div>{new Date(rule.valid_from).toLocaleDateString()}</div>
                       {rule.valid_to && (
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          to {new Date(rule.valid_to).toLocaleDateString()}
+                          {t('commissionRules.table.to', { date: new Date(rule.valid_to).toLocaleDateString() })}
                         </div>
                       )}
                     </td>
@@ -461,7 +463,7 @@ const CommissionRulesManager = () => {
                             : 'bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50'
                         }`}
                       >
-                        {rule.is_active ? 'Active' : 'Inactive'}
+                        {rule.is_active ? t('commissionRules.table.active') : t('commissionRules.table.inactive')}
                       </button>
                     </td>
                     <td className="p-4">
@@ -469,14 +471,14 @@ const CommissionRulesManager = () => {
                         <button
                           onClick={() => handleEditRule(rule)}
                           className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors"
-                          title="Edit"
+                          title={t('commissionRules.table.edit')}
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteRule(rule.id)}
                           className="p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
-                          title="Delete"
+                          title={t('commissionRules.table.delete')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -492,9 +494,9 @@ const CommissionRulesManager = () => {
           {rules.length === 0 && (
             <div className="text-center py-12">
               <Percent className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">No commission rules configured.</p>
+              <p className="text-gray-500">{t('commissionRules.noRules')}</p>
               <p className="text-sm text-gray-400 mt-1">
-                Click "Add Commission Rule" to create your first rule.
+                {t('commissionRules.noRulesSub')}
               </p>
             </div>
           )}
@@ -507,7 +509,7 @@ const CommissionRulesManager = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg max-h-[90vh] overflow-auto">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                {editingRule ? 'Edit Commission Rule' : 'Add Commission Rule'}
+                {editingRule ? t('commissionRules.modal.editTitle') : t('commissionRules.modal.addTitle')}
               </h3>
               <button
                 onClick={() => {
@@ -523,49 +525,49 @@ const CommissionRulesManager = () => {
             <div className="p-6 space-y-4">
               {/* Applies To */}
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Applies To *</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('commissionRules.modal.appliesToLabel')}</label>
                 <select
                   value={ruleForm.applies_to}
                   onChange={(e) => setRuleForm({...ruleForm, applies_to: e.target.value})}
                   className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   required
                 >
-                  <option value="B2C">B2C (Customer Direct)</option>
-                  <option value="Seller">Seller</option>
-                  <option value="dropshipper">Dropshipper</option>
-                  <option value="Pro_Seller">Pro Seller (Premium)</option>
-                  <option value="Pro_dropshipper">Pro Dropshipper (Premium)</option>
+                  <option value="B2C">{t('commissionRules.modal.b2cOption')}</option>
+                  <option value="Seller">{t('commissionRules.modal.sellerOption')}</option>
+                  <option value="dropshipper">{t('commissionRules.modal.dropshipperOption')}</option>
+                  <option value="Pro_Seller">{t('commissionRules.modal.proSellerOption')}</option>
+                  <option value="Pro_dropshipper">{t('commissionRules.modal.proDropshipperOption')}</option>
                 </select>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {ruleForm.applies_to === 'B2C' && '30% commission on final price'}
-                  {ruleForm.applies_to === 'Seller' && 'Commission charged to sellers'}
-                  {ruleForm.applies_to === 'dropshipper' && 'Commission on dropshipper markup'}
-                  {ruleForm.applies_to === 'Pro_Seller' && 'Premium sellers get 80% discount on regular seller rates'}
-                  {ruleForm.applies_to === 'Pro_dropshipper' && 'Premium dropshippers get 80% discount on regular rates'}
+                  {ruleForm.applies_to === 'B2C' && t('commissionRules.modal.hintB2C')}
+                  {ruleForm.applies_to === 'Seller' && t('commissionRules.modal.hintSeller')}
+                  {ruleForm.applies_to === 'dropshipper' && t('commissionRules.modal.hintDropshipper')}
+                  {ruleForm.applies_to === 'Pro_Seller' && t('commissionRules.modal.hintProSeller')}
+                  {ruleForm.applies_to === 'Pro_dropshipper' && t('commissionRules.modal.hintProDropshipper')}
                 </p>
               </div>
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Category (Optional)</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('commissionRules.modal.categoryLabel')}</label>
                 <select
                   value={ruleForm.category}
                   onChange={(e) => setRuleForm({...ruleForm, category: e.target.value})}
                   className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">All Categories (Default Rule)</option>
+                  <option value="">{t('commissionRules.modal.categoryDefault')}</option>
                   {categories.map(cat => (
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Leave empty for default rule (applies to all categories)
+                  {t('commissionRules.modal.categoryHint')}
                 </p>
               </div>
 
               {/* Percentage */}
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Commission Percentage *</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('commissionRules.modal.percentageLabel')}</label>
                 <div className="relative">
                   <input
                     type="number"
@@ -575,21 +577,21 @@ const CommissionRulesManager = () => {
                     value={ruleForm.percentage}
                     onChange={(e) => setRuleForm({...ruleForm, percentage: e.target.value})}
                     className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg pr-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., 30"
+                    placeholder={t('commissionRules.modal.percentagePlaceholder')}
                     required
                   />
                   <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {ruleForm.applies_to === 'Pro_Seller' && 'Pro sellers get 80% discount (20% of regular rates)'}
-                  {ruleForm.applies_to === 'Pro_dropshipper' && 'Pro dropshippers get 80% discount (20% of regular rates)'}
+                  {ruleForm.applies_to === 'Pro_Seller' && t('commissionRules.modal.hintProSellerPercent')}
+                  {ruleForm.applies_to === 'Pro_dropshipper' && t('commissionRules.modal.hintProDropshipperPercent')}
                 </p>
               </div>
 
               {/* Order Amount Range */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Min Order Amount (MAD)</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('commissionRules.modal.minAmount')}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -601,7 +603,7 @@ const CommissionRulesManager = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Max Order Amount (MAD)</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('commissionRules.modal.maxAmount')}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -609,7 +611,7 @@ const CommissionRulesManager = () => {
                     value={ruleForm.max_amount}
                     onChange={(e) => setRuleForm({...ruleForm, max_amount: e.target.value})}
                     className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                    placeholder="No max"
+                    placeholder={t('commissionRules.modal.noMax')}
                   />
                 </div>
               </div>
@@ -617,7 +619,7 @@ const CommissionRulesManager = () => {
               {/* Valid Period */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Valid From</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('commissionRules.modal.validFrom')}</label>
                   <input
                     type="date"
                     value={ruleForm.valid_from}
@@ -626,7 +628,7 @@ const CommissionRulesManager = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Valid To (Optional)</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('commissionRules.modal.validTo')}</label>
                   <input
                     type="date"
                     value={ruleForm.valid_to}
@@ -646,7 +648,7 @@ const CommissionRulesManager = () => {
                   className="rounded text-blue-600 mr-2 focus:ring-blue-500"
                 />
                 <label htmlFor="isActive" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Rule is active
+                  {t('commissionRules.modal.ruleIsActive')}
                 </label>
               </div>
 
@@ -655,7 +657,7 @@ const CommissionRulesManager = () => {
                 <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800/40 rounded-lg">
                   <AlertTriangle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
                   <div className="text-sm text-yellow-800 dark:text-yellow-300">
-                    <p className="font-medium">This rule overlaps with {formConflicts.length} other active rule(s) for the same audience/category/range:</p>
+                    <p className="font-medium">{t('commissionRules.modal.conflictWarning', { count: formConflicts.length })}</p>
                     <ul className="mt-1 space-y-0.5 list-disc list-inside">
                       {formConflicts.map((c) => (
                         <li key={c.id}>
@@ -664,7 +666,7 @@ const CommissionRulesManager = () => {
                         </li>
                       ))}
                     </ul>
-                    <p className="mt-1">Whichever rule has the higher priority will be applied — double check that's the intended one.</p>
+                    <p className="mt-1">{t('commissionRules.modal.conflictPriority')}</p>
                   </div>
                 </div>
               )}
@@ -679,14 +681,14 @@ const CommissionRulesManager = () => {
                   }}
                   className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
                 >
-                  Cancel
+                  {t('commissionRules.modal.cancel')}
                 </button>
                 <button
                   onClick={handleSaveRule}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-colors"
                 >
                   <Save className="w-4 h-4" />
-                  {editingRule ? 'Update Rule' : 'Add Rule'}
+                  {editingRule ? t('commissionRules.modal.updateRule') : t('commissionRules.modal.addRuleBtn')}
                 </button>
               </div>
             </div>
