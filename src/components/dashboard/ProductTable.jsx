@@ -2,9 +2,11 @@
 import React from 'react';
 import { Info, AlertTriangle, Pencil, Trash2 } from 'lucide-react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 
 const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
+  const { t } = useTranslation();
   const formatCurrency = (amount) => {
     if (!amount && amount !== 0) return '-';
     return new Intl.NumberFormat('fr-MA', {
@@ -76,9 +78,9 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
   };
 
   const formatPriceRange = (min, max) => {
-    if (min === null && max === null) return 'all prices';
-    if (min === null) return `up to ${formatCurrency(max)}`;
-    if (max === null) return `${formatCurrency(min)}+`;
+    if (min === null && max === null) return t('productTable.allPrices');
+    if (min === null) return t('productTable.upTo', { amount: formatCurrency(max) });
+    if (max === null) return t('productTable.plus', { amount: formatCurrency(min) });
     return `${formatCurrency(min)} - ${formatCurrency(max)}`;
   };
 
@@ -87,16 +89,16 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
       <table className="w-full table-fixed bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <thead>
           <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-            {renderSortableHeader('Product', 'name', 'w-[20%]')}
-            {renderSortableHeader('Category', 'category', 'w-[9%]')}
-            {renderSortableHeader('Location', 'location', 'w-[9%]')}
-            {renderSortableHeader('Qty', 'quantity', 'w-[6%]')}
-            {renderSortableHeader('Purchase Price', 'purchase_price', 'w-[10%]')}
-            {renderSortableHeader('Commission (MAD)', 'commission', 'w-[10%]')}
-            {renderSortableHeader('Commission Rate', 'commission_rate', 'w-[9%]')}
-            {renderSortableHeader('Est. Net Amount', 'net_amount', 'w-[10%]')}
-            {renderSortableHeader('Status', 'status', 'w-[9%]')}
-            <th className="text-left py-3 px-2 text-sm font-medium text-gray-700 dark:text-gray-300 w-[8%]">Actions</th>
+            {renderSortableHeader(t('productTable.product'), 'name', 'w-[20%]')}
+            {renderSortableHeader(t('productTable.category'), 'category', 'w-[9%]')}
+            {renderSortableHeader(t('productTable.location'), 'location', 'w-[9%]')}
+            {renderSortableHeader(t('productTable.qty'), 'quantity', 'w-[6%]')}
+            {renderSortableHeader(t('productTable.purchasePrice'), 'purchase_price', 'w-[10%]')}
+            {renderSortableHeader(t('productTable.commissionAmount'), 'commission', 'w-[10%]')}
+            {renderSortableHeader(t('productTable.commissionRate'), 'commission_rate', 'w-[9%]')}
+            {renderSortableHeader(t('productTable.estNetAmount'), 'net_amount', 'w-[10%]')}
+            {renderSortableHeader(t('productTable.status'), 'status', 'w-[9%]')}
+            <th className="text-left py-3 px-2 text-sm font-medium text-gray-700 dark:text-gray-300 w-[8%]">{t('productTable.actions')}</th>
            </tr>
         </thead>
         <tbody>
@@ -107,13 +109,18 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
             
             const priceRangeText = product.commission_min_amount || product.commission_max_amount
               ? formatPriceRange(product.commission_min_amount, product.commission_max_amount)
-              : 'all prices';
-            
+              : t('productTable.allPrices');
+
             const isPremiumSeller = product.is_premium || false;
-            const premiumNote = isPremiumSeller ? ' (Premium sellers get 80% discount)' : '';
-            
-            const commissionTooltip = `Commission: ${product.commission_rate || 0}% based on ${product.category || 'Other'} category and price range ${priceRangeText}${premiumNote}`;
-            const netAmountTooltip = "Provisional amount after commission. Final amount may vary based on actual sale.";
+            const premiumNote = isPremiumSeller ? t('productTable.premiumNote') : '';
+
+            const commissionTooltip = t('productTable.commissionTooltip', {
+              rate: product.commission_rate || 0,
+              category: product.category || 'Other',
+              range: priceRangeText,
+              premiumNote
+            });
+            const netAmountTooltip = t('productTable.netAmountTooltip');
             
             return (
               <tr 
@@ -134,13 +141,13 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
                       />
                     ) : (
                       <div className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-700 flex-shrink-0">
-                        <span className="text-gray-400 dark:text-gray-500 text-xs">No img</span>
+                        <span className="text-gray-400 dark:text-gray-500 text-xs">{t('productTable.noImg')}</span>
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
                       <p className="font-medium text-gray-900 dark:text-white truncate">{product.name}</p>
                       {product.sku && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400">SKU: {product.sku}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t('productTable.sku', { sku: product.sku })}</p>
                       )}
                     </div>
                   </div>
@@ -159,12 +166,12 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
                     {stockWarning && !outOfStock && (
                       <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 text-xs rounded-full">
                         <AlertTriangle className="w-3 h-3" />
-                        Low stock
+                        {t('productTable.lowStock')}
                       </span>
                     )}
                     {outOfStock && (
                       <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 text-xs rounded-full">
-                        Out of stock
+                        {t('productTable.outOfStock')}
                       </span>
                     )}
                   </div>
@@ -191,7 +198,7 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
                 </td>
                 <td className="py-2 px-2">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(product.status)}`}>
-                    {product.status === 'available' ? 'Available' : product.status === 'sold' ? 'Sold' : product.status}
+                    {product.status === 'available' ? t('productTable.available') : product.status === 'sold' ? t('productTable.sold') : product.status}
                   </span>
                 </td>
                 <td className="py-2 px-2">
@@ -199,16 +206,16 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
                     <button
                       className="p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow"
                       onClick={() => onEdit(product)}
-                      aria-label="Edit"
-                      title="Edit"
+                      aria-label={t('productTable.edit')}
+                      title={t('productTable.edit')}
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
                       className="p-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all shadow-sm hover:shadow"
                       onClick={() => onDelete(product.id)}
-                      aria-label="Delete"
-                      title="Delete"
+                      aria-label={t('productTable.delete')}
+                      title={t('productTable.delete')}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -222,7 +229,7 @@ const ProductTable = ({ products, onEdit, onDelete, onSort, sortConfig }) => {
       
       {products.length === 0 && (
         <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg">
-          <p className="text-gray-500 dark:text-gray-400">No products found</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('productTable.noProductsFound')}</p>
         </div>
       )}
     </div>

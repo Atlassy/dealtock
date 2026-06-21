@@ -219,6 +219,7 @@ const DeviceBreakdown = ({ mobile, desktop }) => {
 // ESCROW TAB COMPONENT
 // ============================================
 const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
+  const { t } = useTranslation();
   const [escrowOrders, setEscrowOrders] = useState([]);
   const [payoutHistory, setPayoutHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -357,44 +358,44 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
       {/* Escrow Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-5 shadow-sm dark:shadow-none">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Escrow Balance</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('escrowTab.escrowBalance')}</p>
           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{formatCurrency(dashboardData.escrowBalance || 0)}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{dashboardData.pendingEscrowCount || 0} orders pending</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('escrowTab.ordersPending', { count: dashboardData.pendingEscrowCount || 0 })}</p>
         </div>
 
         <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-5 shadow-sm dark:shadow-none">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Available for Payout</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('escrowTab.availableForPayout')}</p>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(dashboardData.availableForPayout || 0)}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Ready to withdraw</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('escrowTab.readyToWithdraw')}</p>
         </div>
 
         <div className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-5 shadow-sm dark:shadow-none">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Released</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('escrowTab.totalReleased')}</p>
           <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{formatCurrency(dashboardData.totalReleased || 0)}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Paid to you</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('escrowTab.paidToYou')}</p>
         </div>
       </div>
 
       {/* Escrow Orders Table */}
       <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-transparent rounded-xl overflow-hidden shadow-sm dark:shadow-none">
         <div className="px-3 py-3 border-b border-gray-200 dark:border-white/10">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Orders in Escrow</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('escrowTab.ordersInEscrow')}</h3>
         </div>
 
         <div className="p-4">
           {escrowOrders.length === 0 ? (
-            <p className="text-gray-500 dark:text-gray-400 text-center py-8">No escrow orders found</p>
+            <p className="text-gray-500 dark:text-gray-400 text-center py-8">{t('escrowTab.noEscrowOrders')}</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="text-left text-gray-500 dark:text-gray-400 text-sm">
-                    <th className="pb-3">Order #</th>
-                    <th className="pb-3">Product</th>
-                    <th className="pb-3">Amount</th>
-                    <th className="pb-3">Status</th>
-                    <th className="pb-3">Delivery Date</th>
-                    <th className="pb-3">Release Date</th>
+                    <th className="pb-3">{t('escrowTab.orderNumber')}</th>
+                    <th className="pb-3">{t('escrowTab.product')}</th>
+                    <th className="pb-3">{t('escrowTab.amount')}</th>
+                    <th className="pb-3">{t('escrowTab.status')}</th>
+                    <th className="pb-3">{t('escrowTab.deliveryDate')}</th>
+                    <th className="pb-3">{t('escrowTab.releaseDate')}</th>
                     </tr>
                 </thead>
                 <tbody className="text-gray-700 dark:text-gray-300">
@@ -414,7 +415,7 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
                               ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
                               : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400'
                           }`}>
-                            {isReleased ? 'Released' : 'Held'}
+                            {isReleased ? t('escrowTab.released') : t('escrowTab.held')}
                           </span>
                         </td>
                         <td className="py-3">{formatDate(order.delivered_at)}</td>
@@ -433,7 +434,7 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
       {payoutHistory.length > 0 && (
         <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-transparent rounded-xl overflow-hidden shadow-sm dark:shadow-none">
           <div className="px-3 py-3 border-b border-gray-200 dark:border-white/10">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Payouts</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('escrowTab.recentPayouts')}</h3>
           </div>
 
           <div className="p-4">
@@ -441,10 +442,10 @@ const EscrowTab = ({ dashboardData, setDashboardData, sellerId }) => {
               <table className="w-full">
                 <thead>
                   <tr className="text-left text-gray-500 dark:text-gray-400 text-sm">
-                    <th className="pb-3">Date</th>
-                    <th className="pb-3">Amount</th>
-                    <th className="pb-3">Status</th>
-                    <th className="pb-3">Reference</th>
+                    <th className="pb-3">{t('escrowTab.date')}</th>
+                    <th className="pb-3">{t('escrowTab.amount')}</th>
+                    <th className="pb-3">{t('escrowTab.status')}</th>
+                    <th className="pb-3">{t('escrowTab.reference')}</th>
                   </tr>
                 </thead>
                 <tbody className="text-gray-700 dark:text-gray-300">
