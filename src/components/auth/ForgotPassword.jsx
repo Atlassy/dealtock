@@ -2,8 +2,10 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function ForgotPassword() {
+  const { t } = useTranslation();
   const [email, setEmail]     = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,10 +36,10 @@ export default function ForgotPassword() {
         </div>
 
         <h2 className="text-xl font-bold text-gray-900 text-center mb-1">
-          Reset your password
+          {t('auth.forgotPassword.title')}
         </h2>
         <p className="text-sm text-gray-500 text-center mb-6">
-          Enter your Dealtock email and we'll send you a secure reset link.
+          {t('auth.forgotPassword.subtitle')}
         </p>
 
         {errorMsg && (
@@ -49,7 +51,7 @@ export default function ForgotPassword() {
         <form onSubmit={handleReset} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Email Address
+              {t('auth.forgotPassword.emailAddress')}
             </label>
             <input
               type="email"
@@ -70,9 +72,9 @@ export default function ForgotPassword() {
             {loading ? (
               <>
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Sending...
+                {t('auth.forgotPassword.sending')}
               </>
-            ) : "Send Reset Link"}
+            ) : t('auth.forgotPassword.sendResetLink')}
           </button>
         </form>
 
@@ -81,7 +83,7 @@ export default function ForgotPassword() {
             to="/login"
             className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Login
+            <ArrowLeft className="w-4 h-4" /> {t('auth.forgotPassword.backToLogin')}
           </Link>
         </div>
       </div>

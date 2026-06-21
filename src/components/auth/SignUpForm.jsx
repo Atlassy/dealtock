@@ -3,8 +3,10 @@ import { supabase } from "@/lib/supabaseClient";
 import { Link, useNavigate } from "react-router-dom";
 import PasswordStrength from "./PasswordStrength";
 import { Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function SignUpForm() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -33,12 +35,12 @@ export default function SignUpForm() {
     setErrorMsg("");
 
     if (password !== confirmPwd) {
-      setErrorMsg("Passwords do not match.");
+      setErrorMsg(t('auth.signup.passwordsDontMatch'));
       return;
     }
 
     if (strength !== "Strong") {
-      setErrorMsg("Please choose a stronger password.");
+      setErrorMsg(t('auth.signup.chooseStrongerPassword'));
       return;
     }
 
@@ -60,9 +62,7 @@ export default function SignUpForm() {
         msg.includes("registered") ||
         msg.includes("exists")
       ) {
-        setErrorMsg(
-          "This email is already registered. Please login or reset your password."
-        );
+        setErrorMsg(t('auth.signup.emailAlreadyRegistered'));
       } else {
         setErrorMsg(signupError.message);
       }
@@ -75,13 +75,9 @@ export default function SignUpForm() {
     // -------------------------------------------------
     if (data.user && data.user.identities.length === 0) {
       if (!data.user.email_confirmed_at) {
-        setErrorMsg(
-          "This email already exists but is not confirmed. Please check your inbox or reset your password."
-        );
+        setErrorMsg(t('auth.signup.emailExistsNotConfirmed'));
       } else {
-        setErrorMsg(
-          "This email is already registered. Please login or reset your password."
-        );
+        setErrorMsg(t('auth.signup.emailAlreadyRegistered'));
       }
       return;
     }
@@ -93,7 +89,7 @@ export default function SignUpForm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white p-8 shadow rounded">
-        <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">{t('auth.signup.createAccount')}</h2>
 
         {errorMsg && (
           <p className="text-red-600 mb-4 text-center">{errorMsg}</p>
@@ -104,7 +100,7 @@ export default function SignUpForm() {
           <input
             type="email"
             className="w-full p-3 border rounded bg-white text-gray-900"
-            placeholder="Email"
+            placeholder={t('auth.signup.emailPlaceholder')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -113,7 +109,7 @@ export default function SignUpForm() {
           <div className="relative">
             <input
               type={showPwd ? "text" : "password"}
-              placeholder="Password"
+              placeholder={t('auth.signup.passwordPlaceholder')}
               className="w-full p-3 border rounded pr-10 bg-white text-gray-900"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -133,7 +129,7 @@ export default function SignUpForm() {
           <div className="relative">
             <input
               type={showConfirmPwd ? "text" : "password"}
-              placeholder="Confirm Password"
+              placeholder={t('auth.signup.confirmPasswordPlaceholder')}
               className="w-full p-3 border rounded pr-10 bg-white text-gray-900"
               value={confirmPwd}
               onChange={(e) => setConfirmPwd(e.target.value)}
@@ -153,7 +149,7 @@ export default function SignUpForm() {
             value={city}
             onChange={(e) => setCity(e.target.value)}
           >
-            <option value="">Select City</option>
+            <option value="">{t('auth.signup.selectCity')}</option>
             {moroccanCities.map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -165,14 +161,14 @@ export default function SignUpForm() {
             type="submit"
             className="w-full bg-black text-white py-3 rounded hover:bg-gray-800"
           >
-            Register
+            {t('auth.signup.register')}
           </button>
         </form>
 
         <p className="mt-4 text-center">
-          Already have an account?{" "}
+          {t('auth.signup.alreadyHaveAccount')}{" "}
           <Link to="/login" className="text-blue-600 underline">
-            Login
+            {t('auth.signup.login')}
           </Link>
         </p>
       </div>

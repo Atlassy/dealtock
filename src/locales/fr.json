@@ -1103,5 +1103,105 @@
     "orderPlacedSuccess": "Commande passée ! Votre marge : {{markup}} MAD | Profit net : {{profit}} MAD",
     "placeOrderFailed": "Échec de la commande",
     "loadCustomersFailed": "Échec du chargement des clients"
+  },
+  "auth": {
+    "version": "Version 1.0",
+    "login": {
+      "welcomeBack": "Bon retour",
+      "emailAddress": "Adresse e-mail",
+      "password": "Mot de passe",
+      "forgotPassword": "Mot de passe oublié ?",
+      "signingIn": "Connexion...",
+      "signIn": "Se connecter",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "createAccount": "Créer un compte",
+      "allRightsReserved": "© {{year}} Dealtock. Tous droits réservés."
+    },
+    "signup": {
+      "createAccount": "Créer un compte",
+      "passwordsDontMatch": "Les mots de passe ne correspondent pas.",
+      "chooseStrongerPassword": "Veuillez choisir un mot de passe plus fort.",
+      "emailAlreadyRegistered": "Cet e-mail est déjà enregistré. Connectez-vous ou réinitialisez votre mot de passe.",
+      "emailExistsNotConfirmed": "Cet e-mail existe déjà mais n'est pas confirmé. Vérifiez votre boîte mail ou réinitialisez votre mot de passe.",
+      "emailPlaceholder": "E-mail",
+      "passwordPlaceholder": "Mot de passe",
+      "confirmPasswordPlaceholder": "Confirmer le mot de passe",
+      "selectCity": "Sélectionner une ville",
+      "register": "S'inscrire",
+      "alreadyHaveAccount": "Vous avez déjà un compte ?",
+      "login": "Connexion"
+    },
+    "forgotPassword": {
+      "title": "Réinitialiser votre mot de passe",
+      "subtitle": "Entrez votre e-mail Dealtock et nous vous envoyons un lien de réinitialisation sécurisé.",
+      "emailAddress": "Adresse e-mail",
+      "sending": "Envoi...",
+      "sendResetLink": "Envoyer le lien de réinitialisation",
+      "backToLogin": "Retour à la connexion"
+    },
+    "resetPassword": {
+      "invalidLinkTitle": "Lien de réinitialisation invalide",
+      "invalidLinkBody": "Ce lien a expiré ou est invalide. Les liens de réinitialisation expirent après 1 heure.",
+      "requestNewLink": "Demander un nouveau lien",
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Choisissez un nouveau mot de passe fort.",
+      "newPassword": "Nouveau mot de passe",
+      "minChars": "8 caractères min.",
+      "confirmPassword": "Confirmer le mot de passe",
+      "repeatPassword": "Répétez votre mot de passe",
+      "updating": "Mise à jour...",
+      "updatePassword": "Mettre à jour le mot de passe",
+      "afterUpdateNote": "Après la mise à jour, vous serez déconnecté et redirigé vers la connexion.",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères.",
+      "passwordsDontMatch": "Les mots de passe ne correspondent pas.",
+      "chooseStrongerPassword": "Veuillez choisir un mot de passe plus fort."
+    },
+    "checkEmail": {
+      "title": "Vérifiez votre boîte mail",
+      "weSent": "Nous avons envoyé un lien de réinitialisation à :",
+      "clickLink": "Cliquez sur le lien dans l'e-mail pour réinitialiser votre mot de passe. Le lien expire dans {{hours}}.",
+      "oneHour": "1 heure",
+      "steps": {
+        "openEmail": "Ouvrez votre application e-mail",
+        "findEmail": "Trouvez l'e-mail de Dealtock",
+        "clickReset": "Cliquez sur \"Réinitialiser mon mot de passe\"",
+        "chooseNew": "Choisissez un nouveau mot de passe fort"
+      },
+      "didntReceive": "Vous n'avez pas reçu l'e-mail ?",
+      "resending": "Renvoi...",
+      "linkResent": "✅ Lien renvoyé !",
+      "resendLink": "Renvoyer le lien",
+      "backToLogin": "Retour à la connexion",
+      "checkSpam": "Vérifiez vos spams/courrier indésirable si vous ne le voyez pas dans votre boîte de réception.",
+      "emailNotFound": "Adresse e-mail introuvable. Revenez en arrière et réessayez.",
+      "resentToast": "Lien de réinitialisation renvoyé !"
+    },
+    "emailConfirmation": {
+      "title": "Confirmez votre e-mail",
+      "body": "Nous avons envoyé un lien de confirmation à votre e-mail.",
+      "clickToActivate": "Cliquez sur le lien pour activer votre compte.",
+      "resent": "Un nouvel e-mail de confirmation a été envoyé.",
+      "resendButton": "Renvoyer l'e-mail de confirmation",
+      "mustLoginAgain": "Vous devez vous reconnecter pour renvoyer l'e-mail de confirmation."
+    },
+    "passwordUpdated": {
+      "title": "Mot de passe mis à jour",
+      "body": "Votre mot de passe a été changé avec succès.",
+      "backToLogin": "Retour à la connexion"
+    },
+    "passwordStrength": {
+      "strengthLabel": "Force du mot de passe : {{strength}}",
+      "enterPassword": "Entrez un mot de passe",
+      "veryWeak": "Très faible",
+      "weak": "Faible",
+      "medium": "Moyen",
+      "strong": "Fort",
+      "atLeast8": "Au moins 8 caractères",
+      "bonus12": "(+ bonus pour 12+)",
+      "uppercase": "Lettre majuscule",
+      "number": "Chiffre",
+      "special": "Caractère spécial",
+      "notCommon": "Pas un mot de passe courant"
+    }
   }
 }

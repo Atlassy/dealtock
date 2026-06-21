@@ -1103,5 +1103,105 @@
     "orderPlacedSuccess": "Order placed! Your markup: {{markup}} MAD | Net profit: {{profit}} MAD",
     "placeOrderFailed": "Failed to place order",
     "loadCustomersFailed": "Failed to load customers"
+  },
+  "auth": {
+    "version": "Version 1.0",
+    "login": {
+      "welcomeBack": "Welcome Back",
+      "emailAddress": "Email Address",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "signingIn": "Signing in...",
+      "signIn": "Sign In",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create account",
+      "allRightsReserved": "© {{year}} Dealtock. All rights reserved."
+    },
+    "signup": {
+      "createAccount": "Create Account",
+      "passwordsDontMatch": "Passwords do not match.",
+      "chooseStrongerPassword": "Please choose a stronger password.",
+      "emailAlreadyRegistered": "This email is already registered. Please login or reset your password.",
+      "emailExistsNotConfirmed": "This email already exists but is not confirmed. Please check your inbox or reset your password.",
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Password",
+      "confirmPasswordPlaceholder": "Confirm Password",
+      "selectCity": "Select City",
+      "register": "Register",
+      "alreadyHaveAccount": "Already have an account?",
+      "login": "Login"
+    },
+    "forgotPassword": {
+      "title": "Reset your password",
+      "subtitle": "Enter your Dealtock email and we'll send you a secure reset link.",
+      "emailAddress": "Email Address",
+      "sending": "Sending...",
+      "sendResetLink": "Send Reset Link",
+      "backToLogin": "Back to Login"
+    },
+    "resetPassword": {
+      "invalidLinkTitle": "Invalid Reset Link",
+      "invalidLinkBody": "This link has expired or is invalid. Password reset links expire after 1 hour.",
+      "requestNewLink": "Request New Reset Link",
+      "title": "Reset Password",
+      "subtitle": "Choose a new strong password.",
+      "newPassword": "New Password",
+      "minChars": "Min. 8 characters",
+      "confirmPassword": "Confirm Password",
+      "repeatPassword": "Repeat your password",
+      "updating": "Updating...",
+      "updatePassword": "Update Password",
+      "afterUpdateNote": "After updating, you'll be signed out and redirected to login.",
+      "passwordMinLength": "Password must be at least 8 characters.",
+      "passwordsDontMatch": "Passwords do not match.",
+      "chooseStrongerPassword": "Please choose a stronger password."
+    },
+    "checkEmail": {
+      "title": "Check your inbox",
+      "weSent": "We sent a password reset link to:",
+      "clickLink": "Click the link in the email to reset your password. The link expires in {{hours}}.",
+      "oneHour": "1 hour",
+      "steps": {
+        "openEmail": "Open your email app",
+        "findEmail": "Find the email from Dealtock",
+        "clickReset": "Click \"Reset my password\"",
+        "chooseNew": "Choose a new strong password"
+      },
+      "didntReceive": "Didn't receive the email?",
+      "resending": "Resending...",
+      "linkResent": "✅ Link resent!",
+      "resendLink": "Resend reset link",
+      "backToLogin": "Back to Login",
+      "checkSpam": "Check spam/junk if you don't see it in your inbox.",
+      "emailNotFound": "Email address not found. Please go back and try again.",
+      "resentToast": "Reset link resent!"
+    },
+    "emailConfirmation": {
+      "title": "Confirm Your Email",
+      "body": "We sent a confirmation link to your email.",
+      "clickToActivate": "Please click the link to activate your account.",
+      "resent": "A new confirmation email was sent.",
+      "resendButton": "Resend Confirmation Email",
+      "mustLoginAgain": "You must login again to resend confirmation email."
+    },
+    "passwordUpdated": {
+      "title": "Password Updated",
+      "body": "Your password has been successfully changed.",
+      "backToLogin": "Back to Login"
+    },
+    "passwordStrength": {
+      "strengthLabel": "Password strength: {{strength}}",
+      "enterPassword": "Enter a password",
+      "veryWeak": "Very Weak",
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong",
+      "atLeast8": "At least 8 characters",
+      "bonus12": "(+ bonus for 12+)",
+      "uppercase": "Uppercase letter",
+      "number": "Number",
+      "special": "Special character",
+      "notCommon": "Not a common password"
+    }
   }
 }

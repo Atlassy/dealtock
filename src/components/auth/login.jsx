@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { signIn, loading } = useAuth();
   const [email, setEmail] = useState("");
@@ -40,11 +42,11 @@ export default function Login() {
           <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent">
             Dealtock
           </h1>
-          <p className="text-xs text-gray-400 mt-0.5">Version 1.0</p>
+          <p className="text-xs text-gray-400 mt-0.5">{t('auth.version')}</p>
         </div>
 
         <h2 className="text-lg font-semibold text-gray-800 text-center mb-5">
-          Welcome Back
+          {t('auth.login.welcomeBack')}
         </h2>
 
         {errorMsg && (
@@ -57,7 +59,7 @@ export default function Login() {
           {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Email Address
+              {t('auth.login.emailAddress')}
             </label>
             <input
               type="email"
@@ -73,9 +75,9 @@ export default function Login() {
           {/* Password — flexbox row, NO absolute positioning */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-sm font-medium text-gray-700">Password</label>
+              <label className="text-sm font-medium text-gray-700">{t('auth.login.password')}</label>
               <Link to="/forgot-password" className="text-xs text-blue-600 hover:underline">
-                Forgot password?
+                {t('auth.login.forgotPassword')}
               </Link>
             </div>
             {/* KEY FIX: flex row instead of relative/absolute */}
@@ -112,21 +114,21 @@ export default function Login() {
             {loading ? (
               <>
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Signing in...
+                {t('auth.login.signingIn')}
               </>
-            ) : "Sign In"}
+            ) : t('auth.login.signIn')}
           </button>
         </form>
 
         <div className="mt-5 pt-5 border-t border-gray-100 text-center text-sm text-gray-500">
-          Don't have an account?{" "}
+          {t('auth.login.noAccount')}{" "}
           <Link to="/signup" className="text-blue-600 font-medium hover:underline">
-            Create account
+            {t('auth.login.createAccount')}
           </Link>
         </div>
 
         <p className="mt-4 text-center text-xs text-gray-400">
-          © {new Date().getFullYear()} Dealtock. All rights reserved.
+          {t('auth.login.allRightsReserved', { year: new Date().getFullYear() })}
         </p>
       </div>
     </div>

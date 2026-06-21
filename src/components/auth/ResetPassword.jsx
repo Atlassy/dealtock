@@ -3,8 +3,10 @@ import { supabase } from "@/lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import PasswordStrength from "./PasswordStrength";
 import { Eye, EyeOff, Lock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function ResetPassword() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -25,9 +27,9 @@ export default function ResetPassword() {
     e.preventDefault();
     setErrorMsg("");
     setLoading(true);
-    if (password.length < 8) { setErrorMsg("Password must be at least 8 characters."); setLoading(false); return; }
-    if (password !== confirm) { setErrorMsg("Passwords do not match."); setLoading(false); return; }
-    if (strength !== "Strong" && strength !== "Medium") { setErrorMsg("Please choose a stronger password."); setLoading(false); return; }
+    if (password.length < 8) { setErrorMsg(t('auth.resetPassword.passwordMinLength')); setLoading(false); return; }
+    if (password !== confirm) { setErrorMsg(t('auth.resetPassword.passwordsDontMatch')); setLoading(false); return; }
+    if (strength !== "Strong" && strength !== "Medium") { setErrorMsg(t('auth.resetPassword.chooseStrongerPassword')); setLoading(false); return; }
     const { error } = await supabase.auth.updateUser({ password });
     if (error) { setErrorMsg(error.message); setLoading(false); return; }
     await supabase.auth.signOut();
@@ -41,15 +43,15 @@ export default function ResetPassword() {
           <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Lock className="w-7 h-7 text-red-500" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Invalid Reset Link</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">{t('auth.resetPassword.invalidLinkTitle')}</h2>
           <p className="text-sm text-gray-500 mb-6">
-            This link has expired or is invalid. Password reset links expire after 1 hour.
+            {t('auth.resetPassword.invalidLinkBody')}
           </p>
           <button
             onClick={() => navigate("/forgot-password")}
             className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition"
           >
-            Request New Reset Link
+            {t('auth.resetPassword.requestNewLink')}
           </button>
         </div>
       </div>
@@ -66,8 +68,8 @@ export default function ResetPassword() {
           </div>
         </div>
 
-        <h2 className="text-xl font-bold text-gray-900 text-center mb-1">Reset Password</h2>
-        <p className="text-sm text-gray-500 text-center mb-6">Choose a new strong password.</p>
+        <h2 className="text-xl font-bold text-gray-900 text-center mb-1">{t('auth.resetPassword.title')}</h2>
+        <p className="text-sm text-gray-500 text-center mb-6">{t('auth.resetPassword.subtitle')}</p>
 
         {errorMsg && (
           <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-4 text-center">
@@ -78,11 +80,11 @@ export default function ResetPassword() {
         <form onSubmit={handleUpdate} className="space-y-4">
           {/* New password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">New Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('auth.resetPassword.newPassword')}</label>
             <div className="relative">
               <input
                 type={showPwd ? "text" : "password"}
-                placeholder="Min. 8 characters"
+                placeholder={t('auth.resetPassword.minChars')}
                 className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -100,11 +102,11 @@ export default function ResetPassword() {
 
           {/* Confirm password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('auth.resetPassword.confirmPassword')}</label>
             <div className="relative">
               <input
                 type={showConfirm ? "text" : "password"}
-                placeholder="Repeat your password"
+                placeholder={t('auth.resetPassword.repeatPassword')}
                 className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
@@ -123,13 +125,13 @@ export default function ResetPassword() {
             className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm transition flex items-center justify-center gap-2"
           >
             {loading ? (
-              <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Updating...</>
-            ) : "Update Password"}
+              <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />{t('auth.resetPassword.updating')}</>
+            ) : t('auth.resetPassword.updatePassword')}
           </button>
         </form>
 
         <p className="mt-4 text-center text-xs text-gray-400">
-          After updating, you'll be signed out and redirected to login.
+          {t('auth.resetPassword.afterUpdateNote')}
         </p>
       </div>
     </div>

@@ -1103,5 +1103,105 @@
     "orderPlacedSuccess": "تم تأكيد الطلب! هامشك: {{markup}} درهم | صافي الربح: {{profit}} درهم",
     "placeOrderFailed": "فشل تنفيذ الطلب",
     "loadCustomersFailed": "فشل تحميل العملاء"
+  },
+  "auth": {
+    "version": "الإصدار 1.0",
+    "login": {
+      "welcomeBack": "مرحباً بعودتك",
+      "emailAddress": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "signingIn": "جارٍ تسجيل الدخول...",
+      "signIn": "تسجيل الدخول",
+      "noAccount": "ليس لديك حساب؟",
+      "createAccount": "إنشاء حساب",
+      "allRightsReserved": "© {{year}} Dealtock. جميع الحقوق محفوظة."
+    },
+    "signup": {
+      "createAccount": "إنشاء حساب",
+      "passwordsDontMatch": "كلمتا المرور غير متطابقتين.",
+      "chooseStrongerPassword": "يرجى اختيار كلمة مرور أقوى.",
+      "emailAlreadyRegistered": "هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو إعادة تعيين كلمة المرور.",
+      "emailExistsNotConfirmed": "هذا البريد الإلكتروني موجود لكنه غير مؤكد. تحقق من بريدك أو أعد تعيين كلمة المرور.",
+      "emailPlaceholder": "البريد الإلكتروني",
+      "passwordPlaceholder": "كلمة المرور",
+      "confirmPasswordPlaceholder": "تأكيد كلمة المرور",
+      "selectCity": "اختر المدينة",
+      "register": "تسجيل",
+      "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+      "login": "تسجيل الدخول"
+    },
+    "forgotPassword": {
+      "title": "إعادة تعيين كلمة المرور",
+      "subtitle": "أدخل بريدك الإلكتروني في Dealtock وسنرسل لك رابط إعادة تعيين آمن.",
+      "emailAddress": "البريد الإلكتروني",
+      "sending": "جارٍ الإرسال...",
+      "sendResetLink": "إرسال رابط إعادة التعيين",
+      "backToLogin": "العودة لتسجيل الدخول"
+    },
+    "resetPassword": {
+      "invalidLinkTitle": "رابط إعادة التعيين غير صالح",
+      "invalidLinkBody": "انتهت صلاحية هذا الرابط أو هو غير صالح. تنتهي صلاحية روابط إعادة التعيين بعد ساعة واحدة.",
+      "requestNewLink": "طلب رابط جديد",
+      "title": "إعادة تعيين كلمة المرور",
+      "subtitle": "اختر كلمة مرور جديدة قوية.",
+      "newPassword": "كلمة المرور الجديدة",
+      "minChars": "8 أحرف على الأقل",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "repeatPassword": "أعد كتابة كلمة المرور",
+      "updating": "جارٍ التحديث...",
+      "updatePassword": "تحديث كلمة المرور",
+      "afterUpdateNote": "بعد التحديث، سيتم تسجيل خروجك وإعادة توجيهك لتسجيل الدخول.",
+      "passwordMinLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل.",
+      "passwordsDontMatch": "كلمتا المرور غير متطابقتين.",
+      "chooseStrongerPassword": "يرجى اختيار كلمة مرور أقوى."
+    },
+    "checkEmail": {
+      "title": "تحقق من بريدك",
+      "weSent": "أرسلنا رابط إعادة تعيين كلمة المرور إلى:",
+      "clickLink": "اضغط على الرابط في البريد الإلكتروني لإعادة تعيين كلمة مرورك. ينتهي الرابط بعد {{hours}}.",
+      "oneHour": "ساعة واحدة",
+      "steps": {
+        "openEmail": "افتح تطبيق البريد الإلكتروني",
+        "findEmail": "ابحث عن البريد من Dealtock",
+        "clickReset": "اضغط على \"إعادة تعيين كلمة مروري\"",
+        "chooseNew": "اختر كلمة مرور جديدة قوية"
+      },
+      "didntReceive": "لم تستلم البريد الإلكتروني؟",
+      "resending": "جارٍ إعادة الإرسال...",
+      "linkResent": "✅ تم إعادة إرسال الرابط!",
+      "resendLink": "إعادة إرسال الرابط",
+      "backToLogin": "العودة لتسجيل الدخول",
+      "checkSpam": "تحقق من البريد المزعج إذا لم تجده في صندوق الوارد.",
+      "emailNotFound": "لم يتم العثور على البريد الإلكتروني. يرجى العودة والمحاولة مرة أخرى.",
+      "resentToast": "تم إعادة إرسال رابط إعادة التعيين!"
+    },
+    "emailConfirmation": {
+      "title": "تأكيد بريدك الإلكتروني",
+      "body": "أرسلنا رابط تأكيد إلى بريدك الإلكتروني.",
+      "clickToActivate": "يرجى الضغط على الرابط لتفعيل حسابك.",
+      "resent": "تم إرسال بريد تأكيد جديد.",
+      "resendButton": "إعادة إرسال بريد التأكيد",
+      "mustLoginAgain": "يجب تسجيل الدخول مرة أخرى لإعادة إرسال بريد التأكيد."
+    },
+    "passwordUpdated": {
+      "title": "تم تحديث كلمة المرور",
+      "body": "تم تغيير كلمة مرورك بنجاح.",
+      "backToLogin": "العودة لتسجيل الدخول"
+    },
+    "passwordStrength": {
+      "strengthLabel": "قوة كلمة المرور: {{strength}}",
+      "enterPassword": "أدخل كلمة مرور",
+      "veryWeak": "ضعيفة جداً",
+      "weak": "ضعيفة",
+      "medium": "متوسطة",
+      "strong": "قوية",
+      "atLeast8": "8 أحرف على الأقل",
+      "bonus12": "(+ مكافأة لـ 12+)",
+      "uppercase": "حرف كبير",
+      "number": "رقم",
+      "special": "رمز خاص",
+      "notCommon": "ليست كلمة مرور شائعة"
+    }
   }
 }

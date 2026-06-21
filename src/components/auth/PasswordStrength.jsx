@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function PasswordStrength({ password, onStrengthChange }) {
+  const { t } = useTranslation();
   const [strength, setStrength] = useState("");
   const [checks, setChecks] = useState({
     length: false,
@@ -87,10 +89,20 @@ export default function PasswordStrength({ password, onStrengthChange }) {
     }
   };
 
+  const getStrengthLabel = () => {
+    switch (strength) {
+      case "Very Weak": return t('auth.passwordStrength.veryWeak');
+      case "Weak": return t('auth.passwordStrength.weak');
+      case "Medium": return t('auth.passwordStrength.medium');
+      case "Strong": return t('auth.passwordStrength.strong');
+      default: return "";
+    }
+  };
+
   return (
     <div className={`p-3 rounded ${getBgColor()}`}>
       <p className={`text-sm font-semibold ${getColor()} mb-2`}>
-        {strength ? `Password strength: ${strength}` : "Enter a password"}
+        {strength ? t('auth.passwordStrength.strengthLabel', { strength: getStrengthLabel() }) : t('auth.passwordStrength.enterPassword')}
       </p>
       
       {/* Progress bar */}
@@ -109,23 +121,23 @@ export default function PasswordStrength({ password, onStrengthChange }) {
       <div className="text-xs space-y-1">
         <div className={`flex items-center ${checks.length ? "text-green-600" : "text-red-500"}`}>
           <span className="mr-2">{checks.length ? "✓" : "✗"}</span>
-          At least 8 characters {password.length >= 12 && "(+ bonus for 12+)"}
+          {t('auth.passwordStrength.atLeast8')} {password.length >= 12 && t('auth.passwordStrength.bonus12')}
         </div>
         <div className={`flex items-center ${checks.uppercase ? "text-green-600" : "text-red-500"}`}>
           <span className="mr-2">{checks.uppercase ? "✓" : "✗"}</span>
-          Uppercase letter
+          {t('auth.passwordStrength.uppercase')}
         </div>
         <div className={`flex items-center ${checks.number ? "text-green-600" : "text-red-500"}`}>
           <span className="mr-2">{checks.number ? "✓" : "✗"}</span>
-          Number
+          {t('auth.passwordStrength.number')}
         </div>
         <div className={`flex items-center ${checks.special ? "text-green-600" : "text-red-500"}`}>
           <span className="mr-2">{checks.special ? "✓" : "✗"}</span>
-          Special character
+          {t('auth.passwordStrength.special')}
         </div>
         <div className={`flex items-center ${checks.notCommon ? "text-green-600" : "text-red-500"}`}>
           <span className="mr-2">{checks.notCommon ? "✓" : "✗"}</span>
-          Not a common password
+          {t('auth.passwordStrength.notCommon')}
         </div>
       </div>
     </div>
