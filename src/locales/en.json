@@ -1203,5 +1203,12 @@
       "special": "Special character",
       "notCommon": "Not a common password"
     }
+  },
+  "myOrders": {
+    "loadingOrders": "Loading your orders...",
+    "title": "My Orders",
+    "noOrdersYet": "No orders yet",
+    "orderNumber": "Order #{{number}}",
+    "product": "Product"
   }
 }

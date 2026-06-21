@@ -370,12 +370,15 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Mise à jour : tous les formulaires d'authentification traduits.** On a fait `login.jsx`, `SignUpForm.jsx`, `ForgotPassword.jsx`, `ResetPassword.jsx`, `CheckEmail.jsx`, `EmailConfirmation.jsx`, `PasswordUpdated.jsx`, `PasswordStrength.jsx` — connexion, inscription, mot de passe oublié/réinitialisation, confirmation d'e-mail, indicateur de force du mot de passe, tout est en FR/AR/EN. Attention conservée sur `PasswordStrength.jsx` : la valeur interne ("Strong"/"Medium"...) utilisée par la logique de validation reste en anglais (comparaisons de code), seul le libellé affiché à l'écran est traduit.
 
-**Reste à faire (volontairement pas fait dans ce lot, pour rester fiable) :**
-- Le paragraphe "Business Insights" du dashboard vendeur (texte dynamique avec logique conditionnelle intégrée) — le titre est traduit, le corps reste en anglais pour l'instant.
-- Les formulaires internes `AddProductForm`/`EditProductForm` (champs de saisie) — pas encore traduits.
-- Modales de config des sociétés de livraison (API/mappings de statuts) — peu utilisées, reportées.
-- Dashboards warehouse, delivery — aucun n'est encore traduit.
-- Page Mes commandes — pas encore traduite.
+**Mise à jour : page Mes commandes traduite.** `MyOrders.jsx` traduite, en réutilisant les libellés de statut déjà créés pour le dashboard vendeur (cohérence des termes entre client et vendeur).
+
+**Bilan de cette série de traductions :** marketplace, panier, profil, dashboard vendeur (+ Inventaire), dashboard admin (en entier), dashboard dropshipper (en entier), formulaires d'authentification, page Mes commandes — tout est maintenant en FR/AR/EN avec bascule réelle (et plus seulement le sens d'écriture).
+
+**Reste à faire (volontairement pas fait, peu utilisé au quotidien) :**
+- Le paragraphe "Business Insights" du dashboard vendeur (texte dynamique avec logique conditionnelle) — titre traduit, corps en anglais.
+- Les formulaires internes `AddProductForm`/`EditProductForm` (champs de saisie).
+- Modales de config des sociétés de livraison (API/mappings de statuts).
+- Dashboards warehouse, delivery — comptes internes, peu nombreux.
 
 ## En attente de décision
 - Aucune société de livraison (`delivery_companies`) n'existe en base staging — une a été créée manuellement ("Test Delivery Co") uniquement pour permettre les tests, à nettoyer/remplacer par de vraies données plus tard.

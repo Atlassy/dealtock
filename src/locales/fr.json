@@ -1203,5 +1203,12 @@
       "special": "Caractère spécial",
       "notCommon": "Pas un mot de passe courant"
     }
+  },
+  "myOrders": {
+    "loadingOrders": "Chargement de vos commandes...",
+    "title": "Mes commandes",
+    "noOrdersYet": "Aucune commande pour l'instant",
+    "orderNumber": "Commande n°{{number}}",
+    "product": "Produit"
   }
 }

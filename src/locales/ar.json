@@ -1203,5 +1203,12 @@
       "special": "رمز خاص",
       "notCommon": "ليست كلمة مرور شائعة"
     }
+  },
+  "myOrders": {
+    "loadingOrders": "جارٍ تحميل طلباتك...",
+    "title": "طلباتي",
+    "noOrdersYet": "لا توجد طلبات بعد",
+    "orderNumber": "طلب رقم {{number}}",
+    "product": "المنتج"
   }
 }
