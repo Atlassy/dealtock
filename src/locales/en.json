@@ -565,5 +565,41 @@
     "bulkReleaseFailed": "Failed to release some escrows",
     "bulkReleased": "{{count}} escrow(s) released",
     "exported": "Escrow data exported"
+  },
+  "deliveryCompanies": {
+    "title": "Delivery Partners",
+    "subtitle": "Manage your delivery company integrations",
+    "addPartner": "Add Partner",
+    "export": "Export",
+    "refresh": "Refresh",
+    "searchPlaceholder": "Search companies...",
+    "allStatus": "All Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "suspended": "Suspended",
+    "table": {
+      "company": "Company",
+      "contact": "Contact",
+      "serviceType": "Service Type",
+      "commission": "Commission",
+      "escrow": "Escrow",
+      "status": "Status",
+      "actions": "Actions",
+      "noAddress": "No address",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "editCompany": "Edit Company",
+      "apiConfiguration": "API Configuration",
+      "statusMappings": "Status Mappings",
+      "deleteCompany": "Delete Company"
+    },
+    "noCompaniesFound": "No delivery companies found",
+    "addFirstPartner": "Add your first delivery partner",
+    "confirmDelete": "Are you sure you want to delete this delivery company?",
+    "companyDeleted": "Delivery company deleted",
+    "deleteFailed": "Failed to delete company",
+    "companyUpdated": "Delivery company updated",
+    "companyAdded": "Delivery company added",
+    "saveFailed": "Failed to save company"
   }
 }

@@ -565,5 +565,41 @@
     "bulkReleaseFailed": "Échec de la libération de certains escrows",
     "bulkReleased": "{{count}} escrow(s) libéré(s)",
     "exported": "Données d'escrow exportées"
+  },
+  "deliveryCompanies": {
+    "title": "Partenaires de livraison",
+    "subtitle": "Gérez vos intégrations avec les sociétés de livraison",
+    "addPartner": "Ajouter un partenaire",
+    "export": "Exporter",
+    "refresh": "Actualiser",
+    "searchPlaceholder": "Rechercher des sociétés...",
+    "allStatus": "Tous les statuts",
+    "active": "Active",
+    "inactive": "Inactive",
+    "suspended": "Suspendue",
+    "table": {
+      "company": "Société",
+      "contact": "Contact",
+      "serviceType": "Type de service",
+      "commission": "Commission",
+      "escrow": "Escrow",
+      "status": "Statut",
+      "actions": "Actions",
+      "noAddress": "Aucune adresse",
+      "enabled": "Activé",
+      "disabled": "Désactivé",
+      "editCompany": "Modifier la société",
+      "apiConfiguration": "Configuration API",
+      "statusMappings": "Correspondances de statuts",
+      "deleteCompany": "Supprimer la société"
+    },
+    "noCompaniesFound": "Aucune société de livraison trouvée",
+    "addFirstPartner": "Ajouter votre premier partenaire de livraison",
+    "confirmDelete": "Voulez-vous vraiment supprimer cette société de livraison ?",
+    "companyDeleted": "Société de livraison supprimée",
+    "deleteFailed": "Échec de la suppression de la société",
+    "companyUpdated": "Société de livraison mise à jour",
+    "companyAdded": "Société de livraison ajoutée",
+    "saveFailed": "Échec de l'enregistrement de la société"
   }
 }

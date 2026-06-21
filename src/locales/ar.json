@@ -565,5 +565,41 @@
     "bulkReleaseFailed": "فشل تحرير بعض الضمانات",
     "bulkReleased": "تم تحرير {{count}} ضمان (ضمانات)",
     "exported": "تم تصدير بيانات الضمان"
+  },
+  "deliveryCompanies": {
+    "title": "شركاء التوصيل",
+    "subtitle": "إدارة تكاملات شركات التوصيل",
+    "addPartner": "إضافة شريك",
+    "export": "تصدير",
+    "refresh": "تحديث",
+    "searchPlaceholder": "البحث عن شركات...",
+    "allStatus": "جميع الحالات",
+    "active": "نشطة",
+    "inactive": "غير نشطة",
+    "suspended": "موقوفة",
+    "table": {
+      "company": "الشركة",
+      "contact": "جهة الاتصال",
+      "serviceType": "نوع الخدمة",
+      "commission": "العمولة",
+      "escrow": "الضمان",
+      "status": "الحالة",
+      "actions": "إجراءات",
+      "noAddress": "بدون عنوان",
+      "enabled": "مفعّل",
+      "disabled": "معطّل",
+      "editCompany": "تعديل الشركة",
+      "apiConfiguration": "تكوين API",
+      "statusMappings": "تطابقات الحالة",
+      "deleteCompany": "حذف الشركة"
+    },
+    "noCompaniesFound": "لم يتم العثور على شركات توصيل",
+    "addFirstPartner": "أضف أول شريك توصيل",
+    "confirmDelete": "هل تريد بالتأكيد حذف شركة التوصيل هذه؟",
+    "companyDeleted": "تم حذف شركة التوصيل",
+    "deleteFailed": "فشل حذف الشركة",
+    "companyUpdated": "تم تحديث شركة التوصيل",
+    "companyAdded": "تمت إضافة شركة التوصيل",
+    "saveFailed": "فشل حفظ الشركة"
   }
 }

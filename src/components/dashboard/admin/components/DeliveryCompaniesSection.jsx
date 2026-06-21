@@ -8,8 +8,10 @@ import { toast } from "sonner";
 import { supabase } from "../../../../lib/supabaseClient";
 import DeliveryCompanyModal from "../modals/DeliveryCompanyModal";
 import ApiKeysModal from "../modals/ApiKeysModal";
+import { useTranslation } from "react-i18next";
 
 const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -36,7 +38,7 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
   };
 
   const handleDelete = async (companyId) => {
-    if (!window.confirm('Are you sure you want to delete this delivery company?')) return;
+    if (!window.confirm(t('deliveryCompanies.confirmDelete'))) return;
 
     try {
       setLoading(true);
@@ -47,11 +49,11 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
 
       if (error) throw error;
 
-      toast.success('Delivery company deleted');
+      toast.success(t('deliveryCompanies.companyDeleted'));
       onRefresh();
     } catch (error) {
       console.error('Error deleting company:', error);
-      toast.error('Failed to delete company');
+      toast.error(t('deliveryCompanies.deleteFailed'));
     } finally {
       setLoading(false);
     }
@@ -82,7 +84,7 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
           .eq('id', selectedCompany.id);
 
         if (error) throw error;
-        toast.success('Delivery company updated');
+        toast.success(t('deliveryCompanies.companyUpdated'));
       } else {
         // Create new
         const { error } = await supabase
@@ -104,14 +106,14 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
           });
 
         if (error) throw error;
-        toast.success('Delivery company added');
+        toast.success(t('deliveryCompanies.companyAdded'));
       }
 
       setIsModalOpen(false);
       onRefresh();
     } catch (error) {
       console.error('Error saving company:', error);
-      toast.error('Failed to save company');
+      toast.error(t('deliveryCompanies.saveFailed'));
     } finally {
       setLoading(false);
     }
@@ -130,10 +132,10 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Truck className="w-6 h-6" />
-            Delivery Partners
+            {t('deliveryCompanies.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
-            Manage your delivery company integrations
+            {t('deliveryCompanies.subtitle')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -142,21 +144,21 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm"
           >
             <Plus className="w-4 h-4" />
-            Add Partner
+            {t('deliveryCompanies.addPartner')}
           </button>
           <button
             onClick={onExport}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 flex items-center gap-2 text-sm"
           >
             <Download className="w-4 h-4" />
-            Export
+            {t('deliveryCompanies.export')}
           </button>
           <button
             onClick={onRefresh}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 flex items-center gap-2 text-sm"
           >
             <RefreshCw className="w-4 h-4" />
-            Refresh
+            {t('deliveryCompanies.refresh')}
           </button>
         </div>
       </div>
@@ -168,7 +170,7 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
-              placeholder="Search companies..."
+              placeholder={t('deliveryCompanies.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg w-full text-sm"
@@ -182,10 +184,10 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm"
           >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="suspended">Suspended</option>
+            <option value="all">{t('deliveryCompanies.allStatus')}</option>
+            <option value="active">{t('deliveryCompanies.active')}</option>
+            <option value="inactive">{t('deliveryCompanies.inactive')}</option>
+            <option value="suspended">{t('deliveryCompanies.suspended')}</option>
           </select>
         </div>
       </div>
@@ -196,13 +198,13 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Company</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Contact</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Service Type</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Commission</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Escrow</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Status</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">Actions</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.company')}</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.contact')}</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.serviceType')}</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.commission')}</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.escrow')}</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.status')}</th>
+                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -214,7 +216,7 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
                   </td>
                   <td className="p-4">
                     <div className="text-sm text-gray-700 dark:text-gray-300">{company.phone || 'N/A'}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">{company.address || 'No address'}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{company.address || t('deliveryCompanies.table.noAddress')}</div>
                   </td>
                   <td className="p-4">
                     <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
@@ -227,11 +229,11 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
                   <td className="p-4">
                     {company.escrow_enabled ? (
                       <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                        Enabled
+                        {t('deliveryCompanies.table.enabled')}
                       </span>
                     ) : (
                       <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                        Disabled
+                        {t('deliveryCompanies.table.disabled')}
                       </span>
                     )}
                   </td>
@@ -252,7 +254,7 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
                       <button
                         onClick={() => handleEdit(company)}
                         className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
-                        title="Edit Company"
+                        title={t('deliveryCompanies.table.editCompany')}
                       >
                         <Edit className="w-4 h-4" />
                       </button>
@@ -261,7 +263,7 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
                       <button
                         onClick={() => handleOpenApiModal(company, 'api')}
                         className="p-1 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded"
-                        title="API Configuration"
+                        title={t('deliveryCompanies.table.apiConfiguration')}
                       >
                         <Key className="w-4 h-4" />
                       </button>
@@ -270,7 +272,7 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
                       <button
                         onClick={() => handleOpenApiModal(company, 'mappings')}
                         className="p-1 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded"
-                        title="Status Mappings"
+                        title={t('deliveryCompanies.table.statusMappings')}
                       >
                         <Map className="w-4 h-4" />
                       </button>
@@ -279,7 +281,7 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
                       <button
                         onClick={() => handleDelete(company.id)}
                         className="p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
-                        title="Delete Company"
+                        title={t('deliveryCompanies.table.deleteCompany')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -294,13 +296,13 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
         {filteredCompanies.length === 0 && (
           <div className="text-center py-12">
             <Truck className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">No delivery companies found</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('deliveryCompanies.noCompaniesFound')}</p>
             <button
               onClick={handleAdd}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              Add your first delivery partner
+              {t('deliveryCompanies.addFirstPartner')}
             </button>
           </div>
         )}
