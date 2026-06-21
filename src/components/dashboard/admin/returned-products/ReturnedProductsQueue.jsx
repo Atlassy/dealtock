@@ -10,22 +10,24 @@ import {
   RefreshCw, Eye, Filter, ChevronDown, Tag,
   AlertCircle, Truck, Calendar, Info
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const daysInStorage = (createdAt) =>
   Math.max(0, Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000));
 
-const DECLINE_REASONS = [
-  "Product description insufficient",
-  "Price too high for condition",
-  "Category mismatch",
-  "City/location missing or unclear",
-  "Duplicate listing detected",
-  "Product not eligible (not sealed/condition A)",
-  "Image required before approval",
-  "Other (see notes)",
+const DECLINE_REASON_KEYS = [
+  "insufficientDescription",
+  "priceTooHigh",
+  "categoryMismatch",
+  "locationMissing",
+  "duplicate",
+  "notEligible",
+  "imageRequired",
+  "other",
 ];
 
 const ReturnedProductsQueue = ({ onSwitchToImport }) => {
+  const { t } = useTranslation();
   const [products, setProducts]           = useState([]);
   const [loading, setLoading]             = useState(true);
   const [filter, setFilter]               = useState("pending_review"); // pending_review | available | declined
@@ -50,7 +52,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
       .order("created_at", { ascending: false });
 
     if (error) {
-      toast.error("Failed to load products: " + error.message);
+      toast.error(t('returnedProducts.queue.loadFailed', { error: error.message }));
     } else {
       setProducts(data || []);
     }
@@ -69,9 +71,9 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
       .eq("id", product.id);
 
     if (error) {
-      toast.error("Approval failed: " + error.message);
+      toast.error(t('returnedProducts.queue.approveFailed', { error: error.message }));
     } else {
-      toast.success(`"${product.name}" approved and live on marketplace!`);
+      toast.success(t('returnedProducts.queue.approvedSuccess', { name: product.name }));
       fetchProducts();
     }
     setProcessing(null);
@@ -80,7 +82,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
   const handleDecline = async () => {
     if (!selectedProduct) return;
     if (!declineReason) {
-      toast.error("Please select a decline reason");
+      toast.error(t('returnedProducts.queue.selectDeclineReason'));
       return;
     }
     setProcessing(selectedProduct.id);
@@ -98,9 +100,9 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
       .eq("id", selectedProduct.id);
 
     if (error) {
-      toast.error("Decline failed: " + error.message);
+      toast.error(t('returnedProducts.queue.declineFailed', { error: error.message }));
     } else {
-      toast.success(`"${selectedProduct.name}" declined with reason sent to delivery company.`);
+      toast.success(t('returnedProducts.queue.declinedSuccess', { name: selectedProduct.name }));
       setSelectedProduct(null);
       setDeclineReason("");
       setDeclineNotes("");
@@ -121,7 +123,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
 
   const handleBulkApprove = async () => {
     if (selectedIds.length === 0) return;
-    if (!window.confirm(`Approve ${selectedIds.length} listing(s)?`)) return;
+    if (!window.confirm(t('returnedProducts.queue.confirmBulkApprove', { count: selectedIds.length }))) return;
 
     setBulkProcessing(true);
     const { error } = await supabase
@@ -130,9 +132,9 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
       .in("id", selectedIds);
 
     if (error) {
-      toast.error("Bulk approval failed: " + error.message);
+      toast.error(t('returnedProducts.queue.bulkApproveFailed', { error: error.message }));
     } else {
-      toast.success(`${selectedIds.length} listing(s) approved`);
+      toast.success(t('returnedProducts.queue.bulkApprovedSuccess', { count: selectedIds.length }));
       setSelectedIds([]);
       fetchProducts();
     }
@@ -142,7 +144,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
   const handleBulkDecline = async () => {
     if (selectedIds.length === 0) return;
     if (!declineReason) {
-      toast.error("Please select a decline reason");
+      toast.error(t('returnedProducts.queue.selectDeclineReason'));
       return;
     }
     setBulkProcessing(true);
@@ -154,9 +156,9 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
       .in("id", selectedIds);
 
     if (error) {
-      toast.error("Bulk decline failed: " + error.message);
+      toast.error(t('returnedProducts.queue.bulkDeclineFailed', { error: error.message }));
     } else {
-      toast.success(`${selectedIds.length} listing(s) declined`);
+      toast.success(t('returnedProducts.queue.bulkDeclinedSuccess', { count: selectedIds.length }));
       setSelectedIds([]);
       setBulkDeclining(false);
       setDeclineReason("");
@@ -174,9 +176,9 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
   );
 
   const statusConfig = {
-    pending_review: { label: "Pending Review", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", icon: Clock },
-    available:      { label: "Approved",        color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",  icon: CheckCircle2 },
-    declined:       { label: "Declined",        color: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",      icon: XCircle },
+    pending_review: { label: t('returnedProducts.queue.statusLabels.pendingReview'), color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", icon: Clock },
+    available:      { label: t('returnedProducts.queue.statusLabels.approved'),       color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",  icon: CheckCircle2 },
+    declined:       { label: t('returnedProducts.queue.statusLabels.declined'),       color: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",      icon: XCircle },
   };
 
   return (
@@ -186,18 +188,18 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Eye className="w-6 h-6 text-kraft-500 dark:text-kraft-400" />
-            Returned Products Queue
+            {t('returnedProducts.queue.title')}
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Review listings submitted by delivery companies before they go live.
+            {t('returnedProducts.queue.subtitle')}
           </p>
         </div>
         <div className="flex gap-2">
           <button onClick={fetchProducts} className="flex items-center gap-1.5 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-            <RefreshCw className="w-4 h-4" /> Refresh
+            <RefreshCw className="w-4 h-4" /> {t('returnedProducts.queue.refresh')}
           </button>
           <button onClick={onSwitchToImport} className="flex items-center gap-1.5 px-3 py-2 bg-kraft-500 dark:bg-kraft-600 hover:bg-kraft-600 dark:hover:bg-kraft-700 text-white rounded-lg text-sm font-medium">
-            <Package className="w-4 h-4" /> Import CSV
+            <Package className="w-4 h-4" /> {t('returnedProducts.queue.importCsv')}
           </button>
         </div>
       </div>
@@ -228,7 +230,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
         <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
         <input
           type="text"
-          placeholder="Search by product, city, category, or delivery company…"
+          placeholder={t('returnedProducts.queue.searchPlaceholder')}
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
           className="w-full pl-9 pr-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-kraft-400 focus:border-kraft-400"
@@ -245,7 +247,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
               onChange={toggleSelectAll}
               className="rounded text-kraft-500 focus:ring-kraft-400"
             />
-            {selectedIds.length > 0 ? `${selectedIds.length} selected` : "Select all"}
+            {selectedIds.length > 0 ? t('returnedProducts.queue.selected', { count: selectedIds.length }) : t('returnedProducts.queue.selectAll')}
           </label>
           {selectedIds.length > 0 && (
             <div className="flex gap-2">
@@ -255,7 +257,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                Approve Selected ({selectedIds.length})
+                {t('returnedProducts.queue.approveSelected', { count: selectedIds.length })}
               </button>
               <button
                 onClick={() => setBulkDeclining(true)}
@@ -263,7 +265,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 disabled:opacity-50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg text-xs font-semibold"
               >
                 <XCircle className="w-3.5 h-3.5" />
-                Decline Selected ({selectedIds.length})
+                {t('returnedProducts.queue.declineSelected', { count: selectedIds.length })}
               </button>
             </div>
           )}
@@ -274,15 +276,15 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
       {loading ? (
         <div className="text-center py-16 text-gray-400 dark:text-gray-500">
           <RefreshCw className="w-8 h-8 mx-auto animate-spin mb-3" />
-          Loading products…
+          {t('returnedProducts.queue.loadingProducts')}
         </div>
       ) : filteredProducts.length === 0 ? (
         <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
           <Package className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-          <p className="text-gray-500 dark:text-gray-400 font-medium">No {statusConfig[filter].label.toLowerCase()} listings</p>
+          <p className="text-gray-500 dark:text-gray-400 font-medium">{t('returnedProducts.queue.noListings', { status: statusConfig[filter].label.toLowerCase() })}</p>
           {filter === "pending_review" && (
             <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-              Import a CSV from a delivery company to see listings here.
+              {t('returnedProducts.queue.importHint')}
             </p>
           )}
         </div>
@@ -316,12 +318,12 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
 
                   {/* Source badge */}
                   <span className={`absolute left-2 px-2 py-0.5 bg-kraft-500 text-white text-xs font-semibold rounded-full flex items-center gap-1 ${filter === "pending_review" ? "top-9" : "top-2"}`}>
-                    <Package className="w-3 h-3" /> Returned
+                    <Package className="w-3 h-3" /> {t('returnedProducts.queue.returned')}
                   </span>
 
                   {/* City locked badge */}
                   <span className="absolute top-2 right-2 px-2 py-0.5 bg-blue-600 text-white text-xs font-semibold rounded-full flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />{product.location || "No city"}
+                    <MapPin className="w-3 h-3" />{product.location || t('returnedProducts.queue.noCity')}
                   </span>
                 </div>
 
@@ -343,18 +345,18 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                     )}
                     <div className="flex items-center gap-1.5">
                       <Truck className="w-3 h-3" />
-                      <span>{product.delivery_company_name || "Unknown delivery co."}</span>
+                      <span>{product.delivery_company_name || t('returnedProducts.queue.unknownDeliveryCo')}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Calendar className="w-3 h-3" />
-                      <span>Listed {new Date(product.created_at).toLocaleDateString("fr-MA")}</span>
+                      <span>{t('returnedProducts.queue.listed', { date: new Date(product.created_at).toLocaleDateString("fr-MA") })}</span>
                     </div>
                     {/* days_in_storage: ADMIN ONLY, calculated from listing date */}
                     <div className="flex items-center gap-1.5">
                       <Clock className="w-3 h-3 text-amber-500 dark:text-amber-400" />
                       <span className="text-amber-600 dark:text-amber-400 font-medium">
-                        {daysInStorage(product.created_at)} days in storage
-                        <span className="text-gray-400 dark:text-gray-500 font-normal ml-1">(admin only)</span>
+                        {t('returnedProducts.queue.daysInStorage', { count: daysInStorage(product.created_at) })}
+                        <span className="text-gray-400 dark:text-gray-500 font-normal ml-1">{t('returnedProducts.queue.adminOnly')}</span>
                       </span>
                     </div>
                     {product.decline_reason && (
@@ -373,7 +375,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                       </span>
                       <span className="text-sm text-gray-400 dark:text-gray-500">MAD</span>
                       <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">
-                        Condition: <span className="font-semibold text-green-600 dark:text-green-400">A (Sealed)</span>
+                        {t('returnedProducts.queue.condition')} <span className="font-semibold text-green-600 dark:text-green-400">{t('returnedProducts.queue.sealed')}</span>
                       </span>
                     </div>
 
@@ -389,7 +391,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                             ? <RefreshCw className="w-3 h-3 animate-spin" />
                             : <CheckCircle2 className="w-3.5 h-3.5" />
                           }
-                          Approve
+                          {t('returnedProducts.queue.approve')}
                         </button>
                         <button
                           onClick={() => setSelectedProduct(product)}
@@ -397,7 +399,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                           className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 disabled:opacity-50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg text-xs font-semibold transition-colors"
                         >
                           <XCircle className="w-3.5 h-3.5" />
-                          Decline
+                          {t('returnedProducts.queue.decline')}
                         </button>
                       </div>
                     )}
@@ -405,7 +407,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                     {filter === "available" && (
                       <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 text-xs font-medium">
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        Live on marketplace · city-locked to {product.location}
+                        {t('returnedProducts.queue.liveOnMarketplace', { city: product.location })}
                       </div>
                     )}
 
@@ -414,7 +416,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                         onClick={() => handleApprove(product)}
                         className="w-full py-2 border border-green-300 dark:border-green-700 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg text-xs font-semibold transition-colors"
                       >
-                        Re-approve listing
+                        {t('returnedProducts.queue.reapprove')}
                       </button>
                     )}
                   </div>
@@ -432,17 +434,21 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
             <div className="p-6 border-b border-gray-100 dark:border-gray-700">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <XCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
-                Decline {bulkDeclining ? `${selectedIds.length} Listings` : "Listing"}
+                {t('returnedProducts.queue.modal.declineTitle', {
+                  target: bulkDeclining
+                    ? t('returnedProducts.queue.modal.listings', { count: selectedIds.length })
+                    : t('returnedProducts.queue.modal.listing')
+                })}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
-                {bulkDeclining ? "This reason will be applied to all selected listings." : `"${selectedProduct.name}"`}
+                {bulkDeclining ? t('returnedProducts.queue.modal.bulkSubtitle') : `"${selectedProduct.name}"`}
               </p>
             </div>
 
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Reason for declining *
+                  {t('returnedProducts.queue.modal.reasonLabel')}
                 </label>
                 <div className="relative">
                   <select
@@ -450,10 +456,11 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                     onChange={e => setDeclineReason(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm appearance-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-400 focus:border-red-400"
                   >
-                    <option value="">— Select a reason —</option>
-                    {DECLINE_REASONS.map(r => (
-                      <option key={r} value={r}>{r}</option>
-                    ))}
+                    <option value="">{t('returnedProducts.queue.modal.selectReason')}</option>
+                    {DECLINE_REASON_KEYS.map(key => {
+                      const label = t(`returnedProducts.queue.declineReasons.${key}`);
+                      return <option key={key} value={label}>{label}</option>;
+                    })}
                   </select>
                   <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-500" />
                 </div>
@@ -461,13 +468,13 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Additional notes <span className="font-normal text-gray-400 dark:text-gray-500">(optional)</span>
+                  {t('returnedProducts.queue.modal.notesLabel')} <span className="font-normal text-gray-400 dark:text-gray-500">{t('returnedProducts.queue.modal.optional')}</span>
                 </label>
                 <textarea
                   value={declineNotes}
                   onChange={e => setDeclineNotes(e.target.value)}
                   rows={3}
-                  placeholder="Provide actionable feedback so the delivery company can resubmit correctly…"
+                  placeholder={t('returnedProducts.queue.modal.notesPlaceholder')}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-400 focus:border-red-400 resize-none"
                 />
               </div>
@@ -475,8 +482,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
               <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/30 rounded-lg">
                 <Info className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
                 <p className="text-xs text-amber-700 dark:text-amber-400">
-                  The decline reason will be visible to the delivery company in their portal
-                  so they can correct and resubmit the listing.
+                  {t('returnedProducts.queue.modal.visibilityNote')}
                 </p>
               </div>
             </div>
@@ -486,7 +492,7 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                 onClick={() => { setSelectedProduct(null); setBulkDeclining(false); setDeclineReason(""); setDeclineNotes(""); }}
                 className="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                Cancel
+                {t('returnedProducts.queue.modal.cancel')}
               </button>
               <button
                 onClick={bulkDeclining ? handleBulkDecline : handleDecline}
@@ -497,7 +503,9 @@ const ReturnedProductsQueue = ({ onSwitchToImport }) => {
                   ? <RefreshCw className="w-4 h-4 animate-spin" />
                   : <XCircle className="w-4 h-4" />
                 }
-                Decline {bulkDeclining ? `${selectedIds.length} listing(s)` : "listing"}
+                {bulkDeclining
+                  ? t('returnedProducts.queue.modal.declineCount', { count: selectedIds.length })
+                  : t('returnedProducts.queue.modal.declineOne')}
               </button>
             </div>
           </div>

@@ -665,5 +665,80 @@
       "shippingCity": "مدينة الشحن:",
       "returnInformation": "معلومات الإرجاع"
     }
+  },
+  "returnedProducts": {
+    "section": {
+      "reviewQueue": "قائمة المراجعة",
+      "importCsv": "استيراد CSV",
+      "summaryPill": "المنتجات المرتجعة — طرود مغلقة فقط · مقفلة بالمدينة · تمت مراجعتها من الإدارة"
+    },
+    "queue": {
+      "title": "قائمة المنتجات المرتجعة",
+      "subtitle": "راجع الإعلانات المقدمة من شركات التوصيل قبل نشرها.",
+      "refresh": "تحديث",
+      "importCsv": "استيراد CSV",
+      "statusLabels": {
+        "pendingReview": "في انتظار المراجعة",
+        "approved": "معتمدة",
+        "declined": "مرفوضة"
+      },
+      "searchPlaceholder": "البحث بالمنتج أو المدينة أو الفئة أو شركة التوصيل…",
+      "selected_one": "تم تحديد {{count}}",
+      "selected_other": "تم تحديد {{count}}",
+      "selectAll": "تحديد الكل",
+      "approveSelected": "الموافقة على المحدد ({{count}})",
+      "declineSelected": "رفض المحدد ({{count}})",
+      "loadingProducts": "جارٍ تحميل المنتجات…",
+      "noListings": "لا توجد إعلانات {{status}}",
+      "importHint": "استورد ملف CSV من شركة توصيل لرؤية الإعلانات هنا.",
+      "returned": "مرتجع",
+      "noCity": "بدون مدينة",
+      "unknownDeliveryCo": "شركة توصيل غير معروفة",
+      "listed": "نُشر في {{date}}",
+      "daysInStorage": "{{count}} أيام في المخزون",
+      "adminOnly": "(للإدارة فقط)",
+      "condition": "الحالة:",
+      "sealed": "A (مغلق)",
+      "approve": "موافقة",
+      "decline": "رفض",
+      "liveOnMarketplace": "متاح في السوق · مقفل على {{city}}",
+      "reapprove": "إعادة الموافقة على الإعلان",
+      "confirmBulkApprove": "الموافقة على {{count}} إعلان(ات)؟",
+      "selectDeclineReason": "يرجى تحديد سبب الرفض",
+      "approveFailed": "فشلت الموافقة: {{error}}",
+      "approvedSuccess": "تمت الموافقة على \"{{name}}\" وهو متاح الآن في السوق!",
+      "declineFailed": "فشل الرفض: {{error}}",
+      "declinedSuccess": "تم رفض \"{{name}}\" وتم إرسال السبب إلى شركة التوصيل.",
+      "bulkApproveFailed": "فشلت الموافقة الجماعية: {{error}}",
+      "bulkApprovedSuccess": "تمت الموافقة على {{count}} إعلان(ات)",
+      "bulkDeclineFailed": "فشل الرفض الجماعي: {{error}}",
+      "bulkDeclinedSuccess": "تم رفض {{count}} إعلان(ات)",
+      "loadFailed": "فشل تحميل المنتجات: {{error}}",
+      "modal": {
+        "declineTitle": "رفض {{target}}",
+        "listings": "{{count}} إعلانات",
+        "listing": "الإعلان",
+        "bulkSubtitle": "سيتم تطبيق هذا السبب على جميع الإعلانات المحددة.",
+        "reasonLabel": "سبب الرفض *",
+        "selectReason": "— اختر سبباً —",
+        "notesLabel": "ملاحظات إضافية",
+        "optional": "(اختياري)",
+        "notesPlaceholder": "قدّم ملاحظات قابلة للتنفيذ حتى تتمكن شركة التوصيل من إعادة التقديم بشكل صحيح…",
+        "visibilityNote": "سيكون سبب الرفض مرئياً لشركة التوصيل في بوابتها لتتمكن من تصحيح الإعلان وإعادة تقديمه.",
+        "cancel": "إلغاء",
+        "declineCount": "رفض {{count}} إعلان(ات)",
+        "declineOne": "رفض الإعلان"
+      },
+      "declineReasons": {
+        "insufficientDescription": "وصف المنتج غير كافٍ",
+        "priceTooHigh": "السعر مرتفع جداً بالنسبة للحالة",
+        "categoryMismatch": "فئة غير متطابقة",
+        "locationMissing": "المدينة/الموقع غير محدد أو غير واضح",
+        "duplicate": "تم اكتشاف إعلان مكرر",
+        "notEligible": "المنتج غير مؤهل (غير مغلق/ليس بحالة A)",
+        "imageRequired": "صورة مطلوبة قبل الموافقة",
+        "other": "أخرى (انظر الملاحظات)"
+      }
+    }
   }
 }

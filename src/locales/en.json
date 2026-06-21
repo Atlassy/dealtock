@@ -665,5 +665,80 @@
       "shippingCity": "Shipping City:",
       "returnInformation": "Return Information"
     }
+  },
+  "returnedProducts": {
+    "section": {
+      "reviewQueue": "Review Queue",
+      "importCsv": "Import CSV",
+      "summaryPill": "Returned products — sealed parcels only · city-locked · admin-reviewed"
+    },
+    "queue": {
+      "title": "Returned Products Queue",
+      "subtitle": "Review listings submitted by delivery companies before they go live.",
+      "refresh": "Refresh",
+      "importCsv": "Import CSV",
+      "statusLabels": {
+        "pendingReview": "Pending Review",
+        "approved": "Approved",
+        "declined": "Declined"
+      },
+      "searchPlaceholder": "Search by product, city, category, or delivery company…",
+      "selected_one": "{{count}} selected",
+      "selected_other": "{{count}} selected",
+      "selectAll": "Select all",
+      "approveSelected": "Approve Selected ({{count}})",
+      "declineSelected": "Decline Selected ({{count}})",
+      "loadingProducts": "Loading products…",
+      "noListings": "No {{status}} listings",
+      "importHint": "Import a CSV from a delivery company to see listings here.",
+      "returned": "Returned",
+      "noCity": "No city",
+      "unknownDeliveryCo": "Unknown delivery co.",
+      "listed": "Listed {{date}}",
+      "daysInStorage": "{{count}} days in storage",
+      "adminOnly": "(admin only)",
+      "condition": "Condition:",
+      "sealed": "A (Sealed)",
+      "approve": "Approve",
+      "decline": "Decline",
+      "liveOnMarketplace": "Live on marketplace · city-locked to {{city}}",
+      "reapprove": "Re-approve listing",
+      "confirmBulkApprove": "Approve {{count}} listing(s)?",
+      "selectDeclineReason": "Please select a decline reason",
+      "approveFailed": "Approval failed: {{error}}",
+      "approvedSuccess": "\"{{name}}\" approved and live on marketplace!",
+      "declineFailed": "Decline failed: {{error}}",
+      "declinedSuccess": "\"{{name}}\" declined with reason sent to delivery company.",
+      "bulkApproveFailed": "Bulk approval failed: {{error}}",
+      "bulkApprovedSuccess": "{{count}} listing(s) approved",
+      "bulkDeclineFailed": "Bulk decline failed: {{error}}",
+      "bulkDeclinedSuccess": "{{count}} listing(s) declined",
+      "loadFailed": "Failed to load products: {{error}}",
+      "modal": {
+        "declineTitle": "Decline {{target}}",
+        "listings": "{{count}} Listings",
+        "listing": "Listing",
+        "bulkSubtitle": "This reason will be applied to all selected listings.",
+        "reasonLabel": "Reason for declining *",
+        "selectReason": "— Select a reason —",
+        "notesLabel": "Additional notes",
+        "optional": "(optional)",
+        "notesPlaceholder": "Provide actionable feedback so the delivery company can resubmit correctly…",
+        "visibilityNote": "The decline reason will be visible to the delivery company in their portal so they can correct and resubmit the listing.",
+        "cancel": "Cancel",
+        "declineCount": "Decline {{count}} listing(s)",
+        "declineOne": "Decline listing"
+      },
+      "declineReasons": {
+        "insufficientDescription": "Product description insufficient",
+        "priceTooHigh": "Price too high for condition",
+        "categoryMismatch": "Category mismatch",
+        "locationMissing": "City/location missing or unclear",
+        "duplicate": "Duplicate listing detected",
+        "notEligible": "Product not eligible (not sealed/condition A)",
+        "imageRequired": "Image required before approval",
+        "other": "Other (see notes)"
+      }
+    }
   }
 }

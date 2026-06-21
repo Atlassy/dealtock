@@ -665,5 +665,80 @@
       "shippingCity": "Ville de livraison :",
       "returnInformation": "Informations de retour"
     }
+  },
+  "returnedProducts": {
+    "section": {
+      "reviewQueue": "File de révision",
+      "importCsv": "Importer CSV",
+      "summaryPill": "Produits retournés — colis scellés uniquement · verrouillés par ville · validés par admin"
+    },
+    "queue": {
+      "title": "File des produits retournés",
+      "subtitle": "Validez les annonces soumises par les sociétés de livraison avant publication.",
+      "refresh": "Actualiser",
+      "importCsv": "Importer CSV",
+      "statusLabels": {
+        "pendingReview": "En attente de révision",
+        "approved": "Approuvée",
+        "declined": "Refusée"
+      },
+      "searchPlaceholder": "Rechercher par produit, ville, catégorie ou société de livraison…",
+      "selected_one": "{{count}} sélectionné",
+      "selected_other": "{{count}} sélectionnés",
+      "selectAll": "Tout sélectionner",
+      "approveSelected": "Approuver la sélection ({{count}})",
+      "declineSelected": "Refuser la sélection ({{count}})",
+      "loadingProducts": "Chargement des produits…",
+      "noListings": "Aucune annonce {{status}}",
+      "importHint": "Importez un CSV d'une société de livraison pour voir des annonces ici.",
+      "returned": "Retourné",
+      "noCity": "Aucune ville",
+      "unknownDeliveryCo": "Société de livraison inconnue",
+      "listed": "Publié le {{date}}",
+      "daysInStorage": "{{count}} jours en stockage",
+      "adminOnly": "(admin uniquement)",
+      "condition": "État :",
+      "sealed": "A (Scellé)",
+      "approve": "Approuver",
+      "decline": "Refuser",
+      "liveOnMarketplace": "En ligne sur la marketplace · verrouillé sur {{city}}",
+      "reapprove": "Réapprouver l'annonce",
+      "confirmBulkApprove": "Approuver {{count}} annonce(s) ?",
+      "selectDeclineReason": "Veuillez sélectionner un motif de refus",
+      "approveFailed": "Échec de l'approbation : {{error}}",
+      "approvedSuccess": "\"{{name}}\" approuvé et en ligne sur la marketplace !",
+      "declineFailed": "Échec du refus : {{error}}",
+      "declinedSuccess": "\"{{name}}\" refusé, motif envoyé à la société de livraison.",
+      "bulkApproveFailed": "Échec de l'approbation groupée : {{error}}",
+      "bulkApprovedSuccess": "{{count}} annonce(s) approuvée(s)",
+      "bulkDeclineFailed": "Échec du refus groupé : {{error}}",
+      "bulkDeclinedSuccess": "{{count}} annonce(s) refusée(s)",
+      "loadFailed": "Échec du chargement des produits : {{error}}",
+      "modal": {
+        "declineTitle": "Refuser {{target}}",
+        "listings": "{{count}} annonces",
+        "listing": "l'annonce",
+        "bulkSubtitle": "Ce motif sera appliqué à toutes les annonces sélectionnées.",
+        "reasonLabel": "Motif du refus *",
+        "selectReason": "— Sélectionner un motif —",
+        "notesLabel": "Notes supplémentaires",
+        "optional": "(optionnel)",
+        "notesPlaceholder": "Donnez un retour exploitable pour que la société de livraison puisse corriger et resoumettre…",
+        "visibilityNote": "Le motif de refus sera visible par la société de livraison dans son portail, pour qu'elle puisse corriger et resoumettre l'annonce.",
+        "cancel": "Annuler",
+        "declineCount": "Refuser {{count}} annonce(s)",
+        "declineOne": "Refuser l'annonce"
+      },
+      "declineReasons": {
+        "insufficientDescription": "Description du produit insuffisante",
+        "priceTooHigh": "Prix trop élevé pour l'état",
+        "categoryMismatch": "Catégorie incorrecte",
+        "locationMissing": "Ville/lieu manquant ou peu clair",
+        "duplicate": "Annonce en doublon détectée",
+        "notEligible": "Produit non éligible (pas scellé/état A)",
+        "imageRequired": "Image requise avant approbation",
+        "other": "Autre (voir notes)"
+      }
+    }
   }
 }

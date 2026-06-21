@@ -360,11 +360,11 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 **Mise à jour : dashboard vendeur 100% traduit.** Suite de la même session — traduction complète de `ProductTable.jsx` (en-têtes de colonnes, badges stock/statut, tooltips de commission), de l'onglet Escrow (`EscrowTab`, cartes, tableaux commandes/versements), et de `SellerOrders.jsx` (badges de statut, boutons d'action, modale de détail commande, état vide). Le dashboard vendeur est désormais le 1er dashboard intégralement traduit en FR/AR/EN.
 
-**Mise à jour : + Delivery Companies + Invoices traduits.** `DeliveryCompaniesSection.jsx`, `InvoicesList.tsx` et `InvoiceDetailModal.tsx` (liste + détail complet : parties, escrow, détail financier, lignes de facture, registre comptable) traduits.
+**Mise à jour : + Delivery Companies + Invoices + Returned Products traduits → dashboard admin terminé.** `DeliveryCompaniesSection.jsx`, `InvoicesList.tsx`/`InvoiceDetailModal.tsx`, et `ReturnedProductsSection.jsx`/`ReturnedProductsQueue.jsx` (file de révision, actions groupées, modale de refus avec motifs traduits) traduits. **Le dashboard admin est maintenant 100% traduit**, à l'exception des modales de configuration des sociétés de livraison (API/mappings de statuts — `DeliveryCompanyModal`, `ApiKeysModal`, `StatusMappingTab`), reportées car peu utilisées au quotidien.
 
 **Reste à faire (volontairement pas fait dans ce lot, pour rester fiable) :**
 - Le paragraphe "Business Insights" du dashboard vendeur (texte dynamique avec logique conditionnelle intégrée) — le titre est traduit, le corps reste en anglais pour l'instant.
-- Dashboard admin : reste en anglais — Returned Products, et les modales de configuration des sociétés de livraison (API/mappings de statuts).
+- Modales de config des sociétés de livraison (API/mappings de statuts) — peu utilisées, reportées.
 - Dashboards dropshipper, warehouse, delivery — aucun n'est encore traduit.
 - Formulaires d'authentification (login/signup/mot de passe oublié), page Profil, page Mes commandes.
 

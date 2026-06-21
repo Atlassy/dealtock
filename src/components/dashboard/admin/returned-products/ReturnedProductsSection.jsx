@@ -7,10 +7,12 @@ import { supabase } from "../../../../lib/supabaseClient";
 import { Package, Upload, Eye } from "lucide-react";
 import ReturnedProductsImporter from "./ReturnedProductsImporter";
 import ReturnedProductsQueue    from "./ReturnedProductsQueue";
+import { useTranslation } from "react-i18next";
 
 const VIEWS = { QUEUE: "queue", IMPORT: "import" };
 
 const ReturnedProductsSection = ({ deliveryCompanies = [] }) => {
+  const { t } = useTranslation();
   const [view, setView]               = useState(VIEWS.QUEUE);
   const [pendingCount, setPendingCount] = useState(0);
 
@@ -43,7 +45,7 @@ const ReturnedProductsSection = ({ deliveryCompanies = [] }) => {
           }`}
         >
           <Eye className="w-4 h-4" />
-          Review Queue
+          {t('returnedProducts.section.reviewQueue')}
           {pendingCount > 0 && (
             <span className="px-2 py-0.5 text-xs bg-kraft-500 dark:bg-kraft-600 text-white rounded-full font-bold">
               {pendingCount}
@@ -60,13 +62,13 @@ const ReturnedProductsSection = ({ deliveryCompanies = [] }) => {
           }`}
         >
           <Upload className="w-4 h-4" />
-          Import CSV
+          {t('returnedProducts.section.importCsv')}
         </button>
 
         {/* Summary pill */}
         <div className="ml-auto flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1.5">
           <Package className="w-3.5 h-3.5 text-kraft-400 dark:text-kraft-500" />
-          Returned products — sealed parcels only · city-locked · admin-reviewed
+          {t('returnedProducts.section.summaryPill')}
         </div>
       </div>
 
