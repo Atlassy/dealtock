@@ -132,7 +132,7 @@ const DeliveryDashboard = () => {
           )
         `)
         .eq('delivery_company_id', companyId)
-        .in('status', ['ready', 'picked', 'shipped', 'in_transit', 'out_for_delivery', 'delivered'])
+        .in('status', ['ready_for_pickup', 'picked_up', 'shipped', 'in_transit', 'out_for_delivery', 'delivered'])
         .order('created_at', { ascending: false });
 
       if (ordersError) {
@@ -193,11 +193,11 @@ const DeliveryDashboard = () => {
       
       // Calculate stats
       const totalDeliveries = transformedDeliveries.length;
-      const inTransit = transformedDeliveries.filter(d => 
-        ['picked', 'shipped', 'in_transit', 'out_for_delivery'].includes(d.status)
+      const inTransit = transformedDeliveries.filter(d =>
+        ['picked_up', 'shipped', 'in_transit', 'out_for_delivery'].includes(d.status)
       ).length;
       const delivered = transformedDeliveries.filter(d => d.status === 'delivered').length;
-      const pending = transformedDeliveries.filter(d => d.status === 'ready').length;
+      const pending = transformedDeliveries.filter(d => d.status === 'ready_for_pickup').length;
       
       // Calculate earnings (only delivered orders)
       const totalEarnings = transformedDeliveries
@@ -268,7 +268,7 @@ const DeliveryDashboard = () => {
       };
 
       // Add timestamps based on status
-      if (newStatus === 'picked') {
+      if (newStatus === 'picked_up') {
         updateData.delivery_picked_at = new Date().toISOString();
       } else if (newStatus === 'delivered') {
         updateData.delivery_confirmed_at = new Date().toISOString();
@@ -326,13 +326,13 @@ const DeliveryDashboard = () => {
 
   const getStatusBadge = (status) => {
     const badges = {
-      ready: {
+      ready_for_pickup: {
         bg: "bg-blue-100 dark:bg-blue-900/30",
         text: "text-blue-800 dark:text-blue-400",
         label: "Ready for Pickup",
         icon: Package
       },
-      picked: {
+      picked_up: {
         bg: "bg-purple-100 dark:bg-purple-900/30",
         text: "text-purple-800 dark:text-purple-400",
         label: "Picked Up",
@@ -382,7 +382,7 @@ const DeliveryDashboard = () => {
       }
     };
 
-    const badge = badges[status] || badges.ready;
+    const badge = badges[status] || badges.ready_for_pickup;
     const Icon = badge.icon;
 
     return (
@@ -599,15 +599,15 @@ const DeliveryDashboard = () => {
                     </td>
                     <td className="p-4">
                       <div className="flex flex-wrap gap-2">
-                        {delivery.status === 'ready' && (
+                        {delivery.status === 'ready_for_pickup' && (
                           <button
-                            onClick={() => updateDeliveryStatus(delivery.id, 'picked')}
+                            onClick={() => updateDeliveryStatus(delivery.id, 'picked_up')}
                             className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                           >
                             Pick Up
                           </button>
                         )}
-                        {(delivery.status === 'picked' || delivery.status === 'shipped') && (
+                        {(delivery.status === 'picked_up' || delivery.status === 'shipped') && (
                           <button
                             onClick={() => updateDeliveryStatus(delivery.id, 'in_transit')}
                             className="px-3 py-1 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"

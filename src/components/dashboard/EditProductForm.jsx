@@ -198,8 +198,8 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Basic Information */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+      <div className="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-5">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
           <Info className="w-5 h-5 text-blue-500" />
           Basic Information
         </h3>
@@ -207,7 +207,7 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
         <div className="space-y-4">
           {/* Product Name - Required */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Product Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -215,8 +215,8 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                errors.name ? 'border-red-500 dark:border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-700'
               }`}
               placeholder="e.g., iPhone 13 Pro Max"
               required
@@ -231,7 +231,7 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Description
             </label>
             <textarea
@@ -239,7 +239,7 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
               value={formData.description}
               onChange={handleChange}
               rows="3"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Detailed description of your product..."
             />
           </div>
@@ -247,14 +247,14 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
           {/* Category & SKU */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Category <span className="text-red-500">*</span>
               </label>
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               >
                 <option value="">Select category</option>
@@ -266,7 +266,7 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
             
             {/* SKU Field with Validation */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 SKU
                 <span className="ml-2 text-xs text-gray-500 font-normal">
                   {formData.sku === originalSku ? '(unchanged)' : '(optional)'}
@@ -278,10 +278,10 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
                   name="sku"
                   value={formData.sku}
                   onChange={handleChange}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.sku ? 'border-red-500 bg-red-50' : 
-                    formData.sku && formData.sku !== originalSku && !errors.sku ? 'border-yellow-300 bg-yellow-50' : 
-                    'border-gray-300'
+                  className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    errors.sku ? 'border-red-500 dark:border-red-500 bg-red-50 dark:bg-red-900/20' :
+                    formData.sku && formData.sku !== originalSku && !errors.sku ? 'border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20' :
+                    'border-gray-300 dark:border-gray-700'
                   }`}
                   placeholder="Auto-generated if empty"
                 />
@@ -312,8 +312,8 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
       </div>
 
       {/* Pricing & Inventory */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+      <div className="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-5">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
           <DollarSign className="w-5 h-5 text-green-500" />
           Pricing & Inventory
         </h3>
@@ -321,21 +321,21 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
         <div className="space-y-4">
           {/* Purchase Price - ONLY price field for sellers */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Your Selling Price (MAD) <span className="text-red-500">*</span>
               <span className="ml-2 text-xs text-gray-500">You receive this amount</span>
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-500">DH</span>
+                <span className="text-gray-500 dark:text-gray-400">DH</span>
               </div>
               <input
                 type="number"
                 name="purchase_price"
                 value={formData.purchase_price}
                 onChange={handleChange}
-                className={`w-full pl-12 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.purchase_price ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                className={`w-full pl-12 pr-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.purchase_price ? 'border-red-500 dark:border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-700'
                 }`}
                 min="0"
                 step="0.01"
@@ -352,25 +352,25 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
 
           {/* Marketplace Price Display - READ ONLY */}
           {formData.purchase_price > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <h4 className="font-semibold text-blue-800 dark:text-blue-400 mb-3 flex items-center gap-2">
                 <Tag className="w-4 h-4" />
                 Marketplace Pricing Preview
               </h4>
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Your Price:</span>
-                  <span className="font-semibold text-gray-900">{formData.purchase_price} MAD</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Your Price:</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{formData.purchase_price} MAD</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Marketplace Fee (30%):</span>
-                  <span className="text-blue-600 font-medium">+{marketplaceFee} MAD</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Marketplace Fee (30%):</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-medium">+{marketplaceFee} MAD</span>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-blue-200">
-                  <span className="text-sm font-medium text-gray-700">Customer Pays:</span>
-                  <span className="font-bold text-green-600">{marketplacePrice} MAD</span>
+                <div className="flex justify-between items-center pt-2 border-t border-blue-200 dark:border-blue-800">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Customer Pays:</span>
+                  <span className="font-bold text-green-600 dark:text-green-400">{marketplacePrice} MAD</span>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                   ⚡ B2B buyers see your price directly • B2C customers pay with 30% markup • Delivery fee added at checkout
                 </p>
               </div>
@@ -380,7 +380,7 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
           {/* Quantity & Condition */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Quantity <span className="text-red-500">*</span>
               </label>
               <input
@@ -388,8 +388,8 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
                 name="quantity"
                 value={formData.quantity}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.quantity ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.quantity ? 'border-red-500 dark:border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-700'
                 }`}
                 min="0"
                 step="1"
@@ -403,14 +403,14 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Condition
               </label>
               <select
                 name="condition"
                 value={formData.condition}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 {CONDITIONS.map(cond => (
                   <option key={cond.value} value={cond.value}>{cond.label}</option>
@@ -422,23 +422,23 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
       </div>
 
       {/* Location & Shipping */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+      <div className="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-5">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
           <MapPin className="w-5 h-5 text-kraft-500" />
           Location & Shipping
         </h3>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Product Location (City) <span className="text-red-500">*</span>
-            <span className="ml-2 text-xs text-gray-500">Used to calculate delivery fees</span>
+            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">Used to calculate delivery fees</span>
           </label>
           <select
             name="location"
             value={formData.location}
             onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              errors.location ? 'border-red-500 bg-red-50' : 'border-gray-300'
+            className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.location ? 'border-red-500 dark:border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-700'
             }`}
             required
           >
@@ -453,21 +453,21 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
               {errors.location}
             </p>
           )}
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
             📦 Delivery fees will be calculated automatically based on customer's location
           </p>
         </div>
       </div>
 
       {/* Media */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+      <div className="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-5">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
           <ImageIcon className="w-5 h-5 text-purple-500" />
           Media
         </h3>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Image URL
           </label>
           <input
@@ -475,16 +475,16 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
             name="image_url"
             value={formData.image_url}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="https://example.com/image.jpg"
           />
           {formData.image_url && (
             <div className="mt-3">
-              <p className="text-xs text-gray-500 mb-2">Image Preview:</p>
-              <img 
-                src={formData.image_url} 
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Image Preview:</p>
+              <img
+                src={formData.image_url}
                 alt="Preview"
-                className="w-24 h-24 object-cover rounded-lg border border-gray-200"
+                className="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = 'https://via.placeholder.com/96?text=Invalid+URL';
@@ -496,27 +496,27 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
       </div>
 
       {/* Status & Availability */}
-      <div className="bg-gray-50 rounded-lg p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <Layers className="w-5 h-5 text-gray-600" />
+      <div className="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-5">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+          <Layers className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           Status & Availability
         </h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Order Status
             </label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               {STATUSES.map(s => (
                 <option key={s.value} value={s.value}>{s.label}</option>
               ))}
             </select>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Note: Only 'Available' products appear in marketplace
             </p>
           </div>
@@ -527,12 +527,12 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
               id="available_checkbox"
               checked={formData.available_for_sale}
               onChange={handleChange}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
             />
-            <label htmlFor="available_checkbox" className="text-sm font-medium text-gray-700">
+            <label htmlFor="available_checkbox" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Available for sale
             </label>
-            <span className="text-xs text-gray-500 ml-2">
+            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
               {formData.available_for_sale ? '✅ Visible' : '❌ Hidden'}
             </span>
           </div>
@@ -540,11 +540,11 @@ const EditProductForm = ({ product, onSubmit, onCancel }) => {
       </div>
 
       {/* Form Actions */}
-      <div className="flex gap-4 pt-4 border-t border-gray-200">
-        <button 
-          type="button" 
+      <div className="flex gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <button
+          type="button"
           onClick={onCancel}
-          className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium flex items-center justify-center gap-2"
+          className="flex-1 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition font-medium flex items-center justify-center gap-2"
           disabled={loading}
         >
           <XCircle className="w-4 h-4" />
