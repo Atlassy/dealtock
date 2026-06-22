@@ -410,4 +410,12 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 - Application mobile — décidé de reporter, pas de date fixée.
 
 ## En attente de décision
-- Aucune société de livraison de test (`Test Delivery Co`) ne doit traîner en base, surtout avant une démo à un partenaire potentiel.
+- ~~Aucune société de livraison de test (`Test Delivery Co`) ne doit traîner en base, surtout avant une démo à un partenaire potentiel.~~ Fait, voir plus bas.
+
+## Nettoyage des données de test (préparation démo)
+
+**Contexte précisé :** l'État marocain n'a pas seulement approuvé le projet, il a aussi **investi** dans Dealtock. Le local et le matériel sont déjà acquis. Le site doit être présentable pour convaincre de vraies sociétés de livraison de devenir partenaires — d'où le besoin de nettoyer ce qui ressemble à du test/bricolage avant toute démo.
+
+**Vérification de `delivery_companies` :** 6 lignes en base. Amana, DHL, Sendit, EcoDelivery sont des exemples avec des clés API factices (`your-amana-secret`...) mais portent de **vrais noms de transporteurs existants** — décision prise de les garder tels quels (ce sont des exemples internes, pas exposés publiquement comme partenariats signés). `Test Delivery Co` et `BENEXPEDITION` étaient de vrais placeholders à supprimer.
+
+**Suppression en pratique :** `Test Delivery Co` avait 14 commandes (`orders.delivery_company_id`) et des lignes `escrow_holdings` qui pointaient directement vers elle (colonne `NOT NULL`, donc impossible de juste supprimer la société sans casser ces lignes). Réassigné ces 14 commandes + les `escrow_holdings` correspondants vers Amana, puis supprimé `Test Delivery Co` et `BENEXPEDITION` (qui n'avait aucune commande liée). Base de données plus propre pour une démo.
