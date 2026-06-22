@@ -382,38 +382,32 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 ## Priorités (méthode MoSCoW)
 
-Pour structurer la suite du travail, on classe ce qui reste à faire par priorité réelle plutôt que par ordre d'idée.
+**Mise à jour importante du contexte :** le projet n'est pas encore lancé. L'idée est approuvée par l'État, le local et le matériel sont déjà pris — ce qui manque, c'est un site présentable pour convaincre de vraies sociétés de livraison de devenir partenaires. Aucun vrai transporteur ne sera intégré avant qu'un partenariat soit signé via cette démarche de présentation. Ça change la priorité : ce qui rend le site crédible pour une démo passe avant ce qui ne sert qu'après le lancement.
 
-**Must have (bloquant avant tout vrai lancement) :**
-- Intégrer un vrai transporteur de livraison (API réelle) — actuellement aucun partenaire réel n'est connecté, seulement des sociétés de test/manuelles. Sans ça, le suivi de commande reste manuel et peu fiable.
-- Vérifier un domaine sur Resend (`dealtock.ma` ou équivalent) pour que l'email de confirmation de commande parte vers de vrais clients, pas seulement vers l'adresse de test du compte gratuit.
-- S'assurer que `delivery_companies` contient uniquement de vraies sociétés (Amana, EcoDelivery, DHL, BENEXPEDITION, Sendit...) et plus la société de test ("Test Delivery Co") avant tout passage en production.
+**Must have (avant de présenter le site à des sociétés de livraison) :**
+- Nettoyer les données de test visibles (`Test Delivery Co`, produits "TEST"/"TEST2"...) qui feraient mauvaise impression si elles apparaissent pendant une démo.
+- S'assurer que les flux principaux (commande → approbation → livraison → facture) fonctionnent de bout en bout sans erreur visible, puisque c'est probablement ce qu'on montrera en démo.
+- Vérifier un domaine sur Resend (`dealtock.ma` ou équivalent) pour que les emails de démonstration n'aient pas l'air d'un compte de test gratuit.
 
-**Should have (important, mais pas bloquant) :**
-- Traduire les dashboards Warehouse et Delivery (comptes internes, peu nombreux, mais utilisés au quotidien par ceux qui les ont).
-- Retravailler le contenu/design de l'email de confirmation de commande (actuellement un HTML basique, fonctionnel mais pas soigné).
+**Should have (renforce la crédibilité, pas bloquant pour une démo) :**
+- Traduire les dashboards Warehouse et Delivery.
+- Retravailler le contenu/design de l'email de confirmation de commande.
 - Traduire les formulaires internes `AddProductForm`/`EditProductForm`.
-- **Notification SMS/WhatsApp en complément de l'email** — au Maroc, le taux d'ouverture email est faible comparé au SMS/WhatsApp pour des achats en COD. S'inspirer de Jumia (gros acteur e-commerce africain) qui privilégie le SMS pour les confirmations. Probablement plus impactant pour les clients que peaufiner le design de l'email.
-- **Vérification photo de la condition du produit** avant mise en ligne — actuellement "Condition A (Sealed)" est une simple déclaration texte côté warehouse/admin, sans preuve. Les plateformes de liquidation sérieuses (B-Stock, Liquidation.com) exigent une photo horodatée. Réduit le risque de litige client.
+- **Notification SMS/WhatsApp en complément de l'email** — argument de poids pour convaincre un transporteur marocain habitué au SMS plutôt qu'à l'email (façon Jumia).
+- **Vérification photo de la condition du produit** avant mise en ligne — rassure un futur partenaire transporteur sur le sérieux du contrôle qualité.
 
-**Could have (utile, sans urgence) :**
-- Traduire les modales de configuration des sociétés de livraison (API/mappings de statuts) — peu utilisées au quotidien.
+**Could have (utile une fois un partenaire signé, pas avant) :**
+- Traduire les modales de configuration des sociétés de livraison (API/mappings de statuts).
 - Traduire le paragraphe dynamique "Business Insights" du dashboard vendeur.
-- Construire une vraie modélisation warehouse (table dédiée, capacité, plusieurs entrepôts par partenaire) si le MVP actuel (réutilisant `products.user_id` + rôle `warehouse`) devient limitant.
-- **Vente par lot/palette** (façon B-Stock/Liquidation.com/BULQ) — permettre à un warehouse partner de regrouper plusieurs produits retournés en un seul lot à acheter d'un coup, plutôt qu'à l'unité uniquement.
-- **Avis/notation vendeur et transporteur** — le champ `seller_rating` existe déjà dans le code mais aucune interface ne permet à un client de réellement laisser un avis. Renforcerait la confiance, comme sur la plupart des marketplaces (Vinted, ThredUp, AliExpress).
-- **Export de rapports pour les vendeurs** (évolution du revenu dans le temps, pas juste un instantané) — utile une fois qu'il y a du volume réel.
+- Construire une vraie modélisation warehouse (table dédiée, capacité, plusieurs entrepôts par partenaire).
+- **Vente par lot/palette** (façon B-Stock/Liquidation.com/BULQ).
+- **Avis/notation vendeur et transporteur** — le champ `seller_rating` existe déjà dans le code mais aucune interface ne permet de laisser un avis.
+- **Export de rapports pour les vendeurs** — utile une fois qu'il y a du volume réel.
 
-**Won't have (pas pour l'instant, décidé ensemble) :**
-- Automatisation du suivi de livraison par webhook transporteur — n'a aucun sens tant qu'aucun vrai transporteur n'est intégré (dépend du Must have ci-dessus).
+**Won't have (pas avant qu'un vrai transporteur soit partenaire) :**
+- Intégration API réelle d'un transporteur — littéralement impossible avant qu'un partenaire signe, puisqu'on n'a pas accès à leur API.
+- Automatisation du suivi de livraison par webhook transporteur — dépend du point ci-dessus.
 - Application mobile — décidé de reporter, pas de date fixée.
 
-### 42. Mode sombre jamais appliqué aux pages d'authentification
-**Signalé par l'associé (capture d'écran) :** la page "Reset Password" restait entièrement en clair même en mode sombre activé.
-
-**Erreur trouvée :** malgré le point 3 (passe "site-wide" sur le mode sombre), les pages d'authentification (`login.jsx`, `SignUpForm.jsx`, `ForgotPassword.jsx`, `ResetPassword.jsx`, `CheckEmail.jsx`, `EmailConfirmation.jsx`, `PasswordUpdated.jsx`, `PasswordStrength.jsx`) n'avaient en réalité jamais reçu de classes `dark:` — seule la lisibilité du texte dans les champs avait été corrigée à l'époque (point 4), pas le reste de la page (fonds, cartes, bordures, liens).
-
-**Solution :** ajout systématique des classes `dark:` sur les 8 fichiers (fond de page, carte blanche, champs de saisie, boutons, liens, messages d'erreur, indicateur de force du mot de passe), suivant la même convention que le reste du site.
-
 ## En attente de décision
-- Aucune société de livraison de test (`Test Delivery Co`) ne doit traîner en base une fois les vraies sociétés en place — à nettoyer avant la mise en production.
+- Aucune société de livraison de test (`Test Delivery Co`) ne doit traîner en base, surtout avant une démo à un partenaire potentiel.
