@@ -584,44 +584,31 @@ const SellerDashboard = () => {
       const isPremium = false; // Pro tier determined by role, not subscription_tier
       const appliesTo = isPremium ? 'Pro_Seller' : 'Seller';
 
-      // Collect unique categories from all products for a targeted fetch
-      const uniqueCategories = [...new Set(
-        (productsData || []).map(p => p.category || 'Other')
-      )];
-
-      // QUERY 1 of 2: Fetch all category-specific rules in one shot
+      // Fetch every active rule for this seller tier in one shot. "is_default"
+      // here means "no specific category" — it's not a single fallback row,
+      // there's one per price tier (0-1000 MAD, 1000-3000 MAD, etc).
       const { data: allRules } = await supabase
         .from('commission_rules')
         .select('percentage, min_amount, max_amount, category, is_default')
         .eq('applies_to', appliesTo)
-        .eq('is_active', true)
-        .in('category', uniqueCategories);
+        .eq('is_active', true);
 
-      // QUERY 2 of 2: Fetch the single default fallback rule
-      const { data: defaultRule } = await supabase
-        .from('commission_rules')
-        .select('percentage')
-        .eq('applies_to', appliesTo)
-        .eq('is_active', true)
-        .eq('is_default', true)
-        .maybeSingle();
-
-      const defaultRate = defaultRule?.percentage || 0;
+      const inPriceRange = (rule, price) =>
+        (rule.min_amount == null || price >= rule.min_amount) &&
+        (rule.max_amount == null || price <= rule.max_amount);
 
       // Match each product to its rule in memory — zero extra queries
       const productsWithCommission = (productsData || []).map((product) => {
         const price = product.purchase_price || 0;
         const category = product.category || 'Other';
 
-        // Find the most specific rule: same category + price within range
-        const matchedRule = (allRules || []).find(
-          r => r.category === category &&
-               !r.is_default &&
-               (r.min_amount == null || price >= r.min_amount) &&
-               (r.max_amount == null || price <= r.max_amount)
-        );
+        // Prefer a category-specific rule for this price tier, fall back to
+        // the category-less (default) rule for the same price tier.
+        const matchedRule =
+          (allRules || []).find(r => !r.is_default && r.category === category && inPriceRange(r, price)) ||
+          (allRules || []).find(r => r.is_default && inPriceRange(r, price));
 
-        const commissionRate = matchedRule?.percentage ?? defaultRate;
+        const commissionRate = matchedRule?.percentage ?? 0;
         const commissionAmount = price * (commissionRate / 100);
 
         return {

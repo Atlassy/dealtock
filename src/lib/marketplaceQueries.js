@@ -118,30 +118,25 @@ export const marketplaceQueries = {
         
         let commissionRate = 20;
         try {
-          const { data: ruleData } = await supabase
+          // "is_default" rules have category = null but are still tiered by
+          // price range (one row per tier), so they can't be fetched with
+          // maybeSingle() — fetch every active rule and match by price range.
+          const { data: rules } = await supabase
             .from('commission_rules')
-            .select('percentage')
+            .select('percentage, category, min_amount, max_amount, is_default')
             .eq('applies_to', 'dropshipper')
-            .eq('is_active', true)
-            .eq('category', category)
-            .lte('min_amount', markup)
-            .gte('max_amount', markup)
-            .maybeSingle();
-          
-          if (ruleData) {
-            commissionRate = ruleData.percentage;
-          } else {
-            const { data: defaultData } = await supabase
-              .from('commission_rules')
-              .select('percentage')
-              .eq('applies_to', 'dropshipper')
-              .eq('is_active', true)
-              .eq('is_default', true)
-              .maybeSingle();
-            
-            if (defaultData) {
-              commissionRate = defaultData.percentage;
-            }
+            .eq('is_active', true);
+
+          const inRange = (r) =>
+            (r.min_amount == null || markup >= r.min_amount) &&
+            (r.max_amount == null || markup <= r.max_amount);
+
+          const matchedRule =
+            (rules || []).find(r => !r.is_default && r.category === category && inRange(r)) ||
+            (rules || []).find(r => r.is_default && inRange(r));
+
+          if (matchedRule) {
+            commissionRate = matchedRule.percentage;
           }
         } catch (err) {
           console.warn('Error fetching commission rate:', err);

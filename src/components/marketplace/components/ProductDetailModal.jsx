@@ -95,41 +95,34 @@ export default function ProductDetailModal({
       
       try {
         const category = product?.category || 'Other';
-        
-        // Fetch the appropriate commission rule based on price range
-        const { data, error } = await supabase
+
+        // "is_default" rules have category = null but are still tiered by
+        // price range (one row per tier), so they can't be fetched with
+        // maybeSingle() — fetch every active rule and match by price range.
+        const { data: rules } = await supabase
           .from('commission_rules')
-          .select('percentage')
+          .select('percentage, category, min_amount, max_amount, is_default')
           .eq('applies_to', appliesTo)
-          .eq('is_active', true)
-          .eq('category', category)
-          .lte('min_amount', basePrice)
-          .gte('max_amount', basePrice)
-          .maybeSingle();
-        
-        if (data) {
-          setCommissionRate(data.percentage);
+          .eq('is_active', true);
+
+        const inRange = (r) =>
+          (r.min_amount == null || basePrice >= r.min_amount) &&
+          (r.max_amount == null || basePrice <= r.max_amount);
+
+        const matchedRule =
+          (rules || []).find(r => !r.is_default && r.category === category && inRange(r)) ||
+          (rules || []).find(r => r.is_default && inRange(r));
+
+        if (matchedRule) {
+          setCommissionRate(matchedRule.percentage);
         } else {
-          // Try default rule (no category)
-          const { data: defaultData } = await supabase
-            .from('commission_rules')
-            .select('percentage')
-            .eq('applies_to', appliesTo)
-            .eq('is_active', true)
-            .eq('is_default', true)
-            .maybeSingle();
-          
-          if (defaultData) {
-            setCommissionRate(defaultData.percentage);
+          // Fallback based on user role
+          if (appliesTo === 'B2C') {
+            if (basePrice >= 5000) setCommissionRate(10);
+            else if (basePrice >= 1000) setCommissionRate(20);
+            else setCommissionRate(30);
           } else {
-            // Fallback based on user role
-            if (appliesTo === 'B2C') {
-              if (basePrice >= 5000) setCommissionRate(10);
-              else if (basePrice >= 1000) setCommissionRate(20);
-              else setCommissionRate(30);
-            } else {
-              setCommissionRate(0);
-            }
+            setCommissionRate(0);
           }
         }
         
