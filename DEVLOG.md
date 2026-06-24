@@ -411,6 +411,7 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 ## En attente de décision
 - ~~Aucune société de livraison de test (`Test Delivery Co`) ne doit traîner en base, surtout avant une démo à un partenaire potentiel.~~ Fait, voir plus bas.
+- Domaine pour Resend (`dealtock.ma` ou équivalent) : pas encore acheté, c'est l'associé qui doit payer. Une fois acheté, reprendre l'ajout du domaine dans Resend + les enregistrements DNS chez NindoHost.
 
 ## Nettoyage des données de test (préparation démo)
 
