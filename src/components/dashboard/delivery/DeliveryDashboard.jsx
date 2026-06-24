@@ -120,8 +120,8 @@ const DeliveryDashboard = () => {
           delivery_notes,
           delivery_weight_kg,
           delivery_service_type,
-          delivery_picked_at,
-          delivery_confirmed_at,
+          picked_up_at,
+          delivered_at,
           created_at,
           updated_at,
           profiles!orders_customer_id_fkey (
@@ -181,8 +181,8 @@ const DeliveryDashboard = () => {
           service_type: order.delivery_service_type || 'standard',
           notes: order.delivery_notes || shippingAddress?.notes || '',
           tracking_code: order.carrier_tracking_code,
-          picked_at: order.delivery_picked_at,
-          confirmed_at: order.delivery_confirmed_at,
+          picked_at: order.picked_up_at,
+          confirmed_at: order.delivered_at,
           created_at: order.created_at,
           updated_at: order.updated_at,
           shipping_address: shippingAddress
@@ -269,9 +269,9 @@ const DeliveryDashboard = () => {
 
       // Add timestamps based on status
       if (newStatus === 'picked_up') {
-        updateData.delivery_picked_at = new Date().toISOString();
+        updateData.picked_up_at = new Date().toISOString();
       } else if (newStatus === 'delivered') {
-        updateData.delivery_confirmed_at = new Date().toISOString();
+        updateData.delivered_at = new Date().toISOString();
       }
 
       // Update in Supabase
