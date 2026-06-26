@@ -411,7 +411,7 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 
 ## En attente de décision
 - ~~Aucune société de livraison de test (`Test Delivery Co`) ne doit traîner en base, surtout avant une démo à un partenaire potentiel.~~ Fait, voir plus bas.
-- Domaine pour Resend (`dealtock.ma` ou équivalent) : pas encore acheté, c'est l'associé qui doit payer. Une fois acheté, reprendre l'ajout du domaine dans Resend + les enregistrements DNS chez NindoHost.
+- ~~Domaine pour Resend (`dealtock.ma` ou équivalent) : pas encore acheté.~~ Fait, voir plus bas.
 
 ## Nettoyage des données de test (préparation démo)
 
@@ -438,3 +438,7 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 **Dernier bug, le plus sournois : le statut "Delivered" revenait tout seul à "Ready for Pickup" après ~10 secondes.** En apparence l'action marchait (toast de succès, badge vert "Delivered" affiché), mais `updated_at` en base montrait une date d'il y a plusieurs jours — l'UPDATE n'avait en réalité jamais été écrit. Cause : `orders` n'avait des policies RLS UPDATE que pour seller/dropshipper/admin, **aucune pour le rôle `delivery`**. Une UPDATE filtrée par RLS ne renvoie pas d'erreur côté Supabase, elle réussit silencieusement en modifiant 0 ligne — d'où le faux succès suivi du "retour en arrière" au prochain rechargement (l'abonnement temps réel refetch la vraie valeur, jamais changée). Corrigé par une nouvelle policy `orders_update_delivery` qui autorise la mise à jour quand la commande est assignée à la société de livraison du compte connecté (jointure `profiles.email = delivery_companies.email`, le même principe que `DeliveryDashboard.jsx` utilise déjà pour retrouver sa société).
 
 **Le flux complet a été testé en direct de bout en bout avec succès, jusqu'à la facture :** vendeur approuve → marque prêt pour enlèvement → la commande apparaît chez le transporteur → Pick Up → en transit → livré (statut qui tient cette fois) → **facture générée automatiquement** par le trigger existant (`INV-060576WXTI0` créée à l'instant de la livraison).
+
+## Domaine `dealtock.ma` configuré sur Resend
+
+Le domaine `dealtock.ma` a été acheté (chez NindoHost, valable jusqu'au 26/06/2028). Ajout du domaine dans Resend, puis configuration des 4 enregistrements DNS dans la "Zone DNS" NindoHost (qui n'existait pas encore, il a fallu la créer) : `TXT resend._domainkey` (DKIM), `MX send` + `TXT send` (SPF, pour l'envoi), `TXT _dmarc` (DMARC). Domaine vérifié côté Resend en quelques minutes. Mise à jour de `send_order_confirmation_email()` pour utiliser `commandes@dealtock.ma` comme expéditeur au lieu de l'adresse de test `onboarding@resend.dev` (qui ne pouvait envoyer qu'au propriétaire du compte Resend). Testé en plaçant une commande réelle : l'email arrive bien, depuis la bonne adresse, à un destinataire externe — **le dernier point Must-have de la liste de préparation à la démo est coché.**
