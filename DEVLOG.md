@@ -412,6 +412,7 @@ En testant réellement "+ Add a new customer" puis "Place B2B Order" de bout en 
 ## En attente de décision
 - ~~Aucune société de livraison de test (`Test Delivery Co`) ne doit traîner en base, surtout avant une démo à un partenaire potentiel.~~ Fait, voir plus bas.
 - ~~Domaine pour Resend (`dealtock.ma` ou équivalent) : pas encore acheté.~~ Fait, voir plus bas.
+- Brancher `dealtock.ma` comme domaine du site lui-même (pas seulement pour les emails) : nécessite l'accès au compte Vercel pour ajouter le domaine dans Settings → Domains, pas encore disponible.
 
 ## Nettoyage des données de test (préparation démo)
 
