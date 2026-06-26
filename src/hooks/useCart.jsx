@@ -194,6 +194,51 @@ export const useCart = () => {
   }, []);
 
   // -----------------------------
+  // SAVE CART
+  // -----------------------------
+  const saveCart = useCallback(async (items) => {
+    try {
+      if (user) {
+        // user_carts is one row per (user_id, product_id) — sync by
+        // deleting rows no longer in the cart, then upserting the rest.
+        const productIds = items.map(i => i.id);
+
+        if (productIds.length > 0) {
+          await supabase
+            .from('user_carts')
+            .delete()
+            .eq('user_id', user.id)
+            .not('product_id', 'in', `(${productIds.join(',')})`);
+
+          const { error } = await supabase
+            .from('user_carts')
+            .upsert(
+              items.map(item => ({
+                user_id: user.id,
+                product_id: item.id,
+                quantity: item.quantity,
+                updated_at: new Date().toISOString()
+              })),
+              { onConflict: 'user_id,product_id' }
+            );
+
+          if (error) throw error;
+        } else {
+          await supabase.from('user_carts').delete().eq('user_id', user.id);
+        }
+      } else {
+        localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
+      }
+
+      setCartItems(items);
+      window.dispatchEvent(new Event('cartUpdated'));
+
+    } catch (err) {
+      console.error('Save cart error:', err);
+    }
+  }, [user]);
+
+  // -----------------------------
   // LOAD CART
   // -----------------------------
   const loadCart = useCallback(async () => {
@@ -204,29 +249,22 @@ export const useCart = () => {
 
       if (user) {
         console.log('📡 Loading cart from Supabase for user:', user.id);
-        
+
+        // user_carts is one row per (user_id, product_id), not a single
+        // JSONB blob — read all rows for this user and map to the shape
+        // the rest of the app expects.
         const { data, error } = await supabase
           .from('user_carts')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
+          .select('product_id, quantity')
+          .eq('user_id', user.id);
 
         if (!error && data) {
-          items = data.items || [];
+          items = data.map(row => ({ id: row.product_id, quantity: row.quantity }));
           console.log('📦 Loaded', items.length, 'items from Supabase');
-          
+
           // Update prices with current user role
           if (items.length > 0 && rulesLoaded) {
             items = await getCartItemsWithPrices(items);
-            // Save updated prices back
-            await supabase
-              .from('user_carts')
-              .upsert({
-                user_id: user.id,
-                items: items,
-                expires_at: new Date(Date.now() + CART_EXPIRATION_DAYS * 24 * 60 * 60 * 1000).toISOString(),
-                updated_at: new Date().toISOString()
-              }, { onConflict: 'user_id' });
           }
         }
 
@@ -248,23 +286,16 @@ export const useCart = () => {
             }
           });
           items = Object.values(merged);
-          
+
           localStorage.removeItem(GUEST_CART_KEY);
           localStorage.removeItem(LEGACY_GUEST_KEY);
-          
+
           // Update prices for merged items
           if (items.length > 0 && rulesLoaded) {
             items = await getCartItemsWithPrices(items);
           }
-          
-          await supabase
-            .from('user_carts')
-            .upsert({
-              user_id: user.id,
-              items: items,
-              expires_at: new Date(Date.now() + CART_EXPIRATION_DAYS * 24 * 60 * 60 * 1000).toISOString(),
-              updated_at: new Date().toISOString()
-            }, { onConflict: 'user_id' });
+
+          await saveCart(items);
         }
 
       } else {
@@ -277,13 +308,13 @@ export const useCart = () => {
             localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
           }
         }
-        
+
         // Update prices for guest
         if (items.length > 0 && rulesLoaded) {
           items = await getCartItemsWithPrices(items);
           localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
         }
-        
+
         console.log('📦 Loaded', items.length, 'items from localStorage (guest)');
         setCartItems(items);
         setLoading(false);
@@ -297,35 +328,7 @@ export const useCart = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, rulesLoaded, getCartItemsWithPrices, migrateLegacyCart]);
-
-  // -----------------------------
-  // SAVE CART
-  // -----------------------------
-  const saveCart = useCallback(async (items) => {
-    try {
-      if (user) {
-        const { error } = await supabase
-          .from('user_carts')
-          .upsert({
-            user_id: user.id,
-            items: items,
-            expires_at: new Date(Date.now() + CART_EXPIRATION_DAYS * 24 * 60 * 60 * 1000).toISOString(),
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'user_id' });
-
-        if (error) throw error;
-      } else {
-        localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
-      }
-
-      setCartItems(items);
-      window.dispatchEvent(new Event('cartUpdated'));
-
-    } catch (err) {
-      console.error('Save cart error:', err);
-    }
-  }, [user]);
+  }, [user, rulesLoaded, getCartItemsWithPrices, migrateLegacyCart, saveCart]);
 
   // -----------------------------
   // ACTIONS
@@ -432,11 +435,11 @@ const addToCart = useCallback(async (product, qty = 1) => {
           table: 'user_carts',
           filter: `user_id=eq.${user.id}`
         },
-        (payload) => {
+        () => {
+          // Each row is one product, not a single blob — easiest to just
+          // refetch the whole cart rather than reconstruct it from the payload.
           console.log('🔄 Realtime cart update');
-          if (payload.new?.items) {
-            setCartItems(payload.new.items);
-          }
+          loadCart();
         }
       )
       .subscribe();
@@ -446,7 +449,7 @@ const addToCart = useCallback(async (product, qty = 1) => {
         supabase.removeChannel(channelRef.current);
       }
     };
-  }, [user]);
+  }, [user, loadCart]);
 
   return {
     cartItems,

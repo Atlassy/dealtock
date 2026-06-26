@@ -1,5 +1,6 @@
 // src/components/dashboard/Dashboard.jsx
 import React, { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/SupabaseAuthContext";
 import { supabase } from "../../lib/supabaseClient";
 import { motion } from "framer-motion";
@@ -65,7 +66,9 @@ const Dashboard = () => {
     case "warehouse":
       return <WarehouseDashboard />;
     default:
-      return <div>Unauthorized role: {profile?.role}</div>;
+      // Plain customer accounts (role is empty by default) have no
+      // dashboard of their own — send them to the marketplace instead.
+      return <Navigate to="/" replace />;
   }
 };
 

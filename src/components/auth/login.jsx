@@ -13,12 +13,14 @@ export default function Login() {
   const [showPwd, setShowPwd] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
+  const DASHBOARD_ROLES = ["admin", "seller", "dropshipper", "delivery", "warehouse"];
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg("");
-    const { error } = await signIn(email, password);
+    const { error, profile } = await signIn(email, password);
     if (error) { setErrorMsg(error.message); return; }
-    navigate("/dashboard");
+    navigate(DASHBOARD_ROLES.includes(profile?.role) ? "/dashboard" : "/");
   };
 
   return (

@@ -96,13 +96,14 @@ export function AuthProvider({ children }) {
       password,
     });
 
+    let signedInProfile = null;
     if (data?.user) {
-      await fetchProfile(data.user.id);
+      signedInProfile = await fetchProfile(data.user.id);
       // 🔥 REMOVED duplicate event - onAuthStateChange will handle this
     }
 
     setLoading(false);
-    return { data, error };
+    return { data, error, profile: signedInProfile };
   };
 
   // 4️⃣ Logout
