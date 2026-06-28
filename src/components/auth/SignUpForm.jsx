@@ -94,15 +94,15 @@ export default function SignUpForm() {
     // For a seller/delivery application, submit a pending request — the
     // role is granted later by an admin, never directly at signup.
     if (accountType !== "customer" && data.user) {
-      const { error: requestError } = await supabase.from("role_requests").insert({
-        user_id: data.user.id,
-        requested_role: accountType,
-        company_name: companyName.trim(),
-        phone: phone.trim() || null,
-        message: message.trim() || null,
+      const { data: rpcResult, error: requestError } = await supabase.rpc("submit_role_request", {
+        p_user_id: data.user.id,
+        p_requested_role: accountType,
+        p_company_name: companyName.trim(),
+        p_phone: phone.trim() || null,
+        p_message: message.trim() || null,
       });
-      if (requestError) {
-        console.error("Error submitting role request:", requestError);
+      if (requestError || !rpcResult?.success) {
+        console.error("Error submitting role request:", requestError || rpcResult?.error);
       }
     }
 
