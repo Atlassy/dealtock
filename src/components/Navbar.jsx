@@ -24,9 +24,43 @@ const languages = [
 
 const CATEGORIES = ["All", "Electronics", "Fashion", "Home", "Beauty", "Sports", "Books", "Automotive", "Other"];
 const MOROCCAN_CITIES = [
-  "Casablanca", "Rabat", "Marrakech", "Fes", "Tangier", "Agadir", 
+  "Casablanca", "Rabat", "Marrakech", "Fes", "Tangier", "Agadir",
   "Meknes", "Oujda", "Kenitra", "Tetouan", "Sale", "Temara"
 ];
+// Approximate city-center coordinates, used to find the nearest city to the
+// browser's geolocation without depending on a paid reverse-geocoding API.
+const CITY_COORDS = {
+  Casablanca: [33.5731, -7.5898],
+  Rabat: [34.0209, -6.8416],
+  Marrakech: [31.6295, -7.9811],
+  Fes: [34.0331, -5.0003],
+  Tangier: [35.7595, -5.8340],
+  Agadir: [30.4278, -9.5981],
+  Meknes: [33.8935, -5.5473],
+  Oujda: [34.6814, -1.9086],
+  Kenitra: [34.2610, -6.5802],
+  Tetouan: [35.5785, -5.3684],
+  Sale: [34.0531, -6.7985],
+  Temara: [33.9287, -6.9061],
+};
+const DELIVERY_CITY_KEY = 'dealtock_delivery_city';
+
+const nearestMoroccanCity = (lat, lng) => {
+  const toRad = (v) => (v * Math.PI) / 180;
+  let closest = null;
+  let closestDist = Infinity;
+  for (const [city, [cLat, cLng]] of Object.entries(CITY_COORDS)) {
+    const dLat = toRad(cLat - lat);
+    const dLng = toRad(cLng - lng);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat)) * Math.cos(toRad(cLat)) * Math.sin(dLng / 2) ** 2;
+    const dist = 2 * Math.asin(Math.sqrt(a));
+    if (dist < closestDist) {
+      closestDist = dist;
+      closest = city;
+    }
+  }
+  return closest;
+};
 const CONDITIONS = ["New", "Like New", "Good", "Fair"];
 
 // ✅ FIXED Promo Banner Component - Handles images correctly
@@ -187,6 +221,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [category, setCategory] = useState('');
   const [city, setCity] = useState('');
+  const [showDeliveryPicker, setShowDeliveryPicker] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [condition, setCondition] = useState('');
   const [sortBy, setSortBy] = useState('newest');
@@ -201,6 +236,7 @@ const Navbar = () => {
   const userMenuRef = useRef(null);
   const sidebarRef = useRef(null);
   const menuButtonRef = useRef(null);
+  const deliveryPickerRef = useRef(null);
 
   const isMarketplacePage = location.pathname === '/' || location.pathname === '/marketplace';
   const userRole = profile?.role || (user ? 'customer' : 'guest');
@@ -241,6 +277,36 @@ const Navbar = () => {
     localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
 
+  // Auto-detect the customer's city once, falling back to manual selection
+  // if geolocation is denied/unavailable.
+  useEffect(() => {
+    const savedCity = localStorage.getItem(DELIVERY_CITY_KEY);
+    if (savedCity) {
+      setCity(savedCity);
+      return;
+    }
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const detected = nearestMoroccanCity(position.coords.latitude, position.coords.longitude);
+        if (detected) {
+          setCity(detected);
+          localStorage.setItem(DELIVERY_CITY_KEY, detected);
+        }
+      },
+      () => {
+        // Denied or unavailable — leave city empty, user picks manually.
+      },
+      { timeout: 8000 }
+    );
+  }, []);
+
+  const handleSelectDeliveryCity = (selected) => {
+    setCity(selected);
+    localStorage.setItem(DELIVERY_CITY_KEY, selected);
+    setShowDeliveryPicker(false);
+  };
+
   useEffect(() => {
     const handleClickOutsideMenus = (event) => {
       if (languageMenuRef.current && !languageMenuRef.current.contains(event.target)) {
@@ -248,6 +314,9 @@ const Navbar = () => {
       }
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setShowUserMenu(false);
+      }
+      if (deliveryPickerRef.current && !deliveryPickerRef.current.contains(event.target)) {
+        setShowDeliveryPicker(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutsideMenus);
@@ -318,12 +387,30 @@ const Navbar = () => {
                 <img src={LOGO_URL} alt="Dealtock" className="h-8 w-auto object-contain" />
               </Link>
               {/* Deliver-to: desktop only */}
-              <div className="hidden lg:flex items-center gap-1 ml-1 px-2 py-1 hover:bg-[#5C3A21] dark:hover:bg-[#febd69] hover:text-white dark:hover:text-gray-900 rounded-lg transition cursor-pointer group">
-                <MapPin className="w-4 h-4 text-[#5C3A21] dark:text-gray-300 group-hover:text-white dark:group-hover:text-gray-900" />
-                <div className="text-[#5C3A21] dark:text-gray-200 group-hover:text-white dark:group-hover:text-gray-900 text-xs">
-                  <p className="text-[10px] text-[#8B6B4A] dark:text-gray-400 group-hover:text-white/80">{t('navbar.deliverTo')}</p>
-                  <p className="font-medium text-sm">{t('navbar.morocco')}</p>
+              <div className="hidden lg:block relative ml-1" ref={deliveryPickerRef}>
+                <div
+                  onClick={() => setShowDeliveryPicker(!showDeliveryPicker)}
+                  className="flex items-center gap-1 px-2 py-1 hover:bg-[#5C3A21] dark:hover:bg-[#febd69] hover:text-white dark:hover:text-gray-900 rounded-lg transition cursor-pointer group"
+                >
+                  <MapPin className="w-4 h-4 text-[#5C3A21] dark:text-gray-300 group-hover:text-white dark:group-hover:text-gray-900" />
+                  <div className="text-[#5C3A21] dark:text-gray-200 group-hover:text-white dark:group-hover:text-gray-900 text-xs">
+                    <p className="text-[10px] text-[#8B6B4A] dark:text-gray-400 group-hover:text-white/80">{t('navbar.deliverTo')}</p>
+                    <p className="font-medium text-sm">{city || t('navbar.morocco')}</p>
+                  </div>
                 </div>
+                {showDeliveryPicker && (
+                  <div className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1 max-h-64 overflow-y-auto">
+                    {MOROCCAN_CITIES.map(c => (
+                      <button
+                        key={c}
+                        onClick={() => handleSelectDeliveryCity(c)}
+                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${c === city ? 'font-semibold text-[#5C3A21] dark:text-[#febd69]' : 'text-gray-700 dark:text-gray-200'}`}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
