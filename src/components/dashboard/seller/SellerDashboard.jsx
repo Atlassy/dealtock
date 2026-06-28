@@ -936,7 +936,7 @@ const SellerDashboard = () => {
         .select()
         .single();
       if (error) throw error;
-      await fetchProducts();
+      await fetchDashboardData();
       setShowAddForm(false);
       toast.success('Product added successfully!');
       return { success: true };
@@ -957,7 +957,7 @@ const SellerDashboard = () => {
         .select()
         .single();
       if (error) throw error;
-      await fetchProducts();
+      await fetchDashboardData();
       setEditingProduct(null);
       toast.success('Product updated successfully!');
     } catch (err) {
