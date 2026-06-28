@@ -298,7 +298,8 @@
       "invoices": "الفواتير",
       "escrowManagement": "إدارة الضمان",
       "deliveryCompanies": "شركات التوصيل",
-      "commissions": "العمولات"
+      "commissions": "العمولات",
+      "roleRequests": "الطلبات"
     }
   },
   "overviewSection": {
@@ -1129,7 +1130,16 @@
       "selectCity": "اختر المدينة",
       "register": "تسجيل",
       "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
-      "login": "تسجيل الدخول"
+      "login": "تسجيل الدخول",
+      "accountType": "أسجل بصفتي",
+      "accountTypeCustomer": "عميل",
+      "accountTypeSeller": "بائع",
+      "accountTypeDelivery": "شركة توصيل",
+      "applicationNotice": "سيتم مراجعة حسابك من قبل فريقنا قبل الحصول على صلاحيات البائع/التوصيل. يمكنك التصفح والشراء في انتظار ذلك.",
+      "companyNamePlaceholder": "اسم الشركة",
+      "phonePlaceholder": "رقم الهاتف",
+      "messagePlaceholder": "أخبرنا أكثر عن نشاطك (اختياري)",
+      "companyNameRequired": "اسم الشركة مطلوب لحسابات البائع/التوصيل."
     },
     "forgotPassword": {
       "title": "إعادة تعيين كلمة المرور",
@@ -1210,5 +1220,25 @@
     "noOrdersYet": "لا توجد طلبات بعد",
     "orderNumber": "طلب رقم {{number}}",
     "product": "المنتج"
+  },
+  "roleRequests": {
+    "title": "الطلبات المعلقة",
+    "noRequests": "لا توجد طلبات معلقة.",
+    "requestedRole": "الصلاحية المطلوبة",
+    "roleSeller": "بائع",
+    "roleDelivery": "شركة توصيل",
+    "companyName": "الشركة",
+    "phone": "الهاتف",
+    "message": "الرسالة",
+    "submittedOn": "تاريخ التقديم",
+    "approve": "قبول",
+    "reject": "رفض",
+    "approveSuccess": "تم قبول الطلب",
+    "rejectSuccess": "تم رفض الطلب",
+    "actionFailed": "فشل الإجراء",
+    "confirmApprove": "قبول هذا الطلب ومنح الصلاحية؟",
+    "rejectReasonPrompt": "سبب الرفض (اختياري):",
+    "noPhone": "لا يوجد رقم هاتف",
+    "noMessage": "لا توجد رسالة"
   }
 }

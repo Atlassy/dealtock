@@ -10,7 +10,8 @@ import {
   Percent,
   RefreshCw,
   FileText,
-  Package
+  Package,
+  UserPlus
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -21,6 +22,7 @@ import DeliveryCompaniesSection from './components/DeliveryCompaniesSection';
 import EscrowManagementSection from './components/EscrowManagementSection';
 import OrderOversightSection from './components/OrderOversightSection';
 import CommissionRulesManager from './components/CommissionRulesManager';
+import RoleRequestsSection from './components/RoleRequestsSection';
 
 // Import invoice components
 import InvoicesList from './invoices/InvoicesList';
@@ -36,6 +38,7 @@ const TABS = {
   COMMISSIONS: 'commissions',
   INVOICES:  'invoices',
   RETURNED:  'returned',
+  REQUESTS:  'requests',
 };
 
 const AdminDashboard = () => {
@@ -65,6 +68,7 @@ const AdminDashboard = () => {
     paidInvoices: 0,
     overdueInvoices: 0,
     pendingReturnedProducts: 0,
+    pendingRoleRequests: 0,
   });
   
   const [deliveryCompanies, setDeliveryCompanies] = useState([]);
@@ -91,6 +95,7 @@ const AdminDashboard = () => {
         profilesResult,
         invoicesResult,
         returnedResult,
+        roleRequestsResult,
       ] = await Promise.allSettled([
         /* 0: delivery_companies */ supabase.from('delivery_companies').select('*').order('created_at', { ascending: false }),
         supabase.from('escrow_holdings')
@@ -122,6 +127,9 @@ const AdminDashboard = () => {
           .select('id', { count: 'exact', head: true })
           .eq('source_type', 'returned')
           .eq('listing_status', 'pending_review'),
+        supabase.from('role_requests')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'pending'),
       ]);
 
       const namedResults = {
@@ -132,6 +140,7 @@ const AdminDashboard = () => {
         Profiles: profilesResult,
         Invoices: invoicesResult,
         'Returned products': returnedResult,
+        'Role requests': roleRequestsResult,
       };
       const failedQueries = Object.entries(namedResults)
         .filter(([, result]) => result.status === 'rejected')
@@ -197,6 +206,9 @@ const AdminDashboard = () => {
             overdueInvoices,
             pendingReturnedProducts: returnedResult.status === 'fulfilled'
               ? (returnedResult.value.count || 0)
+              : 0,
+            pendingRoleRequests: roleRequestsResult.status === 'fulfilled'
+              ? (roleRequestsResult.value.count || 0)
               : 0,
           });
         }
@@ -280,6 +292,7 @@ const AdminDashboard = () => {
     { key: TABS.ESCROW,       label: t('adminDashboard.tabs.escrowManagement'),  icon: Shield },
     { key: TABS.DELIVERY,     label: t('adminDashboard.tabs.deliveryCompanies'), icon: Truck },
     { key: TABS.COMMISSIONS,  label: t('adminDashboard.tabs.commissions'),        icon: Percent },
+    { key: TABS.REQUESTS,     label: t('adminDashboard.tabs.roleRequests'),       icon: UserPlus },
   ];
 
   if (loading) {
@@ -341,6 +354,11 @@ const AdminDashboard = () => {
                   {stats.pendingReturnedProducts}
                 </span>
               )}
+              {tab.key === TABS.REQUESTS && stats.pendingRoleRequests > 0 && (
+                <span className="ml-2 px-2 py-0.5 text-xs bg-blue-500 dark:bg-blue-600 text-white rounded-full font-bold">
+                  {stats.pendingRoleRequests}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -396,6 +414,10 @@ const AdminDashboard = () => {
           
           {activeTab === TABS.COMMISSIONS && (
             <CommissionRulesManager />
+          )}
+
+          {activeTab === TABS.REQUESTS && (
+            <RoleRequestsSection onRefresh={fetchDashboardData} />
           )}
         </div>
       </div>

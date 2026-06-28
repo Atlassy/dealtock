@@ -13,6 +13,10 @@ export default function SignUpForm() {
   const [password, setPassword] = useState("");
   const [confirmPwd, setConfirmPwd] = useState("");
   const [city, setCity] = useState("");
+  const [accountType, setAccountType] = useState("customer");
+  const [companyName, setCompanyName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [strength, setStrength] = useState("");
 
@@ -41,6 +45,11 @@ export default function SignUpForm() {
 
     if (strength !== "Strong") {
       setErrorMsg(t('auth.signup.chooseStrongerPassword'));
+      return;
+    }
+
+    if (accountType !== "customer" && !companyName.trim()) {
+      setErrorMsg(t('auth.signup.companyNameRequired'));
       return;
     }
 
@@ -80,6 +89,21 @@ export default function SignUpForm() {
         setErrorMsg(t('auth.signup.emailAlreadyRegistered'));
       }
       return;
+    }
+
+    // For a seller/delivery application, submit a pending request — the
+    // role is granted later by an admin, never directly at signup.
+    if (accountType !== "customer" && data.user) {
+      const { error: requestError } = await supabase.from("role_requests").insert({
+        user_id: data.user.id,
+        requested_role: accountType,
+        company_name: companyName.trim(),
+        phone: phone.trim() || null,
+        message: message.trim() || null,
+      });
+      if (requestError) {
+        console.error("Error submitting role request:", requestError);
+      }
     }
 
     // SUCCESS — new account created
@@ -156,6 +180,51 @@ export default function SignUpForm() {
               </option>
             ))}
           </select>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              {t('auth.signup.accountType')}
+            </label>
+            <select
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              value={accountType}
+              onChange={(e) => setAccountType(e.target.value)}
+            >
+              <option value="customer">{t('auth.signup.accountTypeCustomer')}</option>
+              <option value="seller">{t('auth.signup.accountTypeSeller')}</option>
+              <option value="delivery">{t('auth.signup.accountTypeDelivery')}</option>
+            </select>
+          </div>
+
+          {accountType !== "customer" && (
+            <div className="space-y-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
+              <p className="text-xs text-blue-700 dark:text-blue-400">
+                {t('auth.signup.applicationNotice')}
+              </p>
+              <input
+                type="text"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                placeholder={t('auth.signup.companyNamePlaceholder')}
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                required
+              />
+              <input
+                type="tel"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                placeholder={t('auth.signup.phonePlaceholder')}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+              <textarea
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                placeholder={t('auth.signup.messagePlaceholder')}
+                rows={3}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+            </div>
+          )}
 
           <button
             type="submit"

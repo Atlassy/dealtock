@@ -298,7 +298,8 @@
       "invoices": "Invoices",
       "escrowManagement": "Escrow Management",
       "deliveryCompanies": "Delivery Companies",
-      "commissions": "Commissions"
+      "commissions": "Commissions",
+      "roleRequests": "Applications"
     }
   },
   "overviewSection": {
@@ -1129,7 +1130,16 @@
       "selectCity": "Select City",
       "register": "Register",
       "alreadyHaveAccount": "Already have an account?",
-      "login": "Login"
+      "login": "Login",
+      "accountType": "I'm signing up as",
+      "accountTypeCustomer": "Customer",
+      "accountTypeSeller": "Seller",
+      "accountTypeDelivery": "Delivery Company",
+      "applicationNotice": "Your account will be reviewed by our team before you get access to seller/delivery features. You can still browse and shop while it's pending.",
+      "companyNamePlaceholder": "Company / business name",
+      "phonePlaceholder": "Phone number",
+      "messagePlaceholder": "Tell us more about your business (optional)",
+      "companyNameRequired": "Company name is required for seller/delivery accounts."
     },
     "forgotPassword": {
       "title": "Reset your password",
@@ -1210,5 +1220,25 @@
     "noOrdersYet": "No orders yet",
     "orderNumber": "Order #{{number}}",
     "product": "Product"
+  },
+  "roleRequests": {
+    "title": "Pending Applications",
+    "noRequests": "No pending applications.",
+    "requestedRole": "Requested role",
+    "roleSeller": "Seller",
+    "roleDelivery": "Delivery company",
+    "companyName": "Company",
+    "phone": "Phone",
+    "message": "Message",
+    "submittedOn": "Submitted",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveSuccess": "Application approved",
+    "rejectSuccess": "Application rejected",
+    "actionFailed": "Action failed",
+    "confirmApprove": "Approve this application and grant the role?",
+    "rejectReasonPrompt": "Reason for rejection (optional):",
+    "noPhone": "No phone provided",
+    "noMessage": "No message"
   }
 }

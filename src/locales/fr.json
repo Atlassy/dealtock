@@ -298,7 +298,8 @@
       "invoices": "Factures",
       "escrowManagement": "Gestion Escrow",
       "deliveryCompanies": "Sociétés de livraison",
-      "commissions": "Commissions"
+      "commissions": "Commissions",
+      "roleRequests": "Candidatures"
     }
   },
   "overviewSection": {
@@ -1129,7 +1130,16 @@
       "selectCity": "Sélectionner une ville",
       "register": "S'inscrire",
       "alreadyHaveAccount": "Vous avez déjà un compte ?",
-      "login": "Connexion"
+      "login": "Connexion",
+      "accountType": "Je m'inscris en tant que",
+      "accountTypeCustomer": "Client",
+      "accountTypeSeller": "Vendeur",
+      "accountTypeDelivery": "Société de livraison",
+      "applicationNotice": "Votre compte sera examiné par notre équipe avant d'avoir accès aux fonctionnalités vendeur/livraison. Vous pouvez quand même naviguer et acheter en attendant.",
+      "companyNamePlaceholder": "Nom de l'entreprise",
+      "phonePlaceholder": "Numéro de téléphone",
+      "messagePlaceholder": "Parlez-nous de votre activité (facultatif)",
+      "companyNameRequired": "Le nom de l'entreprise est requis pour un compte vendeur/livraison."
     },
     "forgotPassword": {
       "title": "Réinitialiser votre mot de passe",
@@ -1210,5 +1220,25 @@
     "noOrdersYet": "Aucune commande pour l'instant",
     "orderNumber": "Commande n°{{number}}",
     "product": "Produit"
+  },
+  "roleRequests": {
+    "title": "Candidatures en attente",
+    "noRequests": "Aucune candidature en attente.",
+    "requestedRole": "Rôle demandé",
+    "roleSeller": "Vendeur",
+    "roleDelivery": "Société de livraison",
+    "companyName": "Entreprise",
+    "phone": "Téléphone",
+    "message": "Message",
+    "submittedOn": "Soumise le",
+    "approve": "Valider",
+    "reject": "Refuser",
+    "approveSuccess": "Candidature validée",
+    "rejectSuccess": "Candidature refusée",
+    "actionFailed": "Action échouée",
+    "confirmApprove": "Valider cette candidature et accorder le rôle ?",
+    "rejectReasonPrompt": "Motif du refus (facultatif) :",
+    "noPhone": "Pas de téléphone fourni",
+    "noMessage": "Pas de message"
   }
 }
