@@ -4,12 +4,14 @@
 -- failing on this constraint since the form existed. All 38 existing
 -- products were inserted some other way (bulk import), bypassing the form
 -- entirely, which is why this went unnoticed.
+-- Drop the old constraint FIRST: it's still enforced during the UPDATE
+-- below otherwise, and writing 'new' would violate the still-active
+-- 'A'/'B'/'C'/'D'-only check before we ever get to swapping it.
+ALTER TABLE products DROP CONSTRAINT products_condition_check;
+
 -- Existing rows used the old letter-grade scheme; 'A' was the only value
--- actually used and maps to the closest equivalent, "new". Must run before
--- swapping the constraint, otherwise adding the new CHECK fails validation
--- against the still-present 'A' values.
+-- actually used and maps to the closest equivalent, "new".
 UPDATE products SET condition = 'new' WHERE condition = 'A';
 
-ALTER TABLE products DROP CONSTRAINT products_condition_check;
 ALTER TABLE products ADD CONSTRAINT products_condition_check
   CHECK (condition IS NULL OR condition = ANY (ARRAY['new', 'opened_like_new', 'damaged']));
