@@ -190,14 +190,14 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400">{priceInfo.label}</p>
-              <p className={`text-lg font-bold ${isReturned ? 'text-kraft-600' : 'text-blue-600 dark:text-blue-400'}`}>
+              <p className={`text-sm sm:text-lg font-bold ${isReturned ? 'text-kraft-600' : 'text-blue-600 dark:text-blue-400'}`}>
                 {formatPrice(priceInfo.price)}
               </p>
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               <button
                 onClick={(e) => { e.stopPropagation(); onViewDetails(e); }}
-                className="p-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition"
+                className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition active:scale-95"
                 title={t('marketplace.viewDetails')}
               >
                 <Eye className="w-4 h-4 text-gray-600 dark:text-gray-300" />
@@ -205,7 +205,7 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
               <button
                 onClick={handleAddToCart}
                 disabled={addingToCart}
-                className={`p-1.5 rounded-lg transition disabled:opacity-50 ${
+                className={`w-9 h-9 flex items-center justify-center rounded-lg transition disabled:opacity-50 active:scale-95 ${
                   isReturned
                     ? 'bg-kraft-500 hover:bg-kraft-600'
                     : 'bg-blue-600 hover:bg-blue-700'
@@ -438,7 +438,7 @@ const MarketplacePage = () => {
 
         {/* Products grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-3 animate-pulse">
                 <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2" />
@@ -466,7 +466,7 @@ const MarketplacePage = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
             {products.map(product => {
               const priceInfo = getPriceForRole(product);
               if (priceInfo.invalid || priceInfo.price <= 0) return null;
@@ -489,11 +489,11 @@ const MarketplacePage = () => {
       {/* Product detail modal */}
       {selectedProduct && selectedProductPriceInfo && showDetailModal && (
         <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50"
           onClick={() => setShowDetailModal(false)}
         >
           <div
-            className={`bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl ${
+            className={`bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl p-4 sm:p-6 max-w-2xl w-full mx-0 sm:mx-4 max-h-[92vh] sm:max-h-[90vh] overflow-y-auto shadow-2xl ${
               selectedProduct.source_type === 'returned' ? 'border-2 border-kraft-300' : ''
             }`}
             onClick={e => e.stopPropagation()}

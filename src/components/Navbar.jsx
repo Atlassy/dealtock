@@ -123,7 +123,7 @@ const PromoBanner = ({ userRole }) => {
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <div className="relative w-full h-32 md:h-36 lg:h-40">
+      <div className="relative w-full h-24 sm:h-32 md:h-36 lg:h-40">
         
         {/* ✅ IMAGE SLIDE */}
         {current.image && (
