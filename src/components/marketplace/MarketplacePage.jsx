@@ -119,7 +119,7 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
         }`}
       >
         {/* Image */}
-        <div className="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
+        <div className="relative h-44 sm:h-48 bg-gray-100 dark:bg-gray-700 overflow-hidden">
           {product.image_url && !imageError ? (
             <>
               <img
@@ -518,7 +518,7 @@ const MarketplacePage = () => {
               <img
                 src={selectedProduct.image_url}
                 alt={selectedProduct.name}
-                className="w-full h-64 object-contain mb-4 rounded-xl"
+                className="w-full h-40 sm:h-64 object-contain mb-4 rounded-xl"
               />
             )}
 

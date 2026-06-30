@@ -141,7 +141,7 @@ export default function SignUpForm() {
             />
             <button
               type="button"
-              className="absolute right-3 top-3 text-gray-600 dark:text-gray-400"
+              className="absolute right-0 top-0 h-full px-3 flex items-center text-gray-600 dark:text-gray-400"
               onClick={() => setShowPwd(!showPwd)}
             >
               {showPwd ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -161,7 +161,7 @@ export default function SignUpForm() {
             />
             <button
               type="button"
-              className="absolute right-3 top-3 text-gray-600 dark:text-gray-400"
+              className="absolute right-0 top-0 h-full px-3 flex items-center text-gray-600 dark:text-gray-400"
               onClick={() => setShowConfirmPwd(!showConfirmPwd)}
             >
               {showConfirmPwd ? <EyeOff size={20} /> : <Eye size={20} />}

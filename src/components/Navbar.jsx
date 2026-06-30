@@ -489,7 +489,7 @@ const Navbar = () => {
               <Link to="/cart" className="relative p-1.5 text-[#5C3A21] dark:text-gray-300 hover:text-[#3D2515] dark:hover:text-[#febd69] rounded-lg transition">
                 <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#5C3A21] dark:bg-[#febd69] text-[#FEDEB8] dark:text-gray-900 text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                  <span className="absolute -top-1.5 -right-1.5 bg-[#5C3A21] dark:bg-[#febd69] text-[#FEDEB8] dark:text-gray-900 text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center leading-none px-0.5">
                     {cartCount > 9 ? '9+' : cartCount}
                   </span>
                 )}
@@ -542,48 +542,47 @@ const Navbar = () => {
       <div className="h-2"></div>
 
       {isMarketplacePage && (
-        <div className="w-full px-4 pt-1">
-          <div className="flex items-center justify-between gap-3 w-full">
-            <div className="flex-shrink-0">
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
-                <option value="">{t('navbar.category')}</option>
-                {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-              </select>
-            </div>
+        <div className="w-full px-3 pt-1 pb-1">
+          {/* Mobile: search bar + search button on one row, filters toggle below */}
+          <div className="flex items-center gap-2 w-full">
             <div className="flex-1 relative">
-              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('navbar.searchPlaceholder')} className="w-full pl-3 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm" />
-              <button onClick={handleSearch} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#febd69]"><Search className="w-4 h-4" /></button>
+              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('navbar.searchPlaceholder')} className="w-full pl-3 pr-10 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm" />
+              <button onClick={handleSearch} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-[#febd69]"><Search className="w-5 h-5" /></button>
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <select value={city} onChange={(e) => setCity(e.target.value)} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
-                <option value="">{t('marketplace.city')}</option>
-                {MOROCCAN_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-              <button onClick={handleSearch} className="px-4 py-2 bg-[#febd69] hover:bg-[#f3a847] text-gray-900 rounded font-medium text-sm">{t('navbar.search')}</button>
-              <button onClick={() => setShowFilters(!showFilters)} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm flex items-center gap-1">
-                <ChevronDown className={`w-3 h-3 transition-transform ${showFilters ? 'rotate-180' : ''}`} /> {t('navbar.filters')}
-              </button>
-            </div>
+            <button onClick={() => setShowFilters(!showFilters)} className="flex-shrink-0 p-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+              <ChevronDown className={`w-5 h-5 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+            </button>
           </div>
 
           {showFilters && (
-            <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex flex-wrap items-center gap-2">
-                <select value={condition} onChange={(e) => setCondition(e.target.value)} className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm">
+            <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <select value={category} onChange={(e) => setCategory(e.target.value)} className="px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
+                  <option value="">{t('navbar.category')}</option>
+                  {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                </select>
+                <select value={city} onChange={(e) => { setCity(e.target.value); localStorage.setItem('dealtock_delivery_city', e.target.value); }} className="px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
+                  <option value="">{t('marketplace.city')}</option>
+                  {MOROCCAN_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <select value={condition} onChange={(e) => setCondition(e.target.value)} className="px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm">
                   <option value="">{t('navbar.conditionAny')}</option>
                   {CONDITIONS.map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
                 </select>
-                <div className="flex items-center gap-1">
-                  <input type="number" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} placeholder="Min" className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm" />
-                  <span className="text-gray-500">-</span>
-                  <input type="number" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} placeholder="Max" className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm" />
-                </div>
-                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm">
+                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm">
                   <option value="newest">{t('navbar.sortNewest')}</option>
                   <option value="price_low">{t('navbar.sortPriceLow')}</option>
                   <option value="price_high">{t('navbar.sortPriceHigh')}</option>
                   <option value="rating">{t('navbar.sortTopRated')}</option>
                 </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <input type="number" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} placeholder="Min MAD" className="flex-1 px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm" />
+                <span className="text-gray-400 text-sm">—</span>
+                <input type="number" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} placeholder="Max MAD" className="flex-1 px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm" />
+                <button onClick={handleSearch} className="flex-shrink-0 px-4 py-2.5 bg-[#febd69] hover:bg-[#f3a847] text-gray-900 rounded-lg font-medium text-sm">{t('navbar.search')}</button>
               </div>
             </div>
           )}

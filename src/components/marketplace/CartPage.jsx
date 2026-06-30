@@ -287,15 +287,15 @@ const CartPage = () => {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="p-1 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                            className="w-10 h-10 flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100"
                             disabled={item.quantity <= 1}
                           >
                             <Minus className="w-4 h-4 text-gray-700 dark:text-gray-300" />
                           </button>
-                          <span className="w-10 text-center text-sm text-gray-900 dark:text-gray-100">{item.quantity}</span>
+                          <span className="w-10 text-center text-sm font-medium text-gray-900 dark:text-gray-100">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="p-1 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                            className="w-10 h-10 flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100"
                             disabled={item.quantity >= (item.stock || 99)}
                           >
                             <Plus className="w-4 h-4 text-gray-700 dark:text-gray-300" />
@@ -322,7 +322,7 @@ const CartPage = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sticky top-24">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 lg:sticky lg:top-24">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t('cart.orderSummary')}</h2>
               <div className="space-y-3 text-gray-700 dark:text-gray-300">
                 <div className="flex justify-between text-sm">

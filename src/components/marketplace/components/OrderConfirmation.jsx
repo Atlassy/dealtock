@@ -672,7 +672,7 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
                       />
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           City *
@@ -782,7 +782,7 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
 
             {/* Right Column - Order Summary */}
             <div>
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 sticky top-4">
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 lg:sticky lg:top-4">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                   <Package className="w-4 h-4" />
                   Order Summary
