@@ -98,11 +98,11 @@ const MyOrders = () => {
                 <StatusBadge status={order.status} />
               </div>
               <p className="font-medium text-gray-900 dark:text-white">{order.product?.name || t('myOrders.product')}</p>
-              <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-sm text-gray-500 dark:text-gray-400">
                 <span className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3" /> {order.shipping_city || order.shipping_address?.city || "—"}
+                  <MapPin className="w-3 h-3 flex-shrink-0" /> {order.shipping_city || order.shipping_address?.city || "—"}
                 </span>
-                <span>{Number(order.final_customer_price || 0).toFixed(2)} MAD</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-200">{Number(order.final_customer_price || 0).toFixed(2)} MAD</span>
                 <span>{new Date(order.created_at).toLocaleDateString("fr-MA")}</span>
               </div>
             </div>
