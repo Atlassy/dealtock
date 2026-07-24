@@ -512,3 +512,40 @@ En testant le parcours vendeur de bout en bout (création de compte → ajout de
 Complication découverte en cours de correction : `'A'` n'est pas qu'un vestige, une autre contrainte (`products_returned_sealed_only`) exige `condition = 'A'` spécifiquement pour les produits **retournés/scellés** (`source_type = 'returned'`, le badge "Sealed" du marketplace). Sur les 38 lignes en `'A'`, seulement 3 étaient réellement des retours scellés, les 35 autres étaient de simples produits "neufs" mal catégorisés par l'ancien système. Migration finale : suppression de l'ancienne contrainte (il fallait le faire *avant* la mise à jour des données, pas après — la contrainte encore active pendant l'`UPDATE` bloquait l'écriture de `'new'`), conversion des 35 produits non-retournés vers `'new'`, conservation de `'A'` pour les 3 retours scellés, et nouvelle contrainte autorisant `['new', 'opened_like_new', 'damaged', 'A']`.
 
 **Deuxième bug trouvé juste après, en testant l'ajout pour de vrai :** une fois la contrainte corrigée, le produit s'ajoutait bien, mais l'écran affichait `fetchProducts is not defined`. `SellerDashboard.jsx` appelait une fonction `fetchProducts()` qui n'a jamais existé dans ce fichier — la vraie fonction de rafraîchissement s'appelle `fetchDashboardData()`. Corrigé aux 2 endroits concernés (ajout et modification de produit).
+
+---
+
+### 14. Refonte mobile complète (style Amazon/AliExpress)
+
+**Problème de départ :** Le site n'était pas utilisable sur téléphone (Oppo Reno 4, iPhone 17). Menu burger invisible pour les non-connectés, stats en 1 colonne qui prennent toute la page, pas de navigation bas, tableaux illisibles sur petit écran.
+
+**Ce qu'on a fait :**
+
+- **Burger menu** : bouton désormais visible pour tous les utilisateurs (y compris non-connectés). Le sidebar affiche "Marketplace" et "Connexion" pour les visiteurs, "Mes commandes" pour les clients connectés, les liens dashboard pour vendeurs/admins.
+- **Barre de navigation bas** (`src/components/BottomNav.jsx`) : fixée en bas de l'écran sur mobile (cachée sur lg+). Contient Accueil / Panier (avec badge) / Commandes (clients) ou Dashboard (vendeurs/admins) / Compte. Style identique à Amazon/AliExpress.
+- **Smart scroll navbar** : la navbar se masque automatiquement en scrollant vers le bas (libère de l'espace écran) et réapparaît dès qu'on scrolle vers le haut, même d'un pixel. Implémenté via un `useEffect` scroll listener avec seuil de 4px et `translate-y` CSS.
+- **App.jsx** : suppression du `pl-16` inutile qui décalait tout le contenu de 64px sur mobile. Ajout de `pb-14 lg:pb-0` pour laisser la place à la bottom nav.
+- **Marketplace ProductCard** : image réduite (`h-36 sm:h-44`), nom du produit sur 2 lignes (`line-clamp-2`), prix en rouge Amazon (`#B12704`), boutons "Voir détails" et "Ajouter" côte-à-côte (texte lisible, pas juste des icônes).
+- **AdminDashboard OverviewSection** : stats en `grid-cols-2 lg:grid-cols-3` (avant : 1 colonne sur mobile), titre compact (`text-base sm:text-2xl`), cartes plus denses sur mobile.
+- **DeliveryDashboard** : stats en `grid-cols-2 lg:grid-cols-4`, header réduit (`text-xl sm:text-3xl`), et surtout **vue en cartes sur mobile** (liste `sm:hidden`) au lieu du tableau qui scrollait horizontalement. Le tableau reste sur desktop (`hidden sm:block`). Les boutons d'action sont pleine largeur et bien tactiles.
+- **SellerDashboard** : `StatCard` plus dense sur mobile (`p-3 sm:p-5`, `text-base sm:text-2xl`), 2ème grille de métriques en `grid-cols-2` sur mobile.
+- **CartPage** : padding réduit sur mobile (`px-3 py-4 sm:px-4 sm:py-8`), titre plus compact.
+- **SignUpForm** : padding `p-4 sm:p-8`, arrondi `rounded-xl`.
+
+**Déploiement :** build local + `scp -r dist/ root@138.199.196.209:/var/www/dealtock/` depuis hotspot mobile (le WiFi école bloque SSH port 22).
+
+### 15. Correction de 3 bugs GitHub (issues #2, #3, #4)
+
+**Problème :** 4 bugs signalés sur GitHub. Le #1 (dark mode reset password) était déjà résolu. On a corrigé les 3 autres.
+
+**Bug #4 — Lien Marketplace en double dans le menu latéral**
+- **Cause :** Le lien `/marketplace` était déclaré deux fois : une fois codé en dur dans le sidebar (ligne 619, visible pour tous), et une seconde fois dans le tableau `sidebarNavItems` avec `roles: ['seller', 'admin', 'dropshipper']`. Les vendeurs et admins voyaient donc "Marketplace" deux fois.
+- **Fix :** Suppression de l'entrée `/marketplace` dans `sidebarNavItems` (`src/components/Navbar.jsx`). Le lien hardcodé reste — il couvre tous les cas.
+
+**Bug #2 — Prix B2C sur la marketplace → prix B2B dans le panier**
+- **Cause :** La fonction `getRoleBasedPrice` dans `useCart.jsx` utilisait `sale_price` en priorité pour les clients. Or `sale_price` dans la base de données est souvent identique à `purchase_price` (prix d'achat B2B, sans marge). La marketplace elle calcule `purchase_price × commission (30%)` — d'où un écart visible.
+- **Fix :** Suppression du raccourci `sale_price` pour les clients. `getRoleBasedPrice` calcule désormais toujours le prix B2C depuis `purchase_price × commission`, aligné sur la logique de `getPriceForRole` dans `useMarketplaceProducts.js`.
+
+**Bug #3 — Frais de livraison affichés à 0 MAD sur la page de confirmation**
+- **Cause :** Si les règles dans la table `delivery_fee_rules` ont `base_fee = 0` ou si aucune règle ne correspond à la ville, le calcul pouvait renvoyer `0` au lieu du fallback de 30 MAD.
+- **Fix :** Dans `OrderConfirmation.jsx`, après le calcul, on applique un plancher : `fee > 0 ? fee : 30`. Les frais ne peuvent plus afficher 0 MAD si une ville est sélectionnée et une société de livraison choisie.

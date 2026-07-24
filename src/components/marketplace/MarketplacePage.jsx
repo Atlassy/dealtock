@@ -119,7 +119,7 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
         }`}
       >
         {/* Image */}
-        <div className="relative h-44 sm:h-48 bg-gray-100 dark:bg-gray-700 overflow-hidden">
+        <div className="relative h-36 sm:h-44 bg-gray-100 dark:bg-gray-700 overflow-hidden">
           {product.image_url && !imageError ? (
             <>
               <img
@@ -171,50 +171,43 @@ const ProductCard = ({ product, priceInfo, formatPrice, onViewDetails, onAddToCa
         </div>
 
         {/* Content */}
-        <div className="p-3">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm line-clamp-1 mb-1">
+        <div className="p-2 sm:p-3" onClick={(e) => { e.stopPropagation(); onViewDetails(e); }}>
+          <h3 className="font-medium text-gray-900 dark:text-white text-xs sm:text-sm line-clamp-2 mb-1 leading-tight">
             {product.name}
           </h3>
 
-          <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-2">
-            <MapPin className="w-3 h-3" />
+          <div className="flex items-center gap-0.5 text-[10px] text-gray-400 dark:text-gray-500 mb-1.5">
+            <MapPin className="w-2.5 h-2.5 flex-shrink-0" />
             <span className="truncate">
               {product.city || t('navbar.morocco')}
               {product.city_locked && (
-                <span className="ml-1 text-kraft-500 font-medium">· {t('marketplace.localPickup')}</span>
+                <span className="ml-0.5 text-kraft-500 font-medium">· {t('marketplace.localPickup')}</span>
               )}
             </span>
           </div>
 
-          {/* Price row */}
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-            <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{priceInfo.label}</p>
-              <p className={`text-sm sm:text-lg font-bold ${isReturned ? 'text-kraft-600' : 'text-blue-600 dark:text-blue-400'}`}>
-                {formatPrice(priceInfo.price)}
-              </p>
-            </div>
-            <div className="flex gap-1.5">
-              <button
-                onClick={(e) => { e.stopPropagation(); onViewDetails(e); }}
-                className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition active:scale-95"
-                title={t('marketplace.viewDetails')}
-              >
-                <Eye className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-              </button>
-              <button
-                onClick={handleAddToCart}
-                disabled={addingToCart}
-                className={`w-9 h-9 flex items-center justify-center rounded-lg transition disabled:opacity-50 active:scale-95 ${
-                  isReturned
-                    ? 'bg-kraft-500 hover:bg-kraft-600'
-                    : 'bg-blue-600 hover:bg-blue-700'
-                }`}
-                title={t('marketplace.addToCart')}
-              >
-                <ShoppingCart className="w-4 h-4 text-white" />
-              </button>
-            </div>
+          {/* Price */}
+          <p className={`text-sm sm:text-base font-bold mb-2 ${isReturned ? 'text-kraft-600' : 'text-[#B12704] dark:text-orange-400'}`}>
+            {formatPrice(priceInfo.price)}
+          </p>
+
+          {/* Action buttons */}
+          <div className="flex gap-1.5">
+            <button
+              onClick={(e) => { e.stopPropagation(); onViewDetails(e); }}
+              className="flex-1 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition"
+            >
+              {t('marketplace.viewDetails')}
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); handleAddToCart(e); }}
+              disabled={addingToCart}
+              className={`flex-1 py-1.5 text-xs rounded-lg text-white font-medium transition disabled:opacity-50 active:scale-95 ${
+                isReturned ? 'bg-kraft-500 hover:bg-kraft-600' : 'bg-[#FF9900] hover:bg-[#e88900]'
+              }`}
+            >
+              {addingToCart ? '...' : t('marketplace.addToCart')}
+            </button>
           </div>
         </div>
       </motion.div>

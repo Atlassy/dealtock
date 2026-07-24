@@ -72,13 +72,13 @@ const StatCard = ({ title, value, icon: Icon, color = "blue", trend, trendValue,
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-5 shadow-sm dark:shadow-none hover:border-blue-500/50 transition-all duration-300"
+    className="bg-white dark:bg-transparent border border-gray-200 dark:border-white/20 dark:backdrop-blur-sm rounded-xl p-3 sm:p-5 shadow-sm dark:shadow-none hover:border-blue-500/50 transition-all duration-300"
   >
     <div className="flex items-start justify-between">
-      <div className="flex-1">
-        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
-        <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
-        {subtext && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{subtext}</p>}
+      <div className="flex-1 min-w-0 pr-1">
+        <p className="text-[10px] sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">{title}</p>
+        <p className="text-base sm:text-2xl font-bold text-gray-900 dark:text-white mt-0.5 sm:mt-1 truncate">{value}</p>
+        {subtext && <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1 line-clamp-1">{subtext}</p>}
         {trend && (
           <div className={`flex items-center mt-2 text-xs ${
             trend > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
@@ -1120,7 +1120,7 @@ const SellerDashboard = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+              className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-8"
             >
               <StatCard
                 title={t('sellerDashboard.stats.conversionRate')}

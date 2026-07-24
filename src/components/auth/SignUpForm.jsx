@@ -111,9 +111,9 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 p-8 shadow rounded">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">{t('auth.signup.createAccount')}</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-3 py-4 sm:px-4">
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 p-4 sm:p-8 shadow rounded-xl">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center text-gray-900 dark:text-white">{t('auth.signup.createAccount')}</h2>
 
         {errorMsg && (
           <p className="text-red-600 dark:text-red-400 mb-4 text-center">{errorMsg}</p>

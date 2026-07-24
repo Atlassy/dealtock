@@ -109,11 +109,11 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
       {/* Header */}
       <div className="flex flex-wrap gap-4 justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Activity className="w-6 h-6" />
+          <h2 className="text-base sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <Activity className="w-5 h-5 sm:w-6 sm:h-6" />
             {t('overviewSection.platformOverview')}
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+          <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mt-0.5">
             {t('overviewSection.realTimeMetrics')}
           </p>
         </div>
@@ -128,25 +128,25 @@ const OverviewSection = ({ stats, recentActivity, onRefresh, isLoading, onTabCha
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {statCards.map((card, index) => (
-          <div key={index} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow">
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+          <div key={index} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-2.5 sm:p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-start justify-between mb-1 sm:mb-2">
+              <div className="flex-1 min-w-0 pr-1">
+                <p className="text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider truncate">
                   {card.title}
                 </p>
-                <div className="text-2xl font-bold mt-1 text-gray-900 dark:text-white">{card.value}</div>
+                <div className="text-lg sm:text-2xl font-bold mt-0.5 sm:mt-1 text-gray-900 dark:text-white">{card.value}</div>
                 {card.amount && (
-                  <div className="text-sm text-gray-600 dark:text-gray-400">{card.amount}</div>
+                  <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{card.amount}</div>
                 )}
               </div>
-              <div className={`${card.color} p-2 rounded-lg`}>
-                <card.icon className="w-5 h-5 text-white" />
+              <div className={`${card.color} p-1.5 sm:p-2 rounded-lg flex-shrink-0`}>
+                <card.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
             </div>
-            <div className="flex items-center justify-between mt-2">
-              <p className="text-xs text-gray-500 dark:text-gray-400">{card.description}</p>
+            <div className="flex items-center justify-between mt-1 sm:mt-2">
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{card.description}</p>
               {card.trend && (
                 <span className={`text-xs font-medium ${card.trendUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                   {card.trend}

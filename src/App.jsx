@@ -13,6 +13,7 @@ import Dashboard from "./components/dashboard/Dashboard";
 import ProfilePage from "./components/ProfilePage";
 import MyOrders from "./components/MyOrders";
 import Navbar from "./components/Navbar";
+import BottomNav from "./components/BottomNav";
 import MarketplacePage from "./components/marketplace/MarketplacePage";
 import CartPage from "./components/marketplace/CartPage";
 import Inventory from "./components/dashboard/seller/Inventory";
@@ -37,18 +38,16 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <Toaster richColors position="top-right" />
-      
-      {/* Unified Navbar - Shows for all users */}
       <Navbar />
 
-      {/* Main content - NO pt-16 needed since navbar is not fixed */}
-      <div className={user ? 'pl-16' : ''}>
+      {/* pb-14 on mobile to make room for the bottom nav */}
+      <div className="pb-14 lg:pb-0">
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<MarketplacePage />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/cart" element={<CartPage />} />
-          
+
           {/* Auth routes */}
           <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
           <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <SignUpForm />} />
@@ -63,9 +62,7 @@ export default function App() {
             path="/dashboard/*"
             element={
               <ProtectedRoute>
-                <div className="pl-16">
-                  <Dashboard />
-                </div>
+                <Dashboard />
               </ProtectedRoute>
             }
           />
@@ -73,9 +70,7 @@ export default function App() {
             path="/inventory"
             element={
               <ProtectedRoute>
-                <div className="pl-16">
-                  <Inventory />
-                </div>
+                <Inventory />
               </ProtectedRoute>
             }
           />
@@ -83,9 +78,7 @@ export default function App() {
             path="/profile"
             element={
               <ProtectedRoute>
-                <div className="pl-16">
-                  <ProfilePage />
-                </div>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />
@@ -93,9 +86,7 @@ export default function App() {
             path="/my-orders"
             element={
               <ProtectedRoute>
-                <div className="pl-16">
-                  <MyOrders />
-                </div>
+                <MyOrders />
               </ProtectedRoute>
             }
           />
@@ -105,9 +96,7 @@ export default function App() {
             path="/dropshipper/orders"
             element={
               <ProtectedRoute requiredRole="dropshipper">
-                <div className="pl-16">
-                  <DropshipperOrders dropshipperId={user?.id} />
-                </div>
+                <DropshipperOrders dropshipperId={user?.id} />
               </ProtectedRoute>
             }
           />
@@ -115,9 +104,7 @@ export default function App() {
             path="/dropshipper/customers"
             element={
               <ProtectedRoute requiredRole="dropshipper">
-                <div className="pl-16">
-                  <DropshipperCustomersPage dropshipperId={user?.id} />
-                </div>
+                <DropshipperCustomersPage dropshipperId={user?.id} />
               </ProtectedRoute>
             }
           />
@@ -125,17 +112,17 @@ export default function App() {
             path="/dropshipper/earnings"
             element={
               <ProtectedRoute requiredRole="dropshipper">
-                <div className="pl-16">
-                  <DropshipperEarningsPage dropshipperId={user?.id} />
-                </div>
+                <DropshipperEarningsPage dropshipperId={user?.id} />
               </ProtectedRoute>
             }
           />
 
-          {/* Catch-all route */}
+          {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
+
+      <BottomNav />
     </div>
   );
 }

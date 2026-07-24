@@ -232,11 +232,29 @@ const Navbar = () => {
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true');
+  const [navVisible, setNavVisible] = useState(true);
+  const lastScrollY = useRef(0);
   const languageMenuRef = useRef(null);
   const userMenuRef = useRef(null);
   const sidebarRef = useRef(null);
   const menuButtonRef = useRef(null);
   const deliveryPickerRef = useRef(null);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const current = window.scrollY;
+      if (current < 10) {
+        setNavVisible(true);
+      } else if (current > lastScrollY.current + 4) {
+        setNavVisible(false);
+      } else if (current < lastScrollY.current - 4) {
+        setNavVisible(true);
+      }
+      lastScrollY.current = current;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const isMarketplacePage = location.pathname === '/' || location.pathname === '/marketplace';
   const userRole = profile?.role || (user ? 'customer' : 'guest');
@@ -345,7 +363,6 @@ const Navbar = () => {
   };
 
   const sidebarNavItems = user ? [
-    { path: '/marketplace', label: t('navbar.sidebar.marketplace'), icon: ShoppingBag, roles: ['seller', 'admin', 'dropshipper'] },
     { path: '/inventory', label: t('navbar.sidebar.inventory'), icon: Package, roles: ['seller', 'admin'] },
     { path: '/dashboard', label: t('navbar.dashboard'), icon: LayoutDashboard, roles: ['seller', 'admin', 'dropshipper'] },
     { path: '/profile', label: t('navbar.profile'), icon: User, roles: ['seller', 'admin', 'dropshipper'] },
@@ -367,6 +384,7 @@ const Navbar = () => {
 
   return (
     <>
+      <div className={`sticky top-0 z-40 transition-transform duration-300 ${navVisible ? 'translate-y-0' : '-translate-y-full'}`}>
       <div className="bg-[#FEDEB8] dark:bg-[#1a1a2e] transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4">
           {/* Mobile-optimised top bar: 3 zones — menu+logo | (spacer) | actions */}
@@ -374,15 +392,13 @@ const Navbar = () => {
 
             {/* LEFT: hamburger + logo */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              {user && (
-                <button
-                  ref={menuButtonRef}
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className="p-1.5 hover:bg-[#5C3A21] dark:hover:bg-[#febd69] hover:text-white dark:hover:text-gray-900 rounded-lg transition text-[#5C3A21] dark:text-gray-200"
-                >
-                  <Menu className="w-5 h-5" />
-                </button>
-              )}
+              <button
+                ref={menuButtonRef}
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="p-1.5 hover:bg-[#5C3A21] dark:hover:bg-[#febd69] hover:text-white dark:hover:text-gray-900 rounded-lg transition text-[#5C3A21] dark:text-gray-200"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
               <Link to="/" className="flex items-center flex-shrink-0">
                 <img src={LOGO_URL} alt="Dealtock" className="h-8 w-auto object-contain" />
               </Link>
@@ -588,34 +604,46 @@ const Navbar = () => {
           )}
         </div>
       )}
+      </div>{/* end sticky wrapper */}
 
-      {user && (
-        <>
-          {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
-          <div ref={sidebarRef} className={`fixed left-0 top-0 bottom-0 z-50 bg-white dark:bg-gray-900 shadow-xl transition-all duration-300 ${sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'}`}>
-            <div className="flex flex-col h-full overflow-y-auto">
-              <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('navbar.menu')}</h2>
-                <button onClick={() => setSidebarOpen(false)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
-              </div>
-              <nav className="flex-1 py-2">
-                {sidebarNavItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
-                  return (
-                    <Link key={item.path} to={item.path} onClick={() => setSidebarOpen(false)} className={`flex items-center gap-3 px-3 py-2 mx-2 rounded-lg transition-colors ${isActive ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`}>
-                      <Icon className="w-5 h-5 flex-shrink-0" /><span className="block text-sm font-medium">{item.label}</span>
-                    </Link>
-                  );
-                })}
-              </nav>
-              <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-                <div className="text-xs text-gray-500 dark:text-gray-400"><p>Dealtock v1.0</p><p>© 2024 {t('navbar.footerTagline')}</p></div>
-              </div>
+      <>
+        {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+        <div ref={sidebarRef} className={`fixed left-0 top-0 bottom-0 z-50 bg-white dark:bg-gray-900 shadow-xl transition-all duration-300 ${sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'}`}>
+          <div className="flex flex-col h-full overflow-y-auto">
+            <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('navbar.menu')}</h2>
+              <button onClick={() => setSidebarOpen(false)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+            </div>
+            <nav className="flex-1 py-2">
+              <Link to="/marketplace" onClick={() => setSidebarOpen(false)} className={`flex items-center gap-3 px-3 py-2 mx-2 rounded-lg transition-colors ${location.pathname === '/marketplace' || location.pathname === '/' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`}>
+                <ShoppingBag className="w-5 h-5 flex-shrink-0" /><span className="block text-sm font-medium">{t('navbar.sidebar.marketplace')}</span>
+              </Link>
+              {user && (!profile?.role || profile.role === 'customer') && (
+                <Link to="/my-orders" onClick={() => setSidebarOpen(false)} className={`flex items-center gap-3 px-3 py-2 mx-2 rounded-lg transition-colors ${location.pathname === '/my-orders' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`}>
+                  <Package className="w-5 h-5 flex-shrink-0" /><span className="block text-sm font-medium">{t('navbar.myOrders')}</span>
+                </Link>
+              )}
+              {user && profile?.role && profile.role !== 'customer' && sidebarNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+                return (
+                  <Link key={item.path} to={item.path} onClick={() => setSidebarOpen(false)} className={`flex items-center gap-3 px-3 py-2 mx-2 rounded-lg transition-colors ${isActive ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`}>
+                    <Icon className="w-5 h-5 flex-shrink-0" /><span className="block text-sm font-medium">{item.label}</span>
+                  </Link>
+                );
+              })}
+              {!user && (
+                <Link to="/login" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2 mx-2 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                  <LogIn className="w-5 h-5 flex-shrink-0" /><span className="block text-sm font-medium">{t('navbar.signIn')}</span>
+                </Link>
+              )}
+            </nav>
+            <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+              <div className="text-xs text-gray-500 dark:text-gray-400"><p>Dealtock v1.0</p><p>© 2024 {t('navbar.footerTagline')}</p></div>
             </div>
           </div>
-        </>
-      )}
+        </div>
+      </>
     </>
   );
 };

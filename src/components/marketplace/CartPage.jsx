@@ -213,10 +213,10 @@ const CartPage = () => {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <ShoppingCart className="w-6 h-6" />
               {t('cart.title')} ({cartItems.length} {t('cart.item', { count: cartItems.length })})
             </h1>

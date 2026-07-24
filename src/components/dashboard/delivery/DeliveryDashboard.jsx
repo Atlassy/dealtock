@@ -466,103 +466,98 @@ const DeliveryDashboard = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="mb-4 sm:mb-8 flex justify-between items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <Truck className="w-8 h-8 text-blue-500" />
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2 sm:gap-3">
+              <Truck className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
               Delivery Dashboard
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-1">
-              {user?.email} • {deliveries.length} active {deliveries.length === 1 ? 'delivery' : 'deliveries'}
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-0.5">
+              {deliveries.length} livraison{deliveries.length !== 1 ? 's' : ''} active{deliveries.length !== 1 ? 's' : ''}
             </p>
           </div>
           <button
             onClick={() => fetchDeliveries()}
-            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm text-gray-900 dark:text-white"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm text-gray-900 dark:text-white text-sm"
           >
             <RefreshCw className="w-4 h-4" />
-            Refresh
+            <span className="hidden sm:inline">Refresh</span>
           </button>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Deliveries</p>
-                <p className="text-3xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalDeliveries}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {stats.pending} ready for pickup
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                <Package className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">In Transit</p>
-                <p className="text-3xl font-bold mt-2 text-gray-900 dark:text-white">{stats.inTransit}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Currently on the road
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center">
-                <Truck className="w-6 h-6 text-white" />
+        {/* Stats Grid — 2 cols on mobile, 4 on desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-8">
+          {[
+            { label: 'Total', value: stats.totalDeliveries, sub: `${stats.pending} à récupérer`, color: 'bg-blue-500', icon: Package },
+            { label: 'En transit', value: stats.inTransit, sub: 'Sur la route', color: 'bg-yellow-500', icon: Truck },
+            { label: 'Livrés', value: stats.delivered, sub: stats.delivered > 0 ? `${((stats.delivered / stats.totalDeliveries) * 100).toFixed(0)}% succès` : '-', color: 'bg-green-500', icon: CheckCircle },
+            { label: 'Gains', value: `${stats.totalEarnings.toFixed(0)} MAD`, sub: `${stats.todayEarnings.toFixed(0)} MAD aujourd'hui`, color: 'bg-purple-500', icon: DollarSign },
+          ].map(({ label, value, sub, color, icon: Icon }) => (
+            <div key={label} className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 sm:p-6 hover:shadow-md transition-shadow">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0 pr-1">
+                  <p className="text-[10px] sm:text-sm font-medium text-gray-600 dark:text-gray-300 truncate">{label}</p>
+                  <p className="text-lg sm:text-3xl font-bold mt-0.5 sm:mt-2 text-gray-900 dark:text-white">{value}</p>
+                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1 line-clamp-1">{sub}</p>
+                </div>
+                <div className={`w-8 h-8 sm:w-12 sm:h-12 ${color} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                  <Icon className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Delivered</p>
-                <p className="text-3xl font-bold mt-2 text-gray-900 dark:text-white">{stats.delivered}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {stats.delivered > 0 ? `${((stats.delivered / stats.totalDeliveries) * 100).toFixed(1)}% success rate` : 'No deliveries yet'}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Earnings</p>
-                <p className="text-3xl font-bold mt-2 text-gray-900 dark:text-white">
-                  MAD {stats.totalEarnings.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  MAD {stats.todayEarnings.toFixed(2)} today
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* Deliveries Table */}
+        {/* Deliveries — cards on mobile, table on desktop */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-            <h2 className="text-xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
-              <Package className="w-5 h-5" />
-              Active Deliveries
+          <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h2 className="text-base sm:text-xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
+              <Package className="w-4 h-4 sm:w-5 sm:h-5" />
+              Livraisons actives
             </h2>
-            <span className="text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full">
+            <span className="text-xs sm:text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2.5 py-1 rounded-full">
               {deliveries.length} total
             </span>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Mobile card list */}
+          <div className="sm:hidden divide-y divide-gray-200 dark:divide-gray-700">
+            {deliveries.map(delivery => (
+              <div key={delivery.id} className="p-4 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="font-semibold text-gray-900 dark:text-white text-sm">{delivery.order_number || 'N/A'}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{delivery.customer_name} · {delivery.customer_phone}</div>
+                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      <MapPin className="w-3 h-3" />{delivery.city}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5">
+                    {getStatusBadge(delivery.status)}
+                    <span className="text-sm font-semibold text-green-600 dark:text-green-400">MAD {delivery.amount.toFixed(0)}</span>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {delivery.status === 'ready_for_pickup' && (
+                    <button onClick={() => updateDeliveryStatus(delivery.id, 'picked_up')} className="flex-1 py-2 text-xs font-medium bg-blue-500 text-white rounded-lg hover:bg-blue-600 active:scale-95 transition">Pick Up</button>
+                  )}
+                  {(delivery.status === 'picked_up' || delivery.status === 'shipped') && (
+                    <button onClick={() => updateDeliveryStatus(delivery.id, 'in_transit')} className="flex-1 py-2 text-xs font-medium bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 active:scale-95 transition">Start Trip</button>
+                  )}
+                  {delivery.status === 'in_transit' && (
+                    <button onClick={() => updateDeliveryStatus(delivery.id, 'out_for_delivery')} className="flex-1 py-2 text-xs font-medium bg-kraft-500 text-white rounded-lg hover:bg-kraft-600 active:scale-95 transition">Out for Delivery</button>
+                  )}
+                  {delivery.status === 'out_for_delivery' && (
+                    <button onClick={() => updateDeliveryStatus(delivery.id, 'delivered')} className="flex-1 py-2 text-xs font-medium bg-green-500 text-white rounded-lg hover:bg-green-600 active:scale-95 transition">Confirmer livré</button>
+                  )}
+                  <button onClick={() => viewOrderDetails(delivery)} className="px-3 py-2 text-xs border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">Détails</button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full table-fixed">
               <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
@@ -594,49 +589,22 @@ const DeliveryDashboard = () => {
                     <td className="p-4 font-medium text-green-600 dark:text-green-400">
                       MAD {delivery.amount.toFixed(2)}
                     </td>
-                    <td className="p-4">
-                      {getStatusBadge(delivery.status)}
-                    </td>
+                    <td className="p-4">{getStatusBadge(delivery.status)}</td>
                     <td className="p-4">
                       <div className="flex flex-wrap gap-2">
                         {delivery.status === 'ready_for_pickup' && (
-                          <button
-                            onClick={() => updateDeliveryStatus(delivery.id, 'picked_up')}
-                            className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                          >
-                            Pick Up
-                          </button>
+                          <button onClick={() => updateDeliveryStatus(delivery.id, 'picked_up')} className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">Pick Up</button>
                         )}
                         {(delivery.status === 'picked_up' || delivery.status === 'shipped') && (
-                          <button
-                            onClick={() => updateDeliveryStatus(delivery.id, 'in_transit')}
-                            className="px-3 py-1 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
-                          >
-                            Start Trip
-                          </button>
+                          <button onClick={() => updateDeliveryStatus(delivery.id, 'in_transit')} className="px-3 py-1 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors">Start Trip</button>
                         )}
                         {delivery.status === 'in_transit' && (
-                          <button
-                            onClick={() => updateDeliveryStatus(delivery.id, 'out_for_delivery')}
-                            className="px-3 py-1 text-sm bg-kraft-500 text-white rounded hover:bg-kraft-600 transition-colors"
-                          >
-                            Out for Delivery
-                          </button>
+                          <button onClick={() => updateDeliveryStatus(delivery.id, 'out_for_delivery')} className="px-3 py-1 text-sm bg-kraft-500 text-white rounded hover:bg-kraft-600 transition-colors">Out for Delivery</button>
                         )}
                         {delivery.status === 'out_for_delivery' && (
-                          <button
-                            onClick={() => updateDeliveryStatus(delivery.id, 'delivered')}
-                            className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                          >
-                            Confirm
-                          </button>
+                          <button onClick={() => updateDeliveryStatus(delivery.id, 'delivered')} className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors">Confirm</button>
                         )}
-                        <button
-                          onClick={() => viewOrderDetails(delivery)}
-                          className="px-3 py-1 text-sm border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                        >
-                          Details
-                        </button>
+                        <button onClick={() => viewOrderDetails(delivery)} className="px-3 py-1 text-sm border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Details</button>
                       </div>
                     </td>
                   </tr>

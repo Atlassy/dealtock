@@ -90,22 +90,15 @@ export const useCart = () => {
 
     const basePrice = Number(product.purchase_price || 0);
     
-    // If no user or customer role - use B2C pricing
+    // If no user or customer role - use B2C pricing (always calculate from purchase_price)
     if (!user || !profile?.role || profile.role === 'customer') {
       if (basePrice > 0) {
-        // ── PRIX FIX ─────────────────────────────────────────────
-        // On ne retourne PAS sale_price directement car dans AddProductForm
-        // sale_price = purchase_price (pas de commission incluse).
-        // On calcule toujours depuis purchase_price + règle de commission B2C.
         const rule = findCommissionRule(product.category, basePrice, 'B2C');
         if (rule) {
           const finalPrice = basePrice * (1 + rule.percentage / 100);
-          console.log(\`💰 B2C price for \${product.name}: \${basePrice} + \${rule.percentage}% = \${finalPrice}\`);
           return Number(finalPrice.toFixed(2));
         }
-        // Default B2C markup 20% (cohérent avec AddProductForm preview)
-        console.log(\`💰 B2C fallback for \${product.name}: \${basePrice} * 1.2 = \${basePrice * 1.2}\`);
-        return Number((basePrice * 1.2).toFixed(2));
+        return Number((basePrice * 1.3).toFixed(2));
       }
       return 0;
     }

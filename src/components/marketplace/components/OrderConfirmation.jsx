@@ -308,10 +308,10 @@ export default function OrderConfirmation({ cartItems, onClose, onSubmitSuccess 
         formData.city,
         totalWeight
       );
-      
+
       console.log(`💰 Final delivery fee for ${formData.city}: ${fee} MAD`);
-      
-      setDeliveryFee(fee);
+
+      setDeliveryFee(fee > 0 ? fee : 30);
       setCalculatingFee(false);
     };
     
