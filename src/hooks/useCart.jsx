@@ -92,22 +92,20 @@ export const useCart = () => {
     
     // If no user or customer role - use B2C pricing
     if (!user || !profile?.role || profile.role === 'customer') {
-      // Try sale_price first
-      if (product.sale_price && product.sale_price > 0) {
-        return Number(product.sale_price);
-      }
-      // If no sale_price, calculate from purchase_price with B2C markup
       if (basePrice > 0) {
-        // Find B2C commission rule
+        // ── PRIX FIX ─────────────────────────────────────────────
+        // On ne retourne PAS sale_price directement car dans AddProductForm
+        // sale_price = purchase_price (pas de commission incluse).
+        // On calcule toujours depuis purchase_price + règle de commission B2C.
         const rule = findCommissionRule(product.category, basePrice, 'B2C');
         if (rule) {
           const finalPrice = basePrice * (1 + rule.percentage / 100);
-          console.log(`💰 B2C price for ${product.name}: ${basePrice} + ${rule.percentage}% = ${finalPrice}`);
+          console.log(\`💰 B2C price for \${product.name}: \${basePrice} + \${rule.percentage}% = \${finalPrice}\`);
           return Number(finalPrice.toFixed(2));
         }
-        // Default B2C markup 30%
-        console.log(`💰 B2C fallback for ${product.name}: ${basePrice} * 1.3 = ${basePrice * 1.3}`);
-        return Number((basePrice * 1.3).toFixed(2));
+        // Default B2C markup 20% (cohérent avec AddProductForm preview)
+        console.log(\`💰 B2C fallback for \${product.name}: \${basePrice} * 1.2 = \${basePrice * 1.2}\`);
+        return Number((basePrice * 1.2).toFixed(2));
       }
       return 0;
     }
@@ -161,7 +159,12 @@ export const useCart = () => {
       if (!product) return item;
 
       const price = getRoleBasedPrice(product);
-      const b2cPrice = product.sale_price || (product.purchase_price * 1.3) || 0;
+      // ── PRIX FIX: originalB2CPrice calculé depuis purchase_price + commission ──
+      const b2cBase = Number(product.purchase_price || 0);
+      const b2cRule = findCommissionRule(product.category, b2cBase, 'B2C');
+      const b2cPrice = b2cBase > 0
+        ? (b2cRule ? b2cBase * (1 + b2cRule.percentage / 100) : b2cBase * 1.2)
+        : 0;
 
       return {
         ...item,
@@ -334,8 +337,8 @@ export const useCart = () => {
   // ACTIONS
   // -----------------------------
   // In useCart.js, update addToCart to store seller_id
-const addToCart = useCallback(async (product, qty = 1) => {
-  // Fetch fresh product data
+const addToCart = useCallback(async (product, qty = 1, preCalculatedPrice = null) => {
+  // Fetch fresh product data to verify stock
   const { data: freshProduct, error } = await supabase
     .from('products')
     .select('*')
@@ -344,7 +347,13 @@ const addToCart = useCallback(async (product, qty = 1) => {
 
   if (error || !freshProduct) return false;
 
-  const price = getRoleBasedPrice(freshProduct);
+  // ── PRIX FIX ─────────────────────────────────────────────────
+  // Priorité: prix pré-calculé par la marketplace (déjà avec commission B2C)
+  // Fallback: recalcul local (pour les ajouts hors marketplace)
+  const price = preCalculatedPrice !== null && preCalculatedPrice > 0
+    ? Number(preCalculatedPrice)
+    : getRoleBasedPrice(freshProduct);
+
   const existing = cartItems.find(i => i.id === product.id);
 
   let updated;
@@ -368,7 +377,7 @@ const addToCart = useCallback(async (product, qty = 1) => {
         stock: freshProduct.quantity,
         location: freshProduct.location,
         condition: freshProduct.condition,
-        seller_id: freshProduct.user_id,  // ← Add this!
+        seller_id: freshProduct.user_id,
       }
     ];
   }
