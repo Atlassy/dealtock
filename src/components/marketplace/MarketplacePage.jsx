@@ -295,7 +295,10 @@ const MarketplacePage = () => {
 
   const addToCart = async (product, price) => {
     if (product.quantity <= 0) { toast.error(`${product.name} is out of stock`); return false; }
-    const success = await addToCartHook(product, 1);
+    // ── PRIX FIX ─────────────────────────────────────────────────
+    // On passe le prix B2C déjà calculé par getPriceForRole()
+    // pour éviter que useCart recalcule avec sale_price brut (sans commission)
+    const success = await addToCartHook(product, 1, price);
     if (success) toast.success(`${product.name} added to cart`);
     else toast.error(`Cannot add ${product.name}. Insufficient stock.`);
     return success;
