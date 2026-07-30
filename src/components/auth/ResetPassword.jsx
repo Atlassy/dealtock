@@ -16,11 +16,40 @@ export default function ResetPassword() {
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [allowed, setAllowed] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setAllowed(data?.session?.type === "recovery");
+    let resolved = false;
+
+    // The official Supabase signal for "this session came from a password
+    // recovery link". This fires once the recovery link has been exchanged
+    // for a valid session by the Supabase client.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        resolved = true;
+        setAllowed(true);
+        setChecking(false);
+      }
     });
+
+    // Fallback: if the event already fired before this component mounted
+    // (e.g. fast redirect), Supabase also puts `type=recovery` in the URL.
+    const params = new URLSearchParams(window.location.hash.replace("#", "?"));
+    if (params.get("type") === "recovery") {
+      resolved = true;
+      setAllowed(true);
+    }
+
+    // Give the recovery event a short window to fire before deciding the
+    // link is invalid, instead of failing immediately.
+    const timeout = setTimeout(() => {
+      if (!resolved) setChecking(false);
+    }, 1500);
+
+    return () => {
+      subscription?.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const handleUpdate = async (e) => {
@@ -35,6 +64,14 @@ export default function ResetPassword() {
     await supabase.auth.signOut();
     navigate("/password-updated");
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-8">
+        <span className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!allowed) {
     return (
