@@ -513,6 +513,10 @@ Complication découverte en cours de correction : `'A'` n'est pas qu'un vestige,
 
 **Deuxième bug trouvé juste après, en testant l'ajout pour de vrai :** une fois la contrainte corrigée, le produit s'ajoutait bien, mais l'écran affichait `fetchProducts is not defined`. `SellerDashboard.jsx` appelait une fonction `fetchProducts()` qui n'a jamais existé dans ce fichier — la vraie fonction de rafraîchissement s'appelle `fetchDashboardData()`. Corrigé aux 2 endroits concernés (ajout et modification de produit).
 
+### Migration preprod — vues SQL manquantes
+
+4 vues SQL manquantes (marketplace_products, admin_products, admin_invoices_overview, order_oversight_with_invoices) non incluses dans la migration initiale. Creees via preprod_06_views. Cause : pg_views n'est pas couvert par list_tables de Supabase MCP.
+
 ---
 
 ### 14. Refonte mobile complète (style Amazon/AliExpress)
