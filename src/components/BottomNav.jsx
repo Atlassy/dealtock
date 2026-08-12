@@ -12,11 +12,7 @@ const BottomNav = () => {
 
   useEffect(() => {
     const read = () => {
-      try {
-        setCartCount(JSON.parse(localStorage.getItem('cart') || '[]').length);
-      } catch {
-        setCartCount(0);
-      }
+      setCartCount(Number(localStorage.getItem('cart_count') || 0));
     };
     read();
     window.addEventListener('cartUpdated', read);

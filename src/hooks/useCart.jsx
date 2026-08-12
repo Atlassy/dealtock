@@ -6,6 +6,13 @@ import { supabase } from '../lib/supabaseClient';
 const CART_EXPIRATION_DAYS = 7;
 const LEGACY_GUEST_KEY = 'cart';
 const GUEST_CART_KEY = 'cart_guest';
+const CART_COUNT_KEY = 'cart_count';
+
+// Mirror badge count
+const persistCartCount = (items) => {
+  const count = (items || []).reduce((n, i) => n + (i.quantity || 0), 0);
+  localStorage.setItem(CART_COUNT_KEY, String(count));
+};
 
 export const useCart = () => {
   const { user, profile } = useAuth();
@@ -226,6 +233,7 @@ export const useCart = () => {
         localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
       }
 
+      persistCartCount(items);
       setCartItems(items);
       window.dispatchEvent(new Event('cartUpdated'));
 
@@ -312,12 +320,16 @@ export const useCart = () => {
         }
 
         console.log('📦 Loaded', items.length, 'items from localStorage (guest)');
+        persistCartCount(items);
         setCartItems(items);
+        window.dispatchEvent(new Event('cartUpdated'));
         setLoading(false);
         return;
       }
 
+      persistCartCount(items);
       setCartItems(items);
+      window.dispatchEvent(new Event('cartUpdated'));
 
     } catch (err) {
       console.error('Load cart error:', err);

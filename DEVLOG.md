@@ -549,3 +549,17 @@ Complication découverte en cours de correction : `'A'` n'est pas qu'un vestige,
 **Bug #3 — Frais de livraison affichés à 0 MAD sur la page de confirmation**
 - **Cause :** Si les règles dans la table `delivery_fee_rules` ont `base_fee = 0` ou si aucune règle ne correspond à la ville, le calcul pouvait renvoyer `0` au lieu du fallback de 30 MAD.
 - **Fix :** Dans `OrderConfirmation.jsx`, après le calcul, on applique un plancher : `fee > 0 ? fee : 30`. Les frais ne peuvent plus afficher 0 MAD si une ville est sélectionnée et une société de livraison choisie.
+
+### 16. Fix badge panier BottomNav toujours a 0
+
+**Bug :** Le badge du panier dans la barre de navigation mobile affichait toujours 0, peu importe le contenu du panier.
+
+**Cause racine :** Double mismatch. D'abord, `BottomNav.jsx` lisait `localStorage.getItem('cart')` (`LEGACY_GUEST_KEY`, format abandonne), alors que `useCart` stocke les invites dans `cart_guest` et les connectes dans la table Supabase `user_carts` - la cle `cart` est donc toujours vide. Ensuite, meme en corrigeant la cle, le panier des connectes est en base (pas en localStorage), donc `BottomNav` ne peut pas le lire directement. `useCart` etant un hook plain (pas un contexte), `BottomNav` ne peut pas acceder a `cartItems.length` sans instancier un etat isole et vide.
+
+**Solution - cle miroir `cart_count` :**
+- Ajout de la constante `CART_COUNT_KEY = 'cart_count'` et du helper module-level `persistCartCount(items)` dans `useCart.jsx`.
+- `persistCartCount` calcule le total des quantites et ecrit le chiffre dans `localStorage`.
+- Appele dans `saveCart` (avant le dispatch) et dans les deux branches de `loadCart` (invites et connectes), chacune suivie d'un `dispatchEvent('cartUpdated')` pour que le badge se rafraichisse immediatement au chargement et au login.
+- `BottomNav.jsx` lit desormais `Number(localStorage.getItem('cart_count') || 0)` - pas de JSON.parse, pas de try/catch inutile.
+
+**Fichiers touches :** `src/hooks/useCart.jsx`, `src/components/BottomNav.jsx`
