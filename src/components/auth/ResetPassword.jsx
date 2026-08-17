@@ -16,11 +16,65 @@ export default function ResetPassword() {
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [allowed, setAllowed] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setAllowed(data?.session?.type === "recovery");
+    let resolved = false;
+
+    // Écoute l'événement PASSWORD_RECOVERY émis par Supabase après
+    // vérification du token (qu'il vienne du hash ou des query params)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        resolved = true;
+        setAllowed(true);
+        setChecking(false);
+      }
     });
+
+    // ── Nouveau template email ──────────────────────────────────────────
+    // URL : /reset-password?token_hash=xxx&type=recovery  (query params)
+    const searchParams = new URLSearchParams(window.location.search);
+    const tokenHash = searchParams.get("token_hash");
+    const typeParam = searchParams.get("type");
+
+    if (tokenHash && typeParam === "recovery") {
+      // Échange le token sans créer de session automatique.
+      // Supabase émettra PASSWORD_RECOVERY → le bloc onAuthStateChange prend le relais.
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" })
+        .then(({ error }) => {
+          if (error) {
+            // Token invalide ou expiré
+            resolved = true;
+            setChecking(false);
+            // setAllowed reste false → affiche l'écran "lien invalide"
+          }
+          // En cas de succès, PASSWORD_RECOVERY se déclenche automatiquement
+        });
+      return () => {
+        subscription?.unsubscribe();
+      };
+    }
+
+    // ── Ancien comportement (hash-based) ────────────────────────────────
+    // Conservé pour compatibilité si {{ .ConfirmationURL }} est encore utilisé
+    // URL : /reset-password#access_token=xxx&type=recovery
+    const hashParams = new URLSearchParams(
+      window.location.hash.replace("#", "?")
+    );
+    if (hashParams.get("type") === "recovery") {
+      resolved = true;
+      setAllowed(true);
+    }
+
+    // Délai de sécurité : si aucun signal reçu en 1.5s → lien invalide
+    const timeout = setTimeout(() => {
+      if (!resolved) setChecking(false);
+    }, 1500);
+
+    return () => {
+      subscription?.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const handleUpdate = async (e) => {
@@ -35,6 +89,14 @@ export default function ResetPassword() {
     await supabase.auth.signOut();
     navigate("/password-updated");
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-8">
+        <span className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!allowed) {
     return (
@@ -78,7 +140,6 @@ export default function ResetPassword() {
         )}
 
         <form onSubmit={handleUpdate} className="space-y-4">
-          {/* New password */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t('auth.resetPassword.newPassword')}</label>
             <div className="relative">
@@ -100,7 +161,6 @@ export default function ResetPassword() {
 
           <PasswordStrength password={password} onStrengthChange={setStrength} />
 
-          {/* Confirm password */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t('auth.resetPassword.confirmPassword')}</label>
             <div className="relative">
