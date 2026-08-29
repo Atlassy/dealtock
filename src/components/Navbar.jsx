@@ -542,7 +542,7 @@ const Navbar = () => {
       <div className="h-2"></div>
 
       {isMarketplacePage && (
-        <div className="w-full px-3 pt-1 pb-1">
+        <div className="sticky top-0 z-40 w-full px-3 pt-1 pb-2 bg-gray-50 dark:bg-gray-900 border-b border-gray-200/70 dark:border-gray-700/70">
           {/* Mobile: search bar + search button on one row, filters toggle below */}
           <div className="flex items-center gap-2 w-full">
             <div className="flex-1 relative">
