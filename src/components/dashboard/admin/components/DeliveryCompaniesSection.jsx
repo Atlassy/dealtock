@@ -1,4 +1,4 @@
-﻿// src/components/dashboard/admin/DeliveryCompaniesSection.jsx
+// src/components/dashboard/admin/DeliveryCompaniesSection.jsx
 import React, { useState } from "react";
 import { 
   Truck, Plus, Edit, Trash2, Key, Map, 
@@ -23,7 +23,10 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
   const filteredCompanies = companies.filter(company => {
     const matchesSearch = company.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          company.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || company.status === statusFilter;
+    const matchesStatus =
+      statusFilter === 'all' ||
+      (statusFilter === 'active' && company.is_active) ||
+      (statusFilter === 'inactive' && !company.is_active);
     return matchesSearch && matchesStatus;
   });
 
@@ -62,47 +65,38 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
   const handleSave = async (formData) => {
     try {
       setLoading(true);
-      
+
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        service_type: formData.service_type,
+        base_fee_multiplier: parseFloat(formData.base_fee_multiplier),
+        cod_fee: parseFloat(formData.cod_fee),
+        is_active: formData.is_active,
+        supports_pickup: formData.supports_pickup,
+        supports_tracking: formData.supports_tracking,
+        escrow_enabled: formData.escrow_enabled,
+        base_url: formData.base_url,
+        updated_at: new Date().toISOString()
+      };
+
       if (selectedCompany) {
-        // Update existing
+        // Update existing — api_key is intentionally absent from this payload.
         const { error } = await supabase
           .from('delivery_companies')
-          .update({
-            name: formData.name,
-            email: formData.contact_email,
-            phone: formData.contact_phone,
-            address: formData.address,
-            commission_rate: parseFloat(formData.commission_rate),
-            status: formData.status,
-            escrow_enabled: formData.escrow_enabled,
-            service_type: formData.service_type,
-            base_url: formData.base_url,
-            api_key: formData.api_key,
-            api_secret: formData.api_secret,
-            updated_at: new Date().toISOString()
-          })
+          .update(payload)
           .eq('id', selectedCompany.id);
 
         if (error) throw error;
         toast.success(t('deliveryCompanies.companyUpdated'));
       } else {
-        // Create new
+        // Create new — api_key is intentionally absent; it is generated later via ApiKeysModal.
         const { error } = await supabase
           .from('delivery_companies')
           .insert({
-            name: formData.name,
-            email: formData.contact_email,
-            phone: formData.contact_phone,
-            address: formData.address,
-            commission_rate: parseFloat(formData.commission_rate),
-            status: formData.status,
-            escrow_enabled: formData.escrow_enabled,
-            service_type: formData.service_type,
-            base_url: formData.base_url,
-            api_key: formData.api_key,
-            api_secret: formData.api_secret,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            ...payload,
+            created_at: new Date().toISOString()
           });
 
         if (error) throw error;
@@ -187,7 +181,6 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
             <option value="all">{t('deliveryCompanies.allStatus')}</option>
             <option value="active">{t('deliveryCompanies.active')}</option>
             <option value="inactive">{t('deliveryCompanies.inactive')}</option>
-            <option value="suspended">{t('deliveryCompanies.suspended')}</option>
           </select>
         </div>
       </div>
@@ -201,7 +194,6 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
                 <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.company')}</th>
                 <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.contact')}</th>
                 <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.serviceType')}</th>
-                <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.commission')}</th>
                 <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.escrow')}</th>
                 <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.status')}</th>
                 <th className="text-left p-4 font-medium text-sm text-gray-700 dark:text-gray-300">{t('deliveryCompanies.table.actions')}</th>
@@ -216,15 +208,11 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
                   </td>
                   <td className="p-4">
                     <div className="text-sm text-gray-700 dark:text-gray-300">{company.phone || 'N/A'}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">{company.address || t('deliveryCompanies.table.noAddress')}</div>
                   </td>
                   <td className="p-4">
                     <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                       {company.service_type || 'standard'}
                     </span>
-                  </td>
-                  <td className="p-4 font-medium text-gray-900 dark:text-white">
-                    {company.commission_rate || 10}%
                   </td>
                   <td className="p-4">
                     {company.escrow_enabled ? (
@@ -239,13 +227,11 @@ const DeliveryCompaniesSection = ({ companies, onRefresh, onExport }) => {
                   </td>
                   <td className="p-4">
                     <span className={`px-2 py-1 text-xs rounded-full ${
-                      company.status === 'active'
+                      company.is_active
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                        : company.status === 'inactive'
-                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                        : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                        : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
                     }`}>
-                      {company.status || 'active'}
+                      {company.is_active ? t('deliveryCompanies.active') : t('deliveryCompanies.inactive')}
                     </span>
                   </td>
                   <td className="p-4">
