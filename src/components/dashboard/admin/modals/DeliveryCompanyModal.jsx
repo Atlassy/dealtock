@@ -1,77 +1,51 @@
-﻿// src/components/dashboard/admin/modals/DeliveryCompanyModal.jsx
+// src/components/dashboard/admin/modals/DeliveryCompanyModal.jsx
 import React, { useState, useEffect } from "react";
-import { X, Save, Key, Globe, Mail, Phone, MapPin, Percent } from "lucide-react";
+import { X, Save, Globe, Mail, Phone } from "lucide-react";
 
 const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => {
   const [formData, setFormData] = useState({
     name: '',
-    contact_email: '',
-    contact_phone: '',
-    address: '',
-    commission_rate: '10.00',
-    status: 'active',
-    escrow_enabled: true,
+    email: '',
+    phone: '',
     service_type: 'standard',
-    // API fields
-    base_url: '',
-    api_key: '',
-    api_secret: '',
-    auth_endpoint: '/auth/login',
-    create_endpoint: '/package',
-    tracking_endpoint: '/package/{trackingID}',
-    auth_type: 'apiKey_secretKey',
+    base_fee_multiplier: '1.0',
+    cod_fee: '10',
+    is_active: true,
     supports_pickup: true,
-    supports_tracking: true,
-    supports_cod: true,
-    supports_webhook: false
+    supports_tracking: false,
+    escrow_enabled: true,
+    base_url: ''
   });
 
   useEffect(() => {
     if (company) {
       setFormData({
         name: company.name || '',
-        contact_email: company.email || company.contact_email || '',
-        contact_phone: company.phone || company.contact_phone || '',
-        address: company.address || '',
-        commission_rate: company.commission_rate?.toString() || '10.00',
-        status: company.status || 'active',
-        escrow_enabled: company.escrow_enabled ?? true,
+        email: company.email || '',
+        phone: company.phone || '',
         service_type: company.service_type || 'standard',
-        // API fields
-        base_url: company.base_url || '',
-        api_key: company.api_key || '',
-        api_secret: company.api_secret || '',
-        auth_endpoint: company.auth_endpoint || '/auth/login',
-        create_endpoint: company.create_endpoint || '/package',
-        tracking_endpoint: company.tracking_endpoint || '/package/{trackingID}',
-        auth_type: company.auth_type || 'apiKey_secretKey',
+        base_fee_multiplier: company.base_fee_multiplier?.toString() ?? '1.0',
+        cod_fee: company.cod_fee?.toString() ?? '10',
+        is_active: company.is_active ?? true,
         supports_pickup: company.supports_pickup ?? true,
-        supports_tracking: company.supports_tracking ?? true,
-        supports_cod: company.supports_cod ?? true,
-        supports_webhook: company.supports_webhook ?? false
+        supports_tracking: company.supports_tracking ?? false,
+        escrow_enabled: company.escrow_enabled ?? true,
+        base_url: company.base_url || ''
       });
     } else {
       // Reset for new company
       setFormData({
         name: '',
-        contact_email: '',
-        contact_phone: '',
-        address: '',
-        commission_rate: '10.00',
-        status: 'active',
-        escrow_enabled: true,
+        email: '',
+        phone: '',
         service_type: 'standard',
-        base_url: '',
-        api_key: '',
-        api_secret: '',
-        auth_endpoint: '/auth/login',
-        create_endpoint: '/package',
-        tracking_endpoint: '/package/{trackingID}',
-        auth_type: 'apiKey_secretKey',
+        base_fee_multiplier: '1.0',
+        cod_fee: '10',
+        is_active: true,
         supports_pickup: true,
-        supports_tracking: true,
-        supports_cod: true,
-        supports_webhook: false
+        supports_tracking: false,
+        escrow_enabled: true,
+        base_url: ''
       });
     }
   }, [company]);
@@ -137,60 +111,39 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
               </select>
             </div>
 
-            {/* Contact Email */}
+            {/* Email */}
             <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Contact Email</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                Email <span className="text-red-500 dark:text-red-400">*</span>
+              </label>
               <div className="relative">
                 <Mail className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                 <input
                   type="email"
-                  name="contact_email"
-                  value={formData.contact_email}
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   placeholder="contact@company.com"
+                  required
                 />
               </div>
             </div>
 
-            {/* Contact Phone */}
+            {/* Phone */}
             <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Contact Phone</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Phone</label>
               <div className="relative">
                 <Phone className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                 <input
                   type="tel"
-                  name="contact_phone"
-                  value={formData.contact_phone}
+                  name="phone"
+                  value={formData.phone}
                   onChange={handleChange}
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   placeholder="+212 6XX XXX XXX"
                 />
               </div>
-            </div>
-
-            {/* Address */}
-            <div className="col-span-2">
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Address</label>
-              <div className="relative">
-                <MapPin className="w-4 h-4 absolute left-3 top-3 text-gray-400 dark:text-gray-500" />
-                <textarea
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
-                  rows="2"
-                  placeholder="123 Main St, Casablanca, Morocco"
-                />
-              </div>
-            </div>
-
-            {/* API Configuration Section */}
-            <div className="col-span-2 border-t border-gray-200 dark:border-gray-700 pt-4 mt-2">
-              <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
-                <Key className="w-4 h-4" />
-                API Configuration
-              </h4>
             </div>
 
             {/* Base URL */}
@@ -209,28 +162,40 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
               </div>
             </div>
 
-            {/* API Key & Secret */}
+            {/* Base Fee Multiplier */}
             <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">API Key</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Base Fee Multiplier</label>
               <input
-                type="text"
-                name="api_key"
-                value={formData.api_key}
+                type="number"
+                step="0.01"
+                min="0"
+                name="base_fee_multiplier"
+                value={formData.base_fee_multiplier}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg font-mono"
-                placeholder="your-api-key"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
+                placeholder="1.0"
               />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Multiplies the base delivery fee for this carrier (1.0 = no change)
+              </p>
             </div>
+
+            {/* COD Fee */}
             <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">API Secret</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">COD Fee (MAD)</label>
               <input
-                type="text"
-                name="api_secret"
-                value={formData.api_secret}
+                type="number"
+                step="0.01"
+                min="0"
+                name="cod_fee"
+                value={formData.cod_fee}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg font-mono"
-                placeholder="your-api-secret"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
+                placeholder="10"
               />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Additional fee charged to the customer for Cash on Delivery orders. Use 0 if this partner does not charge extra for COD.
+              </p>
             </div>
 
             {/* Supported Features */}
@@ -257,115 +222,27 @@ const DeliveryCompanyModal = ({ isOpen, onClose, company, onSave, loading }) => 
                   />
                   <span className="text-sm text-gray-700 dark:text-gray-300">Tracking</span>
                 </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="supports_cod"
-                    checked={formData.supports_cod}
-                    onChange={handleChange}
-                    className="rounded"
-                  />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Cash on Delivery</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="supports_webhook"
-                    checked={formData.supports_webhook}
-                    onChange={handleChange}
-                    className="rounded"
-                  />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Webhook</span>
-                </label>
               </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                Cash on Delivery is a mandatory acceptance criterion for all Dealtock delivery partners and is not configurable here.
+              </p>
             </div>
 
-            {/* Advanced API Configuration */}
+            {/* Active */}
             <div className="col-span-2">
-              <details className="text-sm border border-gray-300 dark:border-gray-600 rounded-lg p-3">
-                <summary className="cursor-pointer text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium">
-                  Advanced API Configuration
-                </summary>
-                <div className="mt-3 space-y-3">
-                  <div>
-                    <label className="block text-xs mb-1 text-gray-600 dark:text-gray-400">Auth Endpoint</label>
-                    <input
-                      type="text"
-                      name="auth_endpoint"
-                      value={formData.auth_endpoint}
-                      onChange={handleChange}
-                      className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs mb-1 text-gray-600 dark:text-gray-400">Create Endpoint</label>
-                    <input
-                      type="text"
-                      name="create_endpoint"
-                      value={formData.create_endpoint}
-                      onChange={handleChange}
-                      className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs mb-1 text-gray-600 dark:text-gray-400">Tracking Endpoint</label>
-                    <input
-                      type="text"
-                      name="tracking_endpoint"
-                      value={formData.tracking_endpoint}
-                      onChange={handleChange}
-                      className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm"
-                      placeholder="/package/{trackingID}"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs mb-1 text-gray-600 dark:text-gray-400">Auth Type</label>
-                    <select
-                      name="auth_type"
-                      value={formData.auth_type}
-                      onChange={handleChange}
-                      className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm"
-                    >
-                      <option value="apiKey_secretKey">API Key + Secret</option>
-                      <option value="bearer_token">Bearer Token Only</option>
-                      <option value="oauth2">OAuth2</option>
-                    </select>
-                  </div>
-                </div>
-              </details>
-            </div>
-
-            {/* Commission Rate */}
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Commission Rate (%)</label>
-              <div className="relative">
-                <Percent className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+              <label className="flex items-center space-x-2 cursor-pointer">
                 <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max="100"
-                  name="commission_rate"
-                  value={formData.commission_rate}
+                  type="checkbox"
+                  name="is_active"
+                  checked={formData.is_active}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
+                  className="rounded text-blue-600"
                 />
-              </div>
-            </div>
-
-            {/* Status */}
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Status</label>
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="suspended">Suspended</option>
-              </select>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">Active</span>
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-6">
+                Inactive partners are excluded from delivery selection and cannot authenticate webhook calls.
+              </p>
             </div>
 
             {/* Escrow Enabled */}
