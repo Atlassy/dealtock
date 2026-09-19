@@ -1,7 +1,9 @@
+```jsx
 // src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+
 import ForgotPassword from "./components/auth/ForgotPassword";
 import ResetPassword from "./components/auth/ResetPassword";
 import EmailConfirmation from "./components/auth/EmailConfirmation";
@@ -9,26 +11,33 @@ import CheckEmail from "./components/auth/CheckEmail";
 import PasswordUpdated from "./components/auth/PasswordUpdated";
 import Login from "./components/auth/login";
 import SignUpForm from "./components/auth/SignUpForm";
+
 import Dashboard from "./components/dashboard/Dashboard";
 import ProfilePage from "./components/ProfilePage";
 import MyOrders from "./components/MyOrders";
 import Navbar from "./components/Navbar";
+
 import MarketplacePage from "./components/marketplace/MarketplacePage";
 import CartPage from "./components/marketplace/CartPage";
+
 import Inventory from "./components/dashboard/seller/Inventory";
-import { Toaster } from "sonner";
+
+// Admin components
+import ProductListingManagement from "./components/dashboard/admin/products/ProductListingManagement";
 
 // Dropshipper components
 import DropshipperOrders from "./components/dashboard/dropshipper/DropshipperOrders";
 import DropshipperCustomersPage from "./components/dashboard/dropshipper/DropshipperCustomersPage";
 import DropshipperEarningsPage from "./components/dashboard/dropshipper/DropshipperEarningsPage";
 
+import { Toaster } from "sonner";
+
 export default function App() {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center text-gray-600">
+      <div className="h-screen flex items-center justify-center text-gray-600 dark:text-gray-300">
         Loading...
       </div>
     );
@@ -37,105 +46,203 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <Toaster richColors position="top-right" />
-      
+
       {/* Unified Navbar - Shows for all users */}
       <Navbar />
 
-      {/* Main content - NO pt-16 needed since navbar is not fixed */}
-      <div className={user ? 'pl-16' : ''}>
+      {/* Main application content */}
+      <div className={user ? "pl-16" : ""}>
         <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<MarketplacePage />} />
-          <Route path="/marketplace" element={<MarketplacePage />} />
-          <Route path="/cart" element={<CartPage />} />
-          
-          {/* Auth routes */}
-          <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
-          <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <SignUpForm />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/check-email" element={<CheckEmail />} />
-          <Route path="/password-updated" element={<PasswordUpdated />} />
-          <Route path="/email-confirmation" element={<EmailConfirmation />} />
 
-          {/* Protected routes */}
+          {/* =============================================================== */}
+          {/* PUBLIC ROUTES                                                    */}
+          {/* =============================================================== */}
+
+          <Route
+            path="/"
+            element={<MarketplacePage />}
+          />
+
+          <Route
+            path="/marketplace"
+            element={<MarketplacePage />}
+          />
+
+          <Route
+            path="/cart"
+            element={<CartPage />}
+          />
+
+          {/* =============================================================== */}
+          {/* AUTH ROUTES                                                      */}
+          {/* =============================================================== */}
+
+          <Route
+            path="/login"
+            element={
+              user ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Login />
+              )
+            }
+          />
+
+          <Route
+            path="/signup"
+            element={
+              user ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <SignUpForm />
+              )
+            }
+          />
+
+          <Route
+            path="/forgot-password"
+            element={<ForgotPassword />}
+          />
+
+          <Route
+            path="/reset-password"
+            element={<ResetPassword />}
+          />
+
+          <Route
+            path="/check-email"
+            element={<CheckEmail />}
+          />
+
+          <Route
+            path="/password-updated"
+            element={<PasswordUpdated />}
+          />
+
+          <Route
+            path="/email-confirmation"
+            element={<EmailConfirmation />}
+          />
+
+          {/* =============================================================== */}
+          {/* GENERAL PROTECTED ROUTES                                         */}
+          {/* =============================================================== */}
+
           <Route
             path="/dashboard/*"
             element={
               <ProtectedRoute>
-                <div className="pl-16">
-                  <Dashboard />
-                </div>
+                <Dashboard />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/inventory"
             element={
               <ProtectedRoute>
-                <div className="pl-16">
-                  <Inventory />
-                </div>
+                <Inventory />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/profile"
             element={
               <ProtectedRoute>
-                <div className="pl-16">
-                  <ProfilePage />
-                </div>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/my-orders"
             element={
               <ProtectedRoute>
-                <div className="pl-16">
-                  <MyOrders />
-                </div>
+                <MyOrders />
               </ProtectedRoute>
             }
           />
 
-          {/* Dropshipper Routes */}
+          {/* =============================================================== */}
+          {/* ADMIN ROUTES                                                     */}
+          {/* =============================================================== */}
+
+          {/* Admin Product Listing Management
+              Route used by:
+              Navbar -> Products / Inventory
+                    -> Approve Product Listing
+          */}
+          <Route
+            path="/admin/products/approve"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <ProductListingManagement />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Optional parent route.
+              Prevents /admin/products from becoming a dead route. */}
+          <Route
+            path="/admin/products"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <Navigate
+                  to="/admin/products/approve"
+                  replace
+                />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* =============================================================== */}
+          {/* DROPSHIPPER ROUTES                                               */}
+          {/* =============================================================== */}
+
           <Route
             path="/dropshipper/orders"
             element={
               <ProtectedRoute requiredRole="dropshipper">
-                <div className="pl-16">
-                  <DropshipperOrders dropshipperId={user?.id} />
-                </div>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dropshipper/customers"
-            element={
-              <ProtectedRoute requiredRole="dropshipper">
-                <div className="pl-16">
-                  <DropshipperCustomersPage dropshipperId={user?.id} />
-                </div>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dropshipper/earnings"
-            element={
-              <ProtectedRoute requiredRole="dropshipper">
-                <div className="pl-16">
-                  <DropshipperEarningsPage dropshipperId={user?.id} />
-                </div>
+                <DropshipperOrders dropshipperId={user?.id} />
               </ProtectedRoute>
             }
           />
 
-          {/* Catch-all route */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route
+            path="/dropshipper/customers"
+            element={
+              <ProtectedRoute requiredRole="dropshipper">
+                <DropshipperCustomersPage
+                  dropshipperId={user?.id}
+                />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dropshipper/earnings"
+            element={
+              <ProtectedRoute requiredRole="dropshipper">
+                <DropshipperEarningsPage
+                  dropshipperId={user?.id}
+                />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* =============================================================== */}
+          {/* CATCH-ALL                                                        */}
+          {/* =============================================================== */}
+
+          <Route
+            path="*"
+            element={<Navigate to="/" replace />}
+          />
+
         </Routes>
       </div>
     </div>
   );
 }
+```
