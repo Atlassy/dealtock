@@ -1,5 +1,3 @@
-```jsx
-// src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -53,25 +51,15 @@ export default function App() {
       {/* Main application content */}
       <div className={user ? "pl-16" : ""}>
         <Routes>
-
           {/* =============================================================== */}
           {/* PUBLIC ROUTES                                                    */}
           {/* =============================================================== */}
 
-          <Route
-            path="/"
-            element={<MarketplacePage />}
-          />
+          <Route path="/" element={<MarketplacePage />} />
 
-          <Route
-            path="/marketplace"
-            element={<MarketplacePage />}
-          />
+          <Route path="/marketplace" element={<MarketplacePage />} />
 
-          <Route
-            path="/cart"
-            element={<CartPage />}
-          />
+          <Route path="/cart" element={<CartPage />} />
 
           {/* =============================================================== */}
           {/* AUTH ROUTES                                                      */}
@@ -80,22 +68,14 @@ export default function App() {
           <Route
             path="/login"
             element={
-              user ? (
-                <Navigate to="/dashboard" replace />
-              ) : (
-                <Login />
-              )
+              user ? <Navigate to="/dashboard" replace /> : <Login />
             }
           />
 
           <Route
             path="/signup"
             element={
-              user ? (
-                <Navigate to="/dashboard" replace />
-              ) : (
-                <SignUpForm />
-              )
+              user ? <Navigate to="/dashboard" replace /> : <SignUpForm />
             }
           />
 
@@ -169,9 +149,9 @@ export default function App() {
           {/* =============================================================== */}
 
           {/* Admin Product Listing Management
-              Route used by:
-              Navbar -> Products / Inventory
-                    -> Approve Product Listing
+              Navbar:
+              Products / Inventory
+                -> Approve Product Listing
           */}
           <Route
             path="/admin/products/approve"
@@ -182,8 +162,7 @@ export default function App() {
             }
           />
 
-          {/* Optional parent route.
-              Prevents /admin/products from becoming a dead route. */}
+          {/* Parent route redirects to the product listing management page */}
           <Route
             path="/admin/products"
             element={
@@ -213,9 +192,7 @@ export default function App() {
             path="/dropshipper/customers"
             element={
               <ProtectedRoute requiredRole="dropshipper">
-                <DropshipperCustomersPage
-                  dropshipperId={user?.id}
-                />
+                <DropshipperCustomersPage dropshipperId={user?.id} />
               </ProtectedRoute>
             }
           />
@@ -224,9 +201,7 @@ export default function App() {
             path="/dropshipper/earnings"
             element={
               <ProtectedRoute requiredRole="dropshipper">
-                <DropshipperEarningsPage
-                  dropshipperId={user?.id}
-                />
+                <DropshipperEarningsPage dropshipperId={user?.id} />
               </ProtectedRoute>
             }
           />
@@ -239,10 +214,8 @@ export default function App() {
             path="*"
             element={<Navigate to="/" replace />}
           />
-
         </Routes>
       </div>
     </div>
   );
 }
-```
