@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/SupabaseAuthContext';
 import { useTranslation } from 'react-i18next';
 import { useNotifications } from '../hooks/useNotifications';
 import NotificationBell from './notifications/NotificationBell';
+import ProductListingManagement from "./components/dashboard/admin/products/ProductListingManagement";
 import { 
   Menu, ShoppingBag, Package, LayoutDashboard, User, LogOut,
   Search, Globe, ChevronDown, ChevronLeft, ChevronRight,
